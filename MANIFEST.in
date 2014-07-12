@@ -1,0 +1,3 @@
+include README
+include rttools/data/receivers.csv
+recursive-include src *.py
