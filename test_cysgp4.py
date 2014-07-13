@@ -52,4 +52,29 @@ dt.set_datetime(datetime.now())
 
 eci = cysgp4.PyEci(cysgp4.PyDateTime(datetime.now()), cysgp4.PyObserver().location)
 
+# -----------------------------------
+import cysgp4
+from datetime import datetime
+from ralib.cyastrometry import astrometry
+from ralib.astrometry import satellite_from_tle
 
+sO = satellite_from_tle.satelliteObserver()
+
+def get_azel_from_tle(tle_string, mjd):
+    tle_name, tle_line1, tle_line2 = tle_string.split('\n')
+    eff_observer = cysgp4.PyObserver()
+    tle = cysgp4.PyTle(tle_name, tle_line1, tle_line2)
+    mysat = cysgp4.Satellite(tle, eff_observer)
+    res = mysat.topo_pos(mjd)
+    return tle_name, res.azimuth, res.elevation
+
+
+TLEstring = """ISS
+1 25544U 98067A   14191.54936479  .00016717  00000-0  10270-3 0  9011
+2 25544  51.6452 343.7596 0003472 238.6843 121.3969 15.50506927 14952"""
+mjdnow = astrometry.astrometry().current_mjd()
+sO.obtainAzElFromTLE(TLEstring, mjdnow)
+get_azel_from_tle(TLEstring, mjdnow)
+
+#% timeit -r 3 -n 3 sO.obtainAzElFromTLE(TLEstring, mjdnow)
+#% timeit -r 3 -n 3 get_azel_from_tle(TLEstring, mjdnow)

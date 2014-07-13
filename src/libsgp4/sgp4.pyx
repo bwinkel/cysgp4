@@ -25,6 +25,9 @@
 #  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 # ####################################################################
 
+#!python
+#cython: cdivision=True, embedsignature=True, boundscheck=False, wraparound=False
+
 
 from sgp4 cimport *
 from cython.operator cimport dereference as deref, address as addr, preincrement as inc
@@ -313,7 +316,7 @@ cdef class Satellite(object):
     cdef object _tle, _observer, _dt
 
     cdef double _mjd
-    cdef python_bool _pos_dirty
+    cdef python_bool _pos_dirty, _tle_dirty
 
     def __cinit__(self, PyTle tle, PyObserver observer=None):
         """Constructs a new Satellite object from given TLE, if observer is None,
@@ -321,7 +324,12 @@ cdef class Satellite(object):
 
         self._tle = tle  # copy reference
         self._observer= observer
-        self.sgp4_ptr = new SGP4(deref((<PyTle> tle).thisptr))
+        try:
+            self.sgp4_ptr = new SGP4(deref((<PyTle> tle).thisptr))
+            self._tle_dirty = <python_bool> False
+        except:
+            print 'SatelliteException catched'
+            self._tle_dirty = <python_bool> True
         self._dt = PyDateTime()  # empty datetime
         self.eci_ptr = new Eci(DateTime(), CoordGeodetic())  # empty Eci, otherwise
         # we cannot assign in _refresh_coords (segfault)
@@ -360,21 +368,31 @@ cdef class Satellite(object):
         self.set_new_mjd(mjd)
         if self._pos_dirty:
             self._refresh_coords()
+        if self._tle_dirty:
+            return None
         return self._pytopo
 
     def geo_pos(self, double mjd):
         self.set_new_mjd(mjd)
         if self._pos_dirty:
             self._refresh_coords()
+        if self._tle_dirty:
+            return None
         return self._pygeo
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.cdivision(True)
     def _refresh_coords(self):
-        self.eci_ptr[0] = self.sgp4_ptr.FindPosition(
+        try:
+            self.eci_ptr[0] = self.sgp4_ptr.FindPosition(
             deref((<PyDateTime> self._dt).thisptr)
             )
+            self._tle_dirty = <python_bool> False
+        except:
+            print 'SatelliteException catched'
+            self._tle_dirty = <python_bool> True
+            return
         self._topo = deref(
             (<PyObserver> self._observer).thisptr
             ).GetLookAngle(deref(self.eci_ptr))
