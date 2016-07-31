@@ -1,45 +1,57 @@
-from distutils.core import setup
-from distutils.extension import Extension
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from setuptools import setup
+from setuptools.extension import Extension
 from Cython.Distutils import build_ext
+import numpy
+import platform
+import glob
 
+EX_COMP_ARGS = []
+if 'mac' in platform.system().lower():
+    EX_COMP_ARGS += ['-stdlib=libc++', '-mmacosx-version-min=10.7']
 
-ext_module_cysgp4 = Extension(
-    'cysgp4',
-    [
-        'src/libsgp4/sgp4.pyx',
-        'src/libsgp4/CoordGeodetic.cpp',
-        'src/libsgp4/CoordTopocentric.cpp',
-        'src/libsgp4/DateTime.cpp',
-        'src/libsgp4/Eci.cpp',
-        'src/libsgp4/Globals.cpp',
-        'src/libsgp4/Observer.cpp',
-        'src/libsgp4/OrbitalElements.cpp',
-        'src/libsgp4/SGP4.cpp',
-        'src/libsgp4/SolarPosition.cpp',
-        'src/libsgp4/TimeSpan.cpp',
-        'src/libsgp4/Tle.cpp',
-        'src/libsgp4/Util.cpp',
-        'src/libsgp4/Vector.cpp',
-        ],
+CPPSOURCES = glob.glob('cextern/sgp4-05d8cc2fc596/libsgp4/*.cpp')
+# print(cppsources)
+
+SGP_EXT = Extension(
+    'cysgp4.cysgp4',
+    ['cysgp4/cysgp4.pyx'] + CPPSOURCES,
+    extra_compile_args=['-O3'] + EX_COMP_ARGS,
+    # extra_link_args=['-fopenmp'],
     language='c++',
-    extra_compile_args=['-O2']
-    #extra_compile_args=['-fopenmp','-O3'],
-    #extra_link_args=['-fopenmp'],
-    #libraries=['m'],
+    include_dirs=[
+        numpy.get_include(),
+        'cysgp4/',
+        'cextern/sgp4-05d8cc2fc596/libsgp4/'
+        # 'cextern/deprecated/'
+    ]
 )
 
-
 setup(
-    name = 'cysgp4',
-    version = '0.1',
-    description = 'cysgp4',
-    author = 'Benjamin Winkel',
-    author_email = 'bwinkel@mpifr.de',
-    url = 'http://www.astro.uni-bonn.de/~bwinkel',
-    cmdclass = {'build_ext': build_ext},
-    ext_modules = [ext_module_cysgp4],
-    #package_data = {'ralib' : ['rttools/data/receivers.csv', 'rttools/data/horizons.txt'] },
-    long_description = """cysgp4 ... Cython-powered wrapper of the
+    name='cysgp4',
+    version='0.1.0',
+    author='Benjamin Winkel',
+    author_email='bwinkel@mpifr.de',
+    description=(
+        'cysgp4: a wrapper around the SGP4 package, for sat TLE calculations'
+        ),
+    long_description='''cysgp4 ... Cython-powered wrapper of the
     sgp4lib (Daniel Warner) library to compute satellite positions
-    from two-line elements (TLE)."""
-) 
+    from two-line elements (TLE).''',
+    install_requires=[
+        'setuptools',
+        'cython>=0.20.2',
+        'numpy>=1.8',
+        # 'astropy>=1.0',
+    ],
+    packages=['cysgp4'],
+    cmdclass={'build_ext': build_ext},
+    ext_modules=[
+        SGP_EXT,
+    ],
+    # url='https://github.com/bwinkel/cyaatm/',
+    # download_url='https://github.com/bwinkel/cyaatm/tarball/0.1.0',
+    # keywords=['astronomy']
+)

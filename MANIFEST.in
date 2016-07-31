@@ -1,3 +1,7 @@
-include README
-include rttools/data/receivers.csv
-recursive-include src *.py
+recursive-include cextern/sgp4-05d8cc2fc596/libsgp4/ *.cpp
+recursive-include cextern/sgp4-05d8cc2fc596/libsgp4/ *.h
+recursive-include cysgp4 *.pyx
+recursive-include cysgp4 *.pxd
+recursive-include cysgp4 *.py
+exclude .gitignore .git build
+include COPYING README.md MANIFEST.in setup.cfg pip-requirements
