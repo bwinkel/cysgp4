@@ -40,13 +40,13 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 cimport cython
-from .cysgp4 cimport *
 from cython.operator cimport dereference as deref
 from cython.operator cimport address as addr
 from cython.operator cimport preincrement as inc
 from cpython cimport bool as python_bool
 from libcpp cimport bool as cpp_bool
 from libc.math cimport M_PI, floor, fabs
+from .cysgp4 cimport *
 
 from datetime import datetime
 
@@ -177,13 +177,25 @@ cdef class PyDateTime(object):
             <int> hour, <int> minute, <int> second, <int> microsecond
             )
 
+    @property
+    def ticks(self):
+        return <long long> self.thisptr.Ticks()
+
     def __str__(self):
 
-        return self.thisptr.ToString()
+        return self.thisptr.ToString().decode('UTF-8')
 
     def __repr__(self):
 
         return '<PyDateTime: ' + self.__str__() + '>'
+
+    def gmst(self):
+
+        return self.thisptr.ToGreenwichSiderealTime()
+
+    def lmst(self, obslon_deg):
+
+        return self.thisptr.ToLocalMeanSiderealTime(DEG2RAD * obslon_deg)
 
 
 cdef class PyTle(object):
@@ -211,11 +223,11 @@ cdef class PyTle(object):
 
     def __str__(self):
 
-        return self.thisptr.ToString()
+        return self.thisptr.ToString().decode('UTF-8')
 
     def __repr__(self):
 
-        return '<PyTle: ' + self.thisptr.Name() + '>'
+        return '<PyTle: ' + self.thisptr.Name().decode('UTF-8') + '>'
 
 
 cdef class PyCoordGeodetic(object):
@@ -228,9 +240,9 @@ cdef class PyCoordGeodetic(object):
 
     def __init__(
             self,
-            double longitude_deg=0,
-            double latitude_deg=0,
-            double altitude_km=0
+            double lon_deg=0,
+            double lat_deg=0,
+            double alt_km=0
             ):
         '''
         Constructor PyCoordGeodetic(
@@ -239,9 +251,9 @@ cdef class PyCoordGeodetic(object):
         '''
 
         self.thisptr = new CoordGeodetic()
-        self.longitude = longitude_deg
-        self.latitude = latitude_deg
-        self.altitude = altitude_km
+        self.lon = lon_deg
+        self.lat = lat_deg
+        self.alt = alt_km
 
     def __dealloc__(self):
 
@@ -250,9 +262,9 @@ cdef class PyCoordGeodetic(object):
     def __str__(self):
 
         return ', '.join([
-            '{:.4f}d'.format(self.longitude),
-            '{:.4f}d'.format(self.latitude),
-            '{:.4f}km'.format(self.altitude),
+            '{:.4f}d'.format(self.lon),
+            '{:.4f}d'.format(self.lat),
+            '{:.4f}km'.format(self.alt),
             ])
 
     def __repr__(self):
@@ -283,9 +295,9 @@ cdef class PyCoordGeodetic(object):
 
         self.thisptr.altitude = alt_km
 
-    longitude = property(_get_lon, _set_lon, None)
-    latitude = property(_get_lat, _set_lat, None)
-    altitude = property(_get_alt, _set_alt, None)
+    lon = property(_get_lon, _set_lon, None)
+    lat = property(_get_lat, _set_lat, None)
+    alt = property(_get_alt, _set_alt, None)
 
 
 cdef class PyCoordTopocentric(object):
@@ -298,10 +310,10 @@ cdef class PyCoordTopocentric(object):
 
     def __init__(
             self,
-            double azimuth_deg=0,
-            double elevation_deg=0,
-            double distance_km=0,
-            double distance_rate_km_per_s=0,
+            double az_deg=0,
+            double el_deg=0,
+            double dist_km=0,
+            double dist_rate_km_per_s=0,
             ):
         '''
         Constructor PyCoordTopocentric(
@@ -311,10 +323,10 @@ cdef class PyCoordTopocentric(object):
         '''
 
         self.thisptr = new CoordTopocentric()
-        self.azimuth = azimuth_deg
-        self.elevation = elevation_deg
-        self.distance = distance_km
-        self.distance_rate = distance_rate_km_per_s
+        self.az = az_deg
+        self.el = el_deg
+        self.dist = dist_km
+        self.dist_rate = dist_rate_km_per_s
 
     def __dealloc__(self):
 
@@ -323,10 +335,10 @@ cdef class PyCoordTopocentric(object):
     def __str__(self):
 
         return ', '.join([
-            '{:.4f}d'.format(self.azimuth),
-            '{:.4f}d'.format(self.elevation),
-            '{:.4f}km'.format(self.distance),
-            '{:.4f}km/s'.format(self.distance_rate),
+            '{:.4f}d'.format(self.az),
+            '{:.4f}d'.format(self.el),
+            '{:.4f}km'.format(self.dist),
+            '{:.4f}km/s'.format(self.dist_rate),
             ])
 
     def __repr__(self):
@@ -365,10 +377,10 @@ cdef class PyCoordTopocentric(object):
 
         self.thisptr.distance_rate = dist_rate_km_per_s
 
-    azimuth = property(_get_az, _set_az, None)
-    elevation = property(_get_el, _set_el, None)
-    distance = property(_get_dist, _set_dist, None)
-    distance_rate = property(_get_dist_rate, _set_dist_rate, None)
+    az = property(_get_az, _set_az, None)
+    el = property(_get_el, _set_el, None)
+    dist = property(_get_dist, _set_dist, None)
+    dist_rate = property(_get_dist_rate, _set_dist_rate, None)
 
 
 cdef class PyObserver(object):
@@ -383,18 +395,18 @@ cdef class PyObserver(object):
 
     def __init__(
             self,
-            double longitude_deg=6.883750,
-            double latitude_deg=50.525,
-            double altitude_km=0.319
+            double lon_deg=6.883750,
+            double lat_deg=50.525,
+            double alt_km=0.319
             ):
         '''
         Constructor PyObserver(double lon_deg, double lat_deg, double alt_km)
         '''
 
         self._obs_loc = PyCoordGeodetic(
-            longitude_deg=longitude_deg,
-            latitude_deg=latitude_deg,
-            altitude_km=altitude_km
+            lon_deg=lon_deg,
+            lat_deg=lat_deg,
+            alt_km=alt_km
             )
         self.thisptr = new Observer(deref(self._obs_loc.thisptr))
 
@@ -457,20 +469,40 @@ cdef class PyEci(object):
 
     def __str__(self):
 
-        return self._geo_loc.__str__() + ' ' + self._dt.__str__()
+        return self._get_geo_loc().__str__() + ' ' + self._get_dt().__str__()
 
     def __repr__(self):
 
         return '<PyEci: ' + self.__str__() + '>'
 
+    def _get_loc(self):
+
+        cdef:
+            Vector _pos = self.thisptr.Position()
+
+        return _pos.x, _pos.y, _pos.z
+
+    def _get_vel(self):
+
+        cdef:
+            Vector _vel = self.thisptr.Velocity()
+
+        return _vel.x, _vel.y, _vel.z
+
     def _get_geo_loc(self):
 
-        return self._geo_loc
+        _geo_loc = PyCoordGeodetic()
+        _geo_loc.thisptr[0] = self.thisptr.ToGeodetic()
+        return _geo_loc
 
     def _get_dt(self):
 
+        _dt = PyDateTime()
+        _dt.thisptr[0] = self.thisptr.GetDateTime()
         return self._dt
 
+    loc = property(_get_loc, None, None)
+    vel = property(_get_vel, None, None)
     geo_loc = property(_get_geo_loc, None, None)
     dt = property(_get_dt, None, None)
 
@@ -584,10 +616,24 @@ cdef class Satellite(object):
 
         return self._geo
 
+    def eci_pos(self, double mjd):
+
+        self._set_mjd(mjd)
+
+        if self._pos_dirty:
+            self._refresh_coords()
+
+        if self._tle_dirty:
+            return None
+
+        return self._eci
+
     def _refresh_coords(self):
 
         try:
 
+            # FindPosition doesn't update ECI time, need to do manually :-/
+            self._eci = PyEci(dt=self._dt)
             self._eci.thisptr[0] = self.sgp4_ptr.FindPosition(
                 deref(self._dt.thisptr)
                 )

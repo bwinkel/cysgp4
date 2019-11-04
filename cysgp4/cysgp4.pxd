@@ -74,6 +74,20 @@ cdef extern from 'Observer.h':
         CoordGeodetic GetLocation() const
 
 
+cdef extern from 'Vector.h':
+
+    cdef cppclass Vector:
+
+        Vector() except +
+        Vector(
+            const double arg_x, const double arg_y, const double arg_z
+            ) except +
+
+        double x
+        double y
+        double z
+
+
 cdef extern from 'DateTime.h':
 
     cdef cppclass DateTime:
@@ -83,6 +97,8 @@ cdef extern from 'DateTime.h':
             int year, int month, int day,
             int hour, int minute, int second, int microsecond
             )
+        double ToGreenwichSiderealTime() const
+        double ToLocalMeanSiderealTime(const double lon) const
         string ToString() const
         long long Ticks() const
 
@@ -101,6 +117,8 @@ cdef extern from 'Eci.h':
         Eci(const DateTime& dt, const CoordGeodetic& geo) except +
         DateTime GetDateTime() const
         CoordGeodetic ToGeodetic() const
+        Vector Position() const
+        Vector Velocity() const
 
 
 cdef extern from 'CoordTopocentric.h':
