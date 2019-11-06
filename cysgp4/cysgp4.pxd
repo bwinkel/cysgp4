@@ -93,14 +93,16 @@ cdef extern from 'DateTime.h':
     cdef cppclass DateTime:
 
         DateTime() except +
+        DateTime(unsigned long long ticks) nogil except +
         void Initialise(
             int year, int month, int day,
             int hour, int minute, int second, int microsecond
-            )
+            ) nogil
         double ToGreenwichSiderealTime() const
         double ToLocalMeanSiderealTime(const double lon) const
         string ToString() const
-        long long Ticks() const
+        DateTime AddTicks(long long ticks) nogil const
+        long long Ticks() nogil const
 
     # how to wrap static c++ member functions???
     # cdef DateTime_Now 'DateTime::Now' (bool microseconds)

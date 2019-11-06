@@ -62,6 +62,9 @@ SGP_EXT = Extension(
     **get_compile_args()
     )
 
+for e in [SGP_EXT]:
+    e.cython_directives = {'language_level': "3"}  # all are Python-3
+
 
 setup(
     name='cysgp4',

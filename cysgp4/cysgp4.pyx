@@ -135,17 +135,28 @@ cdef class PyDateTime(object):
     # hold the C++ instance, which we're wrapping
     cdef DateTime *thisptr
 
-    def __init__(self, object dt=None):
+    def __init__(self, object dt=None, init=True):
         '''
         Constructor PyDateTime(datetime dt)
         '''
 
-        self.thisptr = new DateTime()
-        self.set_datetime(dt)
+        self.thisptr = new DateTime(0)
+        if init:
+            self.set_datetime(dt)
 
     def __dealloc__(self):
 
         del self.thisptr
+
+    @classmethod
+    def from_ticks(cls, unsigned long long ticks):
+
+        dt = cls(dt=None, init=False)
+        print(dt.ticks)
+        dt.ticks = ticks
+        print(dt.ticks)
+
+        return dt
 
     def set_datetime(self, object dt=None):
         '''
@@ -177,9 +188,20 @@ cdef class PyDateTime(object):
             <int> hour, <int> minute, <int> second, <int> microsecond
             )
 
-    @property
-    def ticks(self):
+    def _get_ticks(self):
         return <long long> self.thisptr.Ticks()
+
+    def _set_ticks(self, unsigned long long ticks):
+
+        cdef:
+            long long ticks_new = ticks
+            long long ticks_old = self._get_ticks()
+
+        print('_set_ticks', ticks_new - ticks_old)
+        self.thisptr.AddTicks(ticks_new - ticks_old)
+        print('_set_ticks', self.thisptr.Ticks())
+
+    ticks = property(_get_ticks, _set_ticks, None)
 
     def __str__(self):
 

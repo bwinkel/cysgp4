@@ -40,6 +40,24 @@ class TestPyDateTime:
 
         assert_allclose(t1.lmst(6.88375), 5.07985925)
 
+    def test_ticks(self):
+
+        t1a = PyDateTime(self.dt)
+        t1b = PyDateTime.from_ticks(63681941594000000)
+        dt2 = datetime.datetime(1, 1, 1, 0, 0, 0)  # zero ticks
+        t2a = PyDateTime(dt2)
+        t2b = PyDateTime.from_ticks(0)
+        dt3 = datetime.datetime(1858, 11, 17, 0, 0, 0)  # MJD-0 ticks
+        t3a = PyDateTime(dt3)
+        t3b = PyDateTime.from_ticks(58628880000000000)
+
+        assert t1a.ticks == 63681941594000000
+        assert t1b.ticks == 63681941594000000
+        assert t2a.ticks == 0
+        assert t2b.ticks == 0
+        assert t3a.ticks == 58628880000000000
+        assert t3b.ticks == 58628880000000000
+
 
 class TestPyTle:
 
