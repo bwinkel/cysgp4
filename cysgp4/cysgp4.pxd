@@ -44,19 +44,19 @@ cdef extern from 'Tle.h':
             const string & name,
             const string & line_one,
             const string & line_two
-            ) except +
-        string ToString() const
-        string Name() const
-        string Line1() const
-        string Line2() const
+            ) nogil except +
+        string ToString() nogil const
+        string Name() nogil const
+        string Line1() nogil const
+        string Line2() nogil const
 
 
 cdef extern from 'SGP4.h':
 
     cdef cppclass SGP4:
-        SGP4(const Tle& tle) except +
+        SGP4(const Tle& tle) nogil except +
 
-        Eci FindPosition(const DateTime& date) const
+        Eci FindPosition(const DateTime& date) nogil const
 
 
 cdef extern from 'Observer.h':
@@ -67,21 +67,21 @@ cdef extern from 'Observer.h':
             const double latitude,
             const double longitude,
             const double altitude
-            ) except +
-        Observer(const CoordGeodetic &geo) except +
-        CoordTopocentric GetLookAngle(const Eci &eci)
-        void SetLocation(const CoordGeodetic& geo)
-        CoordGeodetic GetLocation() const
+            ) nogil except +
+        Observer(const CoordGeodetic &geo) nogil except +
+        CoordTopocentric GetLookAngle(const Eci &eci) nogil
+        void SetLocation(const CoordGeodetic& geo) nogil
+        CoordGeodetic GetLocation() nogil const
 
 
 cdef extern from 'Vector.h':
 
     cdef cppclass Vector:
 
-        Vector() except +
+        Vector() nogil except +
         Vector(
             const double arg_x, const double arg_y, const double arg_z
-            ) except +
+            ) nogil except +
 
         double x
         double y
@@ -92,15 +92,15 @@ cdef extern from 'DateTime.h':
 
     cdef cppclass DateTime:
 
-        DateTime() except +
+        DateTime() nogil except +
         DateTime(unsigned long long ticks) nogil except +
         void Initialise(
             int year, int month, int day,
             int hour, int minute, int second, int microsecond
             ) nogil
-        double ToGreenwichSiderealTime() const
-        double ToLocalMeanSiderealTime(const double lon) const
-        string ToString() const
+        double ToGreenwichSiderealTime() nogil const
+        double ToLocalMeanSiderealTime(const double lon) nogil const
+        string ToString() nogil const
         DateTime AddTicks(long long ticks) nogil const
         long long Ticks() nogil const
 
@@ -122,22 +122,22 @@ cdef extern from 'Eci.h':
             const double altitude
             ) nogil except +
         Eci(const DateTime& dt, const CoordGeodetic& geo) nogil except +
-        DateTime GetDateTime() const
-        CoordGeodetic ToGeodetic() const
-        Vector Position() const
-        Vector Velocity() const
+        DateTime GetDateTime() nogil const
+        CoordGeodetic ToGeodetic() nogil const
+        Vector Position() nogil const
+        Vector Velocity() nogil const
 
 
 cdef extern from 'CoordTopocentric.h':
 
     cdef cppclass CoordTopocentric:
 
-        CoordTopocentric() except +
-        CoordTopocentric(const CoordTopocentric& topo) except +
+        CoordTopocentric() nogil except +
+        CoordTopocentric(const CoordTopocentric& topo) nogil except +
         CoordTopocentric(
             double az, double el, double rnge, double rnge_rate
-            ) except +
-        string ToString() const
+            ) nogil except +
+        string ToString() nogil const
         # azimuth in radians
         double azimuth
         # elevations in radians
@@ -153,15 +153,32 @@ cdef extern from 'CoordGeodetic.h':
 
     cdef cppclass CoordGeodetic:
 
-        CoordGeodetic() except +
-        CoordGeodetic(const CoordGeodetic& geo) except +
+        CoordGeodetic() nogil except +
+        CoordGeodetic(const CoordGeodetic& geo) nogil except +
         CoordGeodetic(
             double lat, double lon, double alt, bool is_radians=False
-            ) except +
-        string ToString() const
+            ) nogil except +
+        string ToString() nogil const
         # latitude in radians (-PI >= latitude < PI)
         double latitude
         # latitude in radians (-PI/2 >= latitude <= PI/2)
         double longitude
         # altitude in kilometers
         double altitude
+
+
+# https://stackoverflow.com/questions/51006230/dynamically-sized-array-of-objects-in-cython
+cdef extern from *:
+    """
+    template <typename T>
+    T* array_new(int n) {
+        return new T[n];
+    }
+
+    template <typename T>
+    void array_delete(T* x) {
+        delete [] x;
+    }
+    """
+    T* array_new[T](int)
+    void array_delete[T](T* x)

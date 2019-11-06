@@ -17,6 +17,17 @@ skip_pycraf = pytest.mark.skipif(
     reason='"pycraf" package not installed'
     )
 
+TLE_ISS = (
+    'ISS (ZARYA)',
+    '1 25544U 98067A   13165.59097222  .00004759  00000-0  88814-4 0    47',
+    '2 25544  51.6478 121.2152 0011003  68.5125 263.9959 15.50783143834295',
+    )
+TLE_GPS = (
+    'GPS BIIR-2  (PRN 13)',
+    '1 24876U 97035A   19309.58152857 -.00000011  00000-0  00000+0 0  9996',
+    '2 24876  55.4542 192.9394 0037899  66.9931 293.4794  2.00564219163301',
+    )
+
 
 class TestPyDateTime:
 
@@ -58,18 +69,19 @@ class TestPyDateTime:
         assert t3a.ticks == 58628880000000000
         assert t3b.ticks == 58628880000000000
 
+    def test_from_mjd(self):
+
+        mjd = 56458.123
+        t1 = PyDateTime.from_mjd(mjd)
+
+        assert str(t1) == '2013-06-15 02:57:07.199999 UTC'
+
 
 class TestPyTle:
 
     def setup(self):
 
-        self.tle_tup = (
-            'ISS (ZARYA)',
-            '1 25544U 98067A   13165.59097222  .00004759  00000-0  '
-            '88814-4 0    47',
-            '2 25544  51.6478 121.2152 0011003  68.5125 263.9959 '
-            '15.50783143834295',
-            )
+        self.tle_tup = TLE_ISS
         self.tle1_str = '''Norad Number:         25544
             Int. Designator:      98067A
             Epoch:                2013-06-14 14:10:59.999800 UTC
@@ -170,13 +182,7 @@ class TestSatellite:
 
     def setup(self):
 
-        self.tle_tup = (
-            'ISS (ZARYA)',
-            '1 25544U 98067A   13165.59097222  .00004759  00000-0  '
-            '88814-4 0    47',
-            '2 25544  51.6478 121.2152 0011003  68.5125 263.9959 '
-            '15.50783143834295',
-            )
+        self.tle_tup = TLE_ISS
         self.tle = PyTle(*self.tle_tup)
 
         self.dt_tup = (2013, 6, 15, 2, 57, 7, 200000)
@@ -280,3 +286,74 @@ class TestSatellite:
         assert_allclose(topo_pos.az, az, atol=1e-3)
         assert_allclose(topo_pos.el, el, atol=1e-3)
         assert_allclose(topo_pos.dist, dist, atol=2e-2)
+
+
+def test_propagate_many():
+
+    tles = PyTle(*TLE_ISS)
+    observers = PyObserver(6.88375, 50.525, 0.366)
+    mjds = np.linspace(56458.123, 56459.123, 4)
+    eci_pos, eci_vel, topo_pos = propagate_many(tles, observers, mjds)
+
+    print(eci_pos)
+    print(eci_vel)
+    print(topo_pos)
+    assert_allclose(
+        eci_pos,
+        (
+            np.array([
+                -4728.184444, -1147.648025, 3478.052600, 4540.345522
+                ]),
+            np.array([
+                730.892025, -5164.259228, -5776.901511, -398.376705
+                ]),
+            np.array([
+                4802.515276, 4245.417168, -858.022863, -5052.505474
+                ])
+            ),
+        atol=1.e-5
+        )
+
+    assert_allclose(
+        eci_vel,
+        (
+            np.array([
+                1.530454, 5.324882, 3.719869, -1.505247
+                ]),
+            np.array([
+                -7.065375, -4.172626, 3.104738, 7.243366
+                ]),
+            np.array([
+                2.574385, -3.615363, -5.930719, -1.925367
+                ])
+            ),
+        atol=1.e-5
+        )
+
+    assert_allclose(
+        topo_pos,
+        (
+            np.array([
+                334.789646, 358.119800, 82.269620, 153.995031
+                ]),
+            np.array([
+                -37.384929, -43.467272, -51.326038, -50.639247
+                ]),
+            np.array([
+                8406.367773, 9374.294558, 10485.152119, 10376.500729
+                ]),
+            np.array([
+                -4.351749, 3.058513, 4.306016, 3.230162
+                ])
+            ),
+        atol=1.e-5
+        )
+
+
+def test_propagate_many_broadcast():
+
+    tles = np.array([PyTle(*TLE_ISS), PyTle(*TLE_GPS)])[:, np.newaxis]
+    observers = PyObserver(6.88375, 50.525, 0.366)
+    mjds = np.linspace(56458.123, 56459.123, 4)[np.newaxis, :]
+    eci_pos, eci_vel, topo_pos = propagate_many(tles, observers, mjds)
+    assert eci_pos[0].shape == (2, 4)

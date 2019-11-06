@@ -30,6 +30,15 @@ class Eci
 public:
 
     /**
+     * Added by B. Winkel for cysgp4
+     */
+    Eci()
+        : m_dt(DateTime(0)),
+        m_position(Vector())
+    {
+    }
+
+    /**
      * @param[in] dt the date to be used for this position
      * @param[in] latitude the latitude in degrees
      * @param[in] longitude the longitude in degrees

@@ -40,27 +40,54 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 cimport cython
+from cython.parallel import prange, parallel
+cimport numpy as np
+from numpy cimport PyArray_MultiIter_DATA as Py_Iter_DATA
 from cython.operator cimport dereference as deref
 from cython.operator cimport address as addr
 from cython.operator cimport preincrement as inc
 from cpython cimport bool as python_bool
 from libcpp cimport bool as cpp_bool
-from libc.math cimport M_PI, floor, fabs
+from libc.math cimport M_PI, floor, fabs, fmod
 from .cysgp4 cimport *
 
 from datetime import datetime
+import numpy as np
+
+np.import_array()
 
 
 cdef double DEG2RAD = M_PI / 180.
 cdef double RAD2DEG = 180. / M_PI
 cdef double MJD_RESOLUTION = 0.001 / 24. / 3600.
+cdef long long MJD0_TICKS = 58628880000000000
+
+
+ctypedef SGP4* sgp4_ptr_t
+ctypedef Observer* obs_ptr_t
 
 
 __all__ = [
     'PyDateTime', 'PyTle', 'PyObserver',
     'PyCoordGeodetic', 'PyCoordTopocentric', 'PyEci',
-    'Satellite', 'get_azel_from_tle',
+    'Satellite', 'get_azel_from_tle', 'propagate_many',
     ]
+
+
+cdef inline long long ticks_from_mjd(double mjd) nogil:
+
+    cdef:
+        double days, fdays
+        long long idays
+
+    idays = <long long> mjd
+    fdays = mjd - idays
+
+    return (
+        idays * 86400 * 1000000 +
+        (<long long> (fdays * 86400 * 1000000)) +
+        MJD0_TICKS
+        )
 
 
 cdef void mjd_cal(
@@ -153,6 +180,14 @@ cdef class PyDateTime(object):
 
         dt = cls(dt=None, init=False)
         dt.ticks = ticks
+
+        return dt
+
+    @classmethod
+    def from_mjd(cls, double mjd):
+
+        dt = cls(dt=None, init=False)
+        dt.ticks = ticks_from_mjd(mjd)
 
         return dt
 
@@ -456,6 +491,16 @@ cdef class PyEci(object):
     Wrapper around (C++) Eci class
     '''
 
+    # Note, in order to create an instance of _eci on the stack, a
+    # null constructor needs to be present; have to add the following
+    # to Eci.h:
+
+    #     Eci()
+    #         : m_dt(DateTime(0)),
+    #         m_position(Vector())
+    #     {
+    #     }
+
     cdef:
         # hold the C++ instance, which we're wrapping
         Eci _cobj
@@ -528,7 +573,7 @@ cdef class Satellite(object):
 
     cdef:
         # hold C++ instances, which we're wrapping
-        SGP4 *sgp4_ptr
+        SGP4 *thisptr
 
         PyTle _tle
         PyObserver _observer
@@ -557,7 +602,7 @@ cdef class Satellite(object):
 
         try:
 
-            self.sgp4_ptr = new SGP4(deref(tle.thisptr))
+            self.thisptr = new SGP4(deref(tle.thisptr))
             self._tle_dirty = <python_bool> False
 
         except:
@@ -582,7 +627,7 @@ cdef class Satellite(object):
     def __dealloc__(self):
 
         # del self.eci_ptr
-        del self.sgp4_ptr
+        del self.thisptr
 
     def _get_mjd(self):
 
@@ -648,7 +693,7 @@ cdef class Satellite(object):
 
             # FindPosition doesn't update ECI time, need to do manually :-/
             self._eci = PyEci(dt=self._dt)
-            self._eci._cobj = self.sgp4_ptr.FindPosition(self._dt._cobj)
+            self._eci._cobj = self.thisptr.FindPosition(self._dt._cobj)
             self._tle_dirty = <python_bool> False
 
         except:
@@ -677,6 +722,100 @@ cdef class Satellite(object):
             )
 
         self._dt.initialize(yr, mn, i_dy, i_hh, i_mm, i_ss, i_mus)
+
+
+def propagate_many(tles, observers, mjds):
+
+    cdef:
+
+        SGP4 *_sgp4_ptr
+        Observer *_obs_ptr
+        Eci _eci
+        DateTime _dt
+        CoordTopocentric _topo
+        Vector _eci_pos, _eci_vel
+
+        np.ndarray[double] mjd
+        np.ndarray[object] sat
+        # double[::1] mjd_v
+        # Satellite[::1] sat_v
+        double[::1] eci_x_v, eci_y_v, eci_z_v
+        double[::1] eci_vx_v, eci_vy_v, eci_vz_v
+        double[::1] az_v, el_v, dist_v, dist_rate_v
+        int i, size
+
+        sgp4_ptr_t* _sgp4_ptr_array
+        obs_ptr_t* _obs_ptr_array
+
+    b = np.broadcast(tles, observers)
+    sats = np.empty(b.shape, dtype=object)
+    sats.flat = [Satellite(tle, obs) for (tle, obs) in b]
+
+    it = np.nditer(
+        [sats, mjds] + [None] * 10,
+        flags=['external_loop', 'buffered', 'delay_bufalloc', 'refs_ok'],
+        op_flags=[['readonly']] * 2 + [['readwrite', 'allocate']] * 10,
+        op_dtypes=['object', 'float64'] + ['float64'] * 10
+        )
+
+    # it would be better to use the context manager but
+    # "with it:" requires numpy >= 1.14
+
+    it.reset()
+
+    for itup in it:
+
+        sat = itup[0]
+        mjd = itup[1]
+        eci_x_v = itup[2]
+        eci_y_v = itup[3]
+        eci_z_v = itup[4]
+        eci_vx_v = itup[5]
+        eci_vy_v = itup[6]
+        eci_vz_v = itup[7]
+        az_v = itup[8]
+        el_v = itup[9]
+        dist_v = itup[10]
+        dist_rate_v = itup[11]
+
+        size = mjd.shape[0]
+        _sgp4_ptr_array = array_new[sgp4_ptr_t](size)
+        _obs_ptr_array = array_new[obs_ptr_t](size)
+
+        for i in range(size):
+            # unfortunately, this is not possible in nogil loop
+            _sgp4_ptr_array[i] = (<Satellite> sat[i]).thisptr
+            _obs_ptr_array[i] = (<Satellite> sat[i])._observer.thisptr
+
+        for i in prange(size, nogil=True):
+
+            _sgp4_ptr = _sgp4_ptr_array[i]
+            _obs_ptr = _obs_ptr_array[i]
+
+            # AddTicks returns a new instance...
+            _dt = _dt.AddTicks(ticks_from_mjd(mjd[i]) - _dt.Ticks())
+
+            _eci = _sgp4_ptr.FindPosition(_dt)
+            _topo = _obs_ptr.GetLookAngle(_eci)
+
+            _eci_pos = _eci.Position()
+            _eci_vel = _eci.Velocity()
+            eci_x_v[i] = _eci_pos.x
+            eci_y_v[i] = _eci_pos.y
+            eci_z_v[i] = _eci_pos.z
+            eci_vx_v[i] = _eci_vel.x
+            eci_vy_v[i] = _eci_vel.y
+            eci_vz_v[i] = _eci_vel.z
+            az_v[i] = _topo.azimuth * RAD2DEG
+            el_v[i] = _topo.elevation * RAD2DEG
+            dist_v[i] = _topo.distance
+            dist_rate_v[i] = _topo.distance_rate
+
+        array_delete(_sgp4_ptr_array)
+        array_delete(_obs_ptr_array)
+
+    return it.operands[2:5], it.operands[5:8], it.operands[8:12]
+
 
 
 def get_azel_from_tle(

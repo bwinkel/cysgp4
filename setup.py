@@ -16,7 +16,8 @@ if 'mac' in platform.system().lower():
 def get_compile_args():
 
     comp_args = {
-        'extra_compile_args': ['-O3', '-std=c++11'],
+        'extra_compile_args': ['-fopenmp', '-O3', '-std=c++11'],
+        'extra_link_args': ['-fopenmp'],
         'language': 'c++',
         'include_dirs': [
             numpy.get_include(),
@@ -24,6 +25,10 @@ def get_compile_args():
             'cextern/sgp4-05d8cc2fc596/libsgp4/',
             ],
         }
+
+    if platform.system().lower() == 'windows':
+        comp_args['extra_compile_args'] = ['/openmp']
+        del comp_args['extra_link_args']
 
     if 'darwin' in platform.system().lower():
 
@@ -40,14 +45,16 @@ def get_compile_args():
                 return check_output(s.split())
 
         extra_compile_args = [
-            '-O3', '-std=c++11',
+            '-fopenmp', '-O3', '-std=c++11',
             '-mmacosx-version-min={:s}'.format(mac_version),
             ]
+
         if ('clang' in getoutput('gcc -v')) and all(
                 'command not found' in getoutput('gcc-{:d} -v'.format(d))
                 for d in [6, 7, 8]
                 ):
             extra_compile_args += ['-stdlib=libc++', ]
+
         comp_args['extra_compile_args'] = extra_compile_args
 
     return comp_args
