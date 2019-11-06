@@ -133,28 +133,26 @@ cdef class PyDateTime(object):
     '''
 
     # hold the C++ instance, which we're wrapping
-    cdef DateTime *thisptr
+    cdef DateTime _cobj
 
     def __init__(self, object dt=None, init=True):
         '''
         Constructor PyDateTime(datetime dt)
         '''
 
-        self.thisptr = new DateTime(0)
+        self._cobj = DateTime(0)
         if init:
             self.set_datetime(dt)
 
-    def __dealloc__(self):
+    # def __dealloc__(self):
 
-        del self.thisptr
+    #     del self.thisptr
 
     @classmethod
     def from_ticks(cls, unsigned long long ticks):
 
         dt = cls(dt=None, init=False)
-        print(dt.ticks)
         dt.ticks = ticks
-        print(dt.ticks)
 
         return dt
 
@@ -168,7 +166,7 @@ cdef class PyDateTime(object):
 
         assert isinstance(dt, datetime)
 
-        self.thisptr.Initialise(
+        self._cobj.Initialise(
             <int> dt.year, <int> dt.month, <int> dt.day,
             <int> dt.hour, <int> dt.minute, <int> dt.second,
             <int> dt.microsecond
@@ -183,29 +181,30 @@ cdef class PyDateTime(object):
         Initialize PyDateTime
         '''
 
-        self.thisptr.Initialise(
+        self._cobj.Initialise(
             <int> year, <int> month, <int> day,
             <int> hour, <int> minute, <int> second, <int> microsecond
             )
 
     def _get_ticks(self):
-        return <long long> self.thisptr.Ticks()
+        return <long long> self._cobj.Ticks()
 
     def _set_ticks(self, unsigned long long ticks):
+
+        # this is a bit ugly, but there is to setter method in the C++ code
 
         cdef:
             long long ticks_new = ticks
             long long ticks_old = self._get_ticks()
 
-        print('_set_ticks', ticks_new - ticks_old)
-        self.thisptr.AddTicks(ticks_new - ticks_old)
-        print('_set_ticks', self.thisptr.Ticks())
+        # AddTicks returns a new instance...
+        self._cobj = self._cobj.AddTicks(ticks_new - ticks_old)
 
     ticks = property(_get_ticks, _set_ticks, None)
 
     def __str__(self):
 
-        return self.thisptr.ToString().decode('UTF-8')
+        return self._cobj.ToString().decode('UTF-8')
 
     def __repr__(self):
 
@@ -213,11 +212,11 @@ cdef class PyDateTime(object):
 
     def gmst(self):
 
-        return self.thisptr.ToGreenwichSiderealTime()
+        return self._cobj.ToGreenwichSiderealTime()
 
     def lmst(self, obslon_deg):
 
-        return self.thisptr.ToLocalMeanSiderealTime(DEG2RAD * obslon_deg)
+        return self._cobj.ToLocalMeanSiderealTime(DEG2RAD * obslon_deg)
 
 
 cdef class PyTle(object):
@@ -258,7 +257,7 @@ cdef class PyCoordGeodetic(object):
     '''
 
     # hold the C++ instance, which we're wrapping
-    cdef CoordGeodetic *thisptr
+    cdef CoordGeodetic _cobj
 
     def __init__(
             self,
@@ -272,14 +271,13 @@ cdef class PyCoordGeodetic(object):
             )
         '''
 
-        self.thisptr = new CoordGeodetic()
-        self.lon = lon_deg
-        self.lat = lat_deg
-        self.alt = alt_km
+        self._cobj = CoordGeodetic(
+            lat_deg, lon_deg, alt_km
+            )
 
-    def __dealloc__(self):
+    # def __dealloc__(self):
 
-        del self.thisptr
+    #     del self.thisptr
 
     def __str__(self):
 
@@ -295,27 +293,27 @@ cdef class PyCoordGeodetic(object):
 
     def _get_lon(self):
 
-        return RAD2DEG * self.thisptr.longitude
+        return RAD2DEG * self._cobj.longitude
 
     def _set_lon(self, double lon_deg):
 
-        self.thisptr.longitude = DEG2RAD * lon_deg
+        self._cobj.longitude = DEG2RAD * lon_deg
 
     def _get_lat(self):
 
-        return RAD2DEG * self.thisptr.latitude
+        return RAD2DEG * self._cobj.latitude
 
     def _set_lat(self, double lat_deg):
 
-        self.thisptr.latitude = DEG2RAD * lat_deg
+        self._cobj.latitude = DEG2RAD * lat_deg
 
     def _get_alt(self):
 
-        return self.thisptr.altitude
+        return self._cobj.altitude
 
     def _set_alt(self, double alt_km):
 
-        self.thisptr.altitude = alt_km
+        self._cobj.altitude = alt_km
 
     lon = property(_get_lon, _set_lon, None)
     lat = property(_get_lat, _set_lat, None)
@@ -328,7 +326,7 @@ cdef class PyCoordTopocentric(object):
     '''
 
     # hold the C++ instance, which we're wrapping
-    cdef CoordTopocentric *thisptr
+    cdef CoordTopocentric _cobj
 
     def __init__(
             self,
@@ -344,15 +342,13 @@ cdef class PyCoordTopocentric(object):
             )
         '''
 
-        self.thisptr = new CoordTopocentric()
-        self.az = az_deg
-        self.el = el_deg
-        self.dist = dist_km
-        self.dist_rate = dist_rate_km_per_s
+        self._cobj = CoordTopocentric(
+            az_deg * DEG2RAD, el_deg * DEG2RAD, dist_km, dist_rate_km_per_s
+            )
 
-    def __dealloc__(self):
+    # def __dealloc__(self):
 
-        del self.thisptr
+    #     del self.thisptr
 
     def __str__(self):
 
@@ -369,35 +365,35 @@ cdef class PyCoordTopocentric(object):
 
     def _get_az(self):
 
-        return RAD2DEG * self.thisptr.azimuth
+        return RAD2DEG * self._cobj.azimuth
 
     def _set_az(self, double az_deg):
 
-        self.thisptr.azimuth = DEG2RAD * az_deg
+        self._cobj.azimuth = DEG2RAD * az_deg
 
     def _get_el(self):
 
-        return RAD2DEG * self.thisptr.elevation
+        return RAD2DEG * self._cobj.elevation
 
     def _set_el(self, double el_deg):
 
-        self.thisptr.elevation = DEG2RAD * el_deg
+        self._cobj.elevation = DEG2RAD * el_deg
 
     def _get_dist(self):
 
-        return self.thisptr.distance
+        return self._cobj.distance
 
     def _set_dist(self, double dist_km):
 
-        self.thisptr.distance = dist_km
+        self._cobj.distance = dist_km
 
     def _get_dist_rate(self):
 
-        return self.thisptr.distance_rate
+        return self._cobj.distance_rate
 
     def _set_dist_rate(self, double dist_rate_km_per_s):
 
-        self.thisptr.distance_rate = dist_rate_km_per_s
+        self._cobj.distance_rate = dist_rate_km_per_s
 
     az = property(_get_az, _set_az, None)
     el = property(_get_el, _set_el, None)
@@ -430,7 +426,7 @@ cdef class PyObserver(object):
             lat_deg=lat_deg,
             alt_km=alt_km
             )
-        self.thisptr = new Observer(deref(self._obs_loc.thisptr))
+        self.thisptr = new Observer(self._obs_loc._cobj)
 
     def __dealloc__(self):
 
@@ -450,7 +446,7 @@ cdef class PyObserver(object):
 
     def _set_location(self, PyCoordGeodetic loc):
 
-        self.thisptr.SetLocation(deref(loc.thisptr))
+        self.thisptr.SetLocation(loc._cobj)
 
     location = property(_get_location, _set_location, None)
 
@@ -462,7 +458,7 @@ cdef class PyEci(object):
 
     cdef:
         # hold the C++ instance, which we're wrapping
-        Eci *thisptr
+        Eci _cobj
 
         PyCoordGeodetic _geo_loc
         PyDateTime _dt
@@ -483,11 +479,7 @@ cdef class PyEci(object):
         self._dt = dt
         self._geo_loc = geo_loc
 
-        self.thisptr = new Eci(deref(dt.thisptr), deref(geo_loc.thisptr))
-
-    def __dealloc__(self):
-
-        del self.thisptr
+        self._cobj = Eci(dt._cobj, geo_loc._cobj)
 
     def __str__(self):
 
@@ -500,28 +492,28 @@ cdef class PyEci(object):
     def _get_loc(self):
 
         cdef:
-            Vector _pos = self.thisptr.Position()
+            Vector _pos = self._cobj.Position()
 
         return _pos.x, _pos.y, _pos.z
 
     def _get_vel(self):
 
         cdef:
-            Vector _vel = self.thisptr.Velocity()
+            Vector _vel = self._cobj.Velocity()
 
         return _vel.x, _vel.y, _vel.z
 
     def _get_geo_loc(self):
 
-        _geo_loc = PyCoordGeodetic()
-        _geo_loc.thisptr[0] = self.thisptr.ToGeodetic()
-        return _geo_loc
+        geo_loc = PyCoordGeodetic()
+        geo_loc._cobj = self._cobj.ToGeodetic()
+        return geo_loc
 
     def _get_dt(self):
 
-        _dt = PyDateTime()
-        _dt.thisptr[0] = self.thisptr.GetDateTime()
-        return self._dt
+        dt = PyDateTime()
+        dt._cobj = self._cobj.GetDateTime()
+        return dt
 
     loc = property(_get_loc, None, None)
     vel = property(_get_vel, None, None)
@@ -656,9 +648,7 @@ cdef class Satellite(object):
 
             # FindPosition doesn't update ECI time, need to do manually :-/
             self._eci = PyEci(dt=self._dt)
-            self._eci.thisptr[0] = self.sgp4_ptr.FindPosition(
-                deref(self._dt.thisptr)
-                )
+            self._eci._cobj = self.sgp4_ptr.FindPosition(self._dt._cobj)
             self._tle_dirty = <python_bool> False
 
         except:
@@ -668,10 +658,10 @@ cdef class Satellite(object):
 
             return
 
-        self._topo.thisptr[0] = deref(self._observer.thisptr).GetLookAngle(
-            deref(self._eci.thisptr)
+        self._topo._cobj = deref(self._observer.thisptr).GetLookAngle(
+            self._eci._cobj
             )
-        self._geo.thisptr[0] = self._eci.thisptr.ToGeodetic()
+        self._geo._cobj = self._eci._cobj.ToGeodetic()
 
         self._pos_dirty = <python_bool> False
 

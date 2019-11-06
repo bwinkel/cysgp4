@@ -116,7 +116,12 @@ cdef extern from 'Eci.h':
 
     cdef cppclass Eci:
 
-        Eci(const DateTime& dt, const CoordGeodetic& geo) except +
+        Eci() nogil except +
+        Eci(
+            const DateTime& dt, const double latitude, const double longitude,
+            const double altitude
+            ) nogil except +
+        Eci(const DateTime& dt, const CoordGeodetic& geo) nogil except +
         DateTime GetDateTime() const
         CoordGeodetic ToGeodetic() const
         Vector Position() const
@@ -129,6 +134,9 @@ cdef extern from 'CoordTopocentric.h':
 
         CoordTopocentric() except +
         CoordTopocentric(const CoordTopocentric& topo) except +
+        CoordTopocentric(
+            double az, double el, double rnge, double rnge_rate
+            ) except +
         string ToString() const
         # azimuth in radians
         double azimuth
@@ -147,6 +155,9 @@ cdef extern from 'CoordGeodetic.h':
 
         CoordGeodetic() except +
         CoordGeodetic(const CoordGeodetic& geo) except +
+        CoordGeodetic(
+            double lat, double lon, double alt, bool is_radians=False
+            ) except +
         string ToString() const
         # latitude in radians (-PI >= latitude < PI)
         double latitude
