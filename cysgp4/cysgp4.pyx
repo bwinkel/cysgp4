@@ -70,7 +70,7 @@ ctypedef Observer* obs_ptr_t
 __all__ = [
     'PyDateTime', 'PyTle', 'PyObserver',
     'PyCoordGeodetic', 'PyCoordTopocentric', 'PyEci',
-    'Satellite', 'get_azel_from_tle', 'propagate_many',
+    'Satellite', 'propagate_many',
     ]
 
 
@@ -90,68 +90,14 @@ cdef inline long long ticks_from_mjd(double mjd) nogil:
         )
 
 
-cdef void mjd_cal(
-    double mjd,
-    int &mn, int &yr, int &i_dy,
-    int &i_hh, int &i_mm, int &i_ss, int &i_mus
-    ) nogil:
+cdef inline double mjd_from_ticks(long long ticks) nogil:
 
     cdef:
-        double dy
-        double d, i, f, a, b, ce, g
+        double days, fdays
+        long long idays
 
-    # Note: we need to use the idiom (&refval)[0] to modifiy the call-by-
-    # reference values otherwise a compiler error "Assignment to reference
-    # 'value'" is thrown
-    (&mn)[0] = 0
-    (&yr)[0] = 0
-    dy = 0.0
-
-    mjd -= +15020L - 0.5
-    d = mjd + 0.5
-    i = floor(d)
-    f = d - i
-
-    if f == 1:
-        f = 0
-        i += 1
-
-    if i > -115860.0:
-        a = floor(i / 36524.25 + .99835726) + 14
-        i += 1 + a - floor(a / 4.0)
-
-    b = floor(i / 365.25 + .802601)
-    ce = i - floor(365.25 * b + .750001) + 416
-    g = floor(ce / 30.6001)
-    (&mn)[0] = <int> g - 1
-    dy = <double> ce - floor(30.6001 * g) + f
-    (&yr)[0] = <int> b + 1899
-
-    if g > 13.5:
-        (&mn)[0] = <int> g - 13
-    if mn < 2.5:
-        (&yr)[0] = <int> b + 1900
-    if yr < 1:
-        (&yr)[0] -= 1
-
-    if mjd == 0:
-        (&mn)[0] = 12
-        dy = 31.5
-        (&yr)[0] = 1899
-
-    (&i_dy)[0] = <int> dy
-    dy -= i_dy
-    dy *= 24.
-    (&i_hh)[0] = <int> dy
-    dy -= i_hh
-    dy *= 60.
-    (&i_mm)[0] = <int> dy
-    dy -= i_mm
-    dy *= 60.
-    (&i_ss)[0] = <int> dy
-    dy -= i_ss
-    dy *= 1.e6
-    (&i_mus)[0] = <int> dy
+    ticks -= MJD0_TICKS
+    return ticks / 8.64e10
 
 
 cdef class PyDateTime(object):
@@ -163,17 +109,10 @@ cdef class PyDateTime(object):
     cdef DateTime _cobj
 
     def __init__(self, object dt=None, init=True):
-        '''
-        Constructor PyDateTime(datetime dt)
-        '''
 
         self._cobj = DateTime(0)
         if init:
-            self.set_datetime(dt)
-
-    # def __dealloc__(self):
-
-    #     del self.thisptr
+            self._set_datetime(dt)
 
     @classmethod
     def from_ticks(cls, unsigned long long ticks):
@@ -187,11 +126,23 @@ cdef class PyDateTime(object):
     def from_mjd(cls, double mjd):
 
         dt = cls(dt=None, init=False)
-        dt.ticks = ticks_from_mjd(mjd)
+        dt.mjd = mjd
 
         return dt
 
-    def set_datetime(self, object dt=None):
+    def _get_datetime(self):
+
+        return datetime(
+            self._cobj.Year(),
+            self._cobj.Month(),
+            self._cobj.Day(),
+            self._cobj.Hour(),
+            self._cobj.Minute(),
+            self._cobj.Second(),
+            self._cobj.Microsecond(),
+            )
+
+    def _set_datetime(self, dt):
         '''
         Initialize PyDateTime from python datetime object
         '''
@@ -207,7 +158,9 @@ cdef class PyDateTime(object):
             <int> dt.microsecond
             )
 
-    def initialize(
+    datetime = property(_get_datetime, _set_datetime, None)
+
+    def set(
             self,
             int year, int month, int day,
             int hour, int minute, int second, int microsecond
@@ -237,6 +190,22 @@ cdef class PyDateTime(object):
 
     ticks = property(_get_ticks, _set_ticks, None)
 
+    def _get_mjd(self):
+        return mjd_from_ticks(self._cobj.Ticks())
+
+    def _set_mjd(self, double mjd):
+
+        # this is a bit ugly, but there is to setter method in the C++ code
+
+        cdef:
+            long long ticks_new = ticks_from_mjd(mjd)
+            long long ticks_old = self._get_ticks()
+
+        # AddTicks returns a new instance...
+        self._cobj = self._cobj.AddTicks(ticks_new - ticks_old)
+
+    mjd = property(_get_mjd, _set_mjd, None)
+
     def __str__(self):
 
         return self._cobj.ToString().decode('UTF-8')
@@ -263,9 +232,6 @@ cdef class PyTle(object):
     cdef Tle *thisptr
 
     def __init__(self, name, line_one, line_two):
-        '''
-        Constructor PyTle(name, line_one, line_two)
-        '''
 
         self.thisptr = new Tle(
             name.encode('UTF-8'),
@@ -300,19 +266,10 @@ cdef class PyCoordGeodetic(object):
             double lat_deg=0,
             double alt_km=0
             ):
-        '''
-        Constructor PyCoordGeodetic(
-            double lon_deg, double lat_deg, double alt_km
-            )
-        '''
 
         self._cobj = CoordGeodetic(
             lat_deg, lon_deg, alt_km
             )
-
-    # def __dealloc__(self):
-
-    #     del self.thisptr
 
     def __str__(self):
 
@@ -370,20 +327,10 @@ cdef class PyCoordTopocentric(object):
             double dist_km=0,
             double dist_rate_km_per_s=0,
             ):
-        '''
-        Constructor PyCoordTopocentric(
-            double az_deg, double el_deg,
-            double dist_km, double dist_rate_km_per_s,
-            )
-        '''
 
         self._cobj = CoordTopocentric(
             az_deg * DEG2RAD, el_deg * DEG2RAD, dist_km, dist_rate_km_per_s
             )
-
-    # def __dealloc__(self):
-
-    #     del self.thisptr
 
     def __str__(self):
 
@@ -491,16 +438,6 @@ cdef class PyEci(object):
     Wrapper around (C++) Eci class
     '''
 
-    # Note, in order to create an instance of _eci on the stack, a
-    # null constructor needs to be present; have to add the following
-    # to Eci.h:
-
-    #     Eci()
-    #         : m_dt(DateTime(0)),
-    #         m_position(Vector())
-    #     {
-    #     }
-
     cdef:
         # hold the C++ instance, which we're wrapping
         Eci _cobj
@@ -583,10 +520,16 @@ cdef class Satellite(object):
         PyCoordTopocentric _topo
         PyCoordGeodetic _geo
 
-        double _mjd
+        double _mjd, _mjd_cache_resolution
         python_bool _pos_dirty, _tle_dirty
 
-    def __init__(self, PyTle tle, PyObserver observer=None):
+    def __init__(
+            self,
+            PyTle tle,
+            PyObserver observer=None,
+            object dt=None,
+            double mjd_cache_resolution=MJD_RESOLUTION,
+            ):
         '''
         Constructs a new Satellite object from given TLE
 
@@ -597,6 +540,7 @@ cdef class Satellite(object):
 
             observer = PyObserver()
 
+        self._mjd_cache_resolution = mjd_cache_resolution
         self._tle = tle  # copy reference
         self._observer = observer  # copy reference
 
@@ -617,7 +561,7 @@ cdef class Satellite(object):
         # initialize workspaces, otherwise we cannot assign values in
         # _refresh_coords (would produce segfault)
         # note: it is not sufficient to define these as class members (above)
-        self._dt = PyDateTime()  # initialize with current datetime
+        self._dt = PyDateTime(dt)  # initialize with current datetime
         self._eci = PyEci()
         self._topo = PyCoordTopocentric()
         self._geo = PyCoordGeodetic()
@@ -633,27 +577,29 @@ cdef class Satellite(object):
 
         return self._mjd
 
-    def _set_mjd(self, double _mjd):
+    def _set_mjd(self, double mjd):
 
-        assert _mjd < 1000000., 'warning, make sure to use mjd'
+        assert mjd < 1000000., 'warning, make sure to use mjd'
 
-        if fabs(self._mjd - _mjd) < MJD_RESOLUTION:
+        if fabs(self._mjd - mjd) < self._mjd_cache_resolution:
             return
 
-        self._mjd = _mjd
-        self._refresh_datetime()
+        self._dt.mjd = self._mjd = mjd
         self._pos_dirty = <python_bool> True
 
     mjd = property(_get_mjd, _set_mjd, None, 'mjd')
 
-    @property
-    def dt(self):
+    def _get_datetime(self):
 
         return self._dt
 
-    def topo_pos(self, double mjd):
+    def _set_datetime(self, dt):
 
-        self._set_mjd(mjd)
+        self._set_mjd = dt.mjd
+
+    datetime = property(_get_datetime, _set_datetime, None, 'datetime')
+
+    def topo_pos(self):
 
         if self._pos_dirty:
             self._refresh_coords()
@@ -663,9 +609,7 @@ cdef class Satellite(object):
 
         return self._topo
 
-    def geo_pos(self, double mjd):
-
-        self._set_mjd(mjd)
+    def geo_pos(self):
 
         if self._pos_dirty:
             self._refresh_coords()
@@ -675,9 +619,7 @@ cdef class Satellite(object):
 
         return self._geo
 
-    def eci_pos(self, double mjd):
-
-        self._set_mjd(mjd)
+    def eci_pos(self):
 
         if self._pos_dirty:
             self._refresh_coords()
@@ -710,21 +652,8 @@ cdef class Satellite(object):
 
         self._pos_dirty = <python_bool> False
 
-    def _refresh_datetime(self):
 
-        cdef:
-            int mn = 0, yr = 0, i_dy = 0
-            int i_hh = 0, i_mm = 0, i_ss = 0, i_mus = 0
-
-        mjd_cal(
-            self._mjd,
-            mn, yr, i_dy, i_hh, i_mm, i_ss, i_mus
-            )
-
-        self._dt.initialize(yr, mn, i_dy, i_hh, i_mm, i_ss, i_mus)
-
-
-def propagate_many(tles, observers, mjds):
+def propagate_many(mjds, tles, observers=None):
 
     cdef:
 
@@ -743,11 +672,18 @@ def propagate_many(tles, observers, mjds):
         double[::1] eci_vx_v, eci_vy_v, eci_vz_v
         double[::1] az_v, el_v, dist_v, dist_rate_v
         int i, size
+        bint do_topo = True
 
         sgp4_ptr_t* _sgp4_ptr_array
         obs_ptr_t* _obs_ptr_array
 
-    b = np.broadcast(tles, observers)
+    if observers is None:
+        do_topo = False
+
+    b = np.broadcast(
+        tles,
+        observers if observers is not None else PyObserver()
+        )
     sats = np.empty(b.shape, dtype=object)
     sats.flat = [Satellite(tle, obs) for (tle, obs) in b]
 
@@ -783,7 +719,9 @@ def propagate_many(tles, observers, mjds):
         _obs_ptr_array = array_new[obs_ptr_t](size)
 
         for i in range(size):
-            # unfortunately, this is not possible in nogil loop
+            # unfortunately, it is not possible in nogil loop to access
+            # the cdef'ed class members; therefore, we have to maintain
+            # arrays of pointers to the sgp4 and observer objects
             _sgp4_ptr_array[i] = (<Satellite> sat[i]).thisptr
             _obs_ptr_array[i] = (<Satellite> sat[i])._observer.thisptr
 
@@ -796,7 +734,8 @@ def propagate_many(tles, observers, mjds):
             _dt = _dt.AddTicks(ticks_from_mjd(mjd[i]) - _dt.Ticks())
 
             _eci = _sgp4_ptr.FindPosition(_dt)
-            _topo = _obs_ptr.GetLookAngle(_eci)
+            if do_topo:
+                _topo = _obs_ptr.GetLookAngle(_eci)
 
             _eci_pos = _eci.Position()
             _eci_vel = _eci.Velocity()
@@ -814,37 +753,8 @@ def propagate_many(tles, observers, mjds):
         array_delete(_sgp4_ptr_array)
         array_delete(_obs_ptr_array)
 
-    return it.operands[2:5], it.operands[5:8], it.operands[8:12]
+    if observers is None:
+        return it.operands[2:5], it.operands[5:8]
+    else:
+        return it.operands[2:5], it.operands[5:8], it.operands[8:12]
 
-
-
-def get_azel_from_tle(
-        tle_string, double mjd, PyObserver observer=None
-        ):
-    '''
-    Compute horizontal coordinates for given TLE and MJD
-
-    TLE must be a three-line string.
-
-    Returns:
-        tle_name, azimuth [deg], elevation [deg]
-    '''
-
-    tle_name, tle_line1, tle_line2 = tle_string.split('\n')[:3]
-    tle_name, tle_line1, tle_line2 = (
-        tle_name.rstrip(), tle_line1.rstrip(), tle_line2.rstrip()
-        )
-
-    if observer is None:
-
-        observer = PyObserver()
-
-    tle = PyTle(
-        tle_name,
-        tle_line1,
-        tle_line2
-        )
-    mysat = Satellite(tle, observer)
-    topo_pos = mysat.topo_pos(mjd)
-
-    return tle_name, topo_pos.azimuth, topo_pos.elevation

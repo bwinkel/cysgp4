@@ -104,6 +104,14 @@ cdef extern from 'DateTime.h':
         DateTime AddTicks(long long ticks) nogil const
         long long Ticks() nogil const
 
+        int Year() nogil const
+        int Month() nogil const
+        int Day() nogil const
+        int Hour() nogil const
+        int Minute() nogil const
+        int Second() nogil const
+        int Microsecond() nogil const
+
     # how to wrap static c++ member functions???
     # cdef DateTime_Now 'DateTime::Now' (bool microseconds)
 
@@ -113,6 +121,16 @@ cdef extern from 'DateTime.h':
 
 
 cdef extern from 'Eci.h':
+
+    # Note, in order to create an instance of Eci on the stack, a
+    # null constructor needs to be present; have to add the following
+    # to Eci.h:
+
+    #     Eci()
+    #         : m_dt(DateTime(0)),
+    #         m_position(Vector())
+    #     {
+    #     }
 
     cdef cppclass Eci:
 
@@ -148,7 +166,6 @@ cdef extern from 'CoordTopocentric.h':
         double distance_rate 'range_rate'
 
 
-
 cdef extern from 'CoordGeodetic.h':
 
     cdef cppclass CoordGeodetic:
@@ -169,7 +186,7 @@ cdef extern from 'CoordGeodetic.h':
 
 # https://stackoverflow.com/questions/51006230/dynamically-sized-array-of-objects-in-cython
 cdef extern from *:
-    """
+    '''
     template <typename T>
     T* array_new(int n) {
         return new T[n];
@@ -179,6 +196,6 @@ cdef extern from *:
     void array_delete(T* x) {
         delete [] x;
     }
-    """
+    '''
     T* array_new[T](int)
     void array_delete[T](T* x)

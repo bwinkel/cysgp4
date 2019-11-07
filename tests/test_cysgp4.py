@@ -51,6 +51,11 @@ class TestPyDateTime:
 
         assert_allclose(t1.lmst(6.88375), 5.07985925)
 
+    def test_datetimes(self):
+
+        t1 = PyDateTime(self.dt)
+        assert t1.datetime == self.dt
+
     def test_ticks(self):
 
         t1a = PyDateTime(self.dt)
@@ -69,12 +74,13 @@ class TestPyDateTime:
         assert t3a.ticks == 58628880000000000
         assert t3b.ticks == 58628880000000000
 
-    def test_from_mjd(self):
+    def test_mjd(self):
 
         mjd = 56458.123
         t1 = PyDateTime.from_mjd(mjd)
 
         assert str(t1) == '2013-06-15 02:57:07.199999 UTC'
+        assert_allclose(mjd, t1.mjd)
 
 
 class TestPyTle:
@@ -208,8 +214,9 @@ class TestSatellite:
     def test_eci_position(self):
 
         sat = Satellite(self.tle, self.effbg_observer)
+        sat.mjd = self.mjd
         # print(sat.dt)
-        eci_pos = sat.eci_pos(self.mjd)
+        eci_pos = sat.eci_pos()
 
         print(eci_pos.loc)
         print(self.pos2)
@@ -228,9 +235,10 @@ class TestSatellite:
     def test_geo_position(self):
 
         sat = Satellite(self.tle, self.effbg_observer)
+        sat.mjd = self.mjd
         # print(sat.dt)
-        eci_pos = sat.eci_pos(self.mjd)
-        geo_pos = sat.geo_pos(self.mjd)
+        eci_pos = sat.eci_pos()
+        geo_pos = sat.geo_pos()
 
         print(eci_pos.geo_loc)
         print(geo_pos.lon, geo_pos.lat, geo_pos.alt)
@@ -243,8 +251,9 @@ class TestSatellite:
     def test_topo_position(self):
 
         sat = Satellite(self.tle, self.effbg_observer)
+        sat.mjd = self.mjd
         # print(sat.dt)
-        topo_pos = sat.topo_pos(self.mjd)
+        topo_pos = sat.topo_pos()
 
         print(topo_pos.az, topo_pos.el, topo_pos.dist)
 
@@ -275,9 +284,10 @@ class TestSatellite:
         print(az, el, dist)
 
         sat = Satellite(self.tle, self.effbg_observer)
+        sat.mjd = self.mjd
         # print(sat.dt)
-        eci_pos = sat.eci_pos(self.mjd)
-        topo_pos = sat.topo_pos(self.mjd)
+        eci_pos = sat.eci_pos()
+        topo_pos = sat.topo_pos()
 
         print(eci_pos.dt)
         print(eci_pos.dt.gmst(), eci_pos.dt.lmst(self.effbg_tup[0]))
@@ -293,7 +303,7 @@ def test_propagate_many():
     tles = PyTle(*TLE_ISS)
     observers = PyObserver(6.88375, 50.525, 0.366)
     mjds = np.linspace(56458.123, 56459.123, 4)
-    eci_pos, eci_vel, topo_pos = propagate_many(tles, observers, mjds)
+    eci_pos, eci_vel, topo_pos = propagate_many(mjds, tles, observers)
 
     print(eci_pos)
     print(eci_vel)
@@ -355,5 +365,13 @@ def test_propagate_many_broadcast():
     tles = np.array([PyTle(*TLE_ISS), PyTle(*TLE_GPS)])[:, np.newaxis]
     observers = PyObserver(6.88375, 50.525, 0.366)
     mjds = np.linspace(56458.123, 56459.123, 4)[np.newaxis, :]
-    eci_pos, eci_vel, topo_pos = propagate_many(tles, observers, mjds)
+    eci_pos, eci_vel, topo_pos = propagate_many(mjds, tles, observers)
     assert eci_pos[0].shape == (2, 4)
+
+
+def test_propagate_many_no_topo():
+
+    tles = PyTle(*TLE_ISS)
+    mjds = np.linspace(56458.123, 56459.123, 4)
+    eci_pos, eci_vel = propagate_many(mjds, tles)
+    assert eci_pos[0].shape == (4,)
