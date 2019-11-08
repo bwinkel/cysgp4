@@ -64,6 +64,7 @@ cdef long long MJD0_TICKS = 58628880000000000
 
 
 ctypedef SGP4* sgp4_ptr_t
+ctypedef Tle* tle_ptr_t
 ctypedef Observer* obs_ptr_t
 
 
@@ -658,6 +659,7 @@ def propagate_many(mjds, tles, observers=None):
     cdef:
 
         SGP4 *_sgp4_ptr
+        Tle *_tle_ptr
         Observer *_obs_ptr
         Eci _eci
         DateTime _dt
@@ -665,33 +667,25 @@ def propagate_many(mjds, tles, observers=None):
         Vector _eci_pos, _eci_vel
 
         np.ndarray[double] mjd
-        np.ndarray[object] sat
-        # double[::1] mjd_v
-        # Satellite[::1] sat_v
+        np.ndarray[object] tle, obs
         double[::1] eci_x_v, eci_y_v, eci_z_v
         double[::1] eci_vx_v, eci_vy_v, eci_vz_v
         double[::1] az_v, el_v, dist_v, dist_rate_v
         int i, size
         bint do_topo = True
 
-        sgp4_ptr_t* _sgp4_ptr_array
+        tle_ptr_t* _tle_ptr_array
         obs_ptr_t* _obs_ptr_array
 
     if observers is None:
+        observers = PyObserver()
         do_topo = False
 
-    b = np.broadcast(
-        tles,
-        observers if observers is not None else PyObserver()
-        )
-    sats = np.empty(b.shape, dtype=object)
-    sats.flat = [Satellite(tle, obs) for (tle, obs) in b]
-
     it = np.nditer(
-        [sats, mjds] + [None] * 10,
+        [tles, observers, mjds] + [None] * 10,
         flags=['external_loop', 'buffered', 'delay_bufalloc', 'refs_ok'],
-        op_flags=[['readonly']] * 2 + [['readwrite', 'allocate']] * 10,
-        op_dtypes=['object', 'float64'] + ['float64'] * 10
+        op_flags=[['readonly']] * 3 + [['readwrite', 'allocate']] * 10,
+        op_dtypes=['object', 'object', 'float64'] + ['float64'] * 10
         )
 
     # it would be better to use the context manager but
@@ -701,41 +695,50 @@ def propagate_many(mjds, tles, observers=None):
 
     for itup in it:
 
-        sat = itup[0]
-        mjd = itup[1]
-        eci_x_v = itup[2]
-        eci_y_v = itup[3]
-        eci_z_v = itup[4]
-        eci_vx_v = itup[5]
-        eci_vy_v = itup[6]
-        eci_vz_v = itup[7]
-        az_v = itup[8]
-        el_v = itup[9]
-        dist_v = itup[10]
-        dist_rate_v = itup[11]
+        tle = itup[0]
+        obs = itup[1]
+        mjd = itup[2]
+        eci_x_v = itup[3]
+        eci_y_v = itup[4]
+        eci_z_v = itup[5]
+        eci_vx_v = itup[6]
+        eci_vy_v = itup[7]
+        eci_vz_v = itup[8]
+        az_v = itup[9]
+        el_v = itup[10]
+        dist_v = itup[11]
+        dist_rate_v = itup[12]
 
         size = mjd.shape[0]
-        _sgp4_ptr_array = array_new[sgp4_ptr_t](size)
+        _tle_ptr_array = array_new[tle_ptr_t](size)
         _obs_ptr_array = array_new[obs_ptr_t](size)
 
         for i in range(size):
             # unfortunately, it is not possible in nogil loop to access
             # the cdef'ed class members; therefore, we have to maintain
             # arrays of pointers to the sgp4 and observer objects
-            _sgp4_ptr_array[i] = (<Satellite> sat[i]).thisptr
-            _obs_ptr_array[i] = (<Satellite> sat[i])._observer.thisptr
+            _tle_ptr_array[i] = (<PyTle> tle[i]).thisptr
+            _obs_ptr_array[i] = (<PyObserver> obs[i]).thisptr
 
         for i in prange(size, nogil=True):
 
-            _sgp4_ptr = _sgp4_ptr_array[i]
-            _obs_ptr = _obs_ptr_array[i]
+            _tle_ptr = _tle_ptr_array[i]
+            # _obs_ptr = _obs_ptr_array[i]
 
             # AddTicks returns a new instance...
             _dt = _dt.AddTicks(ticks_from_mjd(mjd[i]) - _dt.Ticks())
 
+            # it is mandatory to create SGP4 instance here, as the
+            # "FindPosition" method heavily changes class members
+            # this could create problems with parallelization if instances
+            # where re-used!
+            _sgp4_ptr = new SGP4(deref(_tle_ptr))
             _eci = _sgp4_ptr.FindPosition(_dt)
+            del _sgp4_ptr
             if do_topo:
+                _obs_ptr = new Observer(_obs_ptr_array[i].GetLocation())
                 _topo = _obs_ptr.GetLookAngle(_eci)
+                del _obs_ptr
 
             _eci_pos = _eci.Position()
             _eci_vel = _eci.Velocity()
@@ -750,11 +753,11 @@ def propagate_many(mjds, tles, observers=None):
             dist_v[i] = _topo.distance
             dist_rate_v[i] = _topo.distance_rate
 
-        array_delete(_sgp4_ptr_array)
+        array_delete(_tle_ptr_array)
         array_delete(_obs_ptr_array)
 
-    if observers is None:
-        return it.operands[2:5], it.operands[5:8]
+    if do_topo:
+        return it.operands[3:6], it.operands[6:9], it.operands[9:13]
     else:
-        return it.operands[2:5], it.operands[5:8], it.operands[8:12]
+        return it.operands[3:6], it.operands[6:9]
 
