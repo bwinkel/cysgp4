@@ -115,6 +115,41 @@ class TestPyTle:
 
         assert repr(tle1) == '<PyTle: ISS (ZARYA)>'
 
+    def test_exception_checksum(self):
+        '''
+        Note, one would assume that a wrong checksum would raise an
+        exception, but it doesn't in the underlying sgp4 code.
+        '''
+
+        tle_tup_wrong = (
+            TLE_ISS[0],
+            TLE_ISS[1][:-1] + '0',  # modify checksum
+            TLE_ISS[2],
+            )
+        tle_wrong = PyTle(*tle_tup_wrong)
+        slist = str(tle_wrong).split('\n')
+
+        for s1, s2 in zip(slist, self.tle1_str):
+            assert s1.strip() == s2.strip()
+
+        assert repr(tle_wrong) == '<PyTle: ISS (ZARYA)>'
+
+    # Note, there are more exceptions in the C++ code, which we could
+    # test here, but it can be assumed that exception handling with
+    # Cython will work similarly for other cases. We only need to test
+    # that it works in general (i.e., for one example).
+    def test_exception_invalid_line_length(self):
+
+        tle_tup_wrong = (
+            TLE_ISS[0],
+            TLE_ISS[1][:-1],
+            TLE_ISS[2],
+            )
+        with pytest.raises(RuntimeError) as excinfo:
+            PyTle(*tle_tup_wrong)
+
+        assert 'Invalid length for line one' in str(excinfo.value)
+
 
 class TestPyCoordGeodetic:
 
