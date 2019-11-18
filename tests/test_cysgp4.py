@@ -221,9 +221,9 @@ class TestPyObserver:
     def test_location_property(self):
 
         obs = PyObserver(*self.effbg_observer)
-        assert str(obs.location) == '6.8838d, 50.5250d, 0.3660km'
+        assert str(obs.loc) == '6.8838d, 50.5250d, 0.3660km'
         geo = PyCoordGeodetic(1, 2, 3)
-        obs.location = geo
+        obs.loc = geo
         assert str(obs) == '1.0000d, 2.0000d, 3.0000km'
 
 
@@ -328,12 +328,12 @@ class TestSatellite:
 
         sat = Satellite(self.tle, self.effbg_observer)
         sat.mjd = self.mjd
-        # print(sat.dt)
+        # print(sat.pydt)
         eci_pos = sat.eci_pos()
         topo_pos = sat.topo_pos()
 
-        print(eci_pos.dt)
-        print(eci_pos.dt.gmst(), eci_pos.dt.lmst(self.effbg_tup[0]))
+        print(eci_pos.pydt)
+        print(eci_pos.pydt.gmst(), eci_pos.pydt.lmst(self.effbg_tup[0]))
         print(topo_pos.az, topo_pos.el, topo_pos.dist)
 
         assert_allclose(topo_pos.az, az, atol=1e-3)

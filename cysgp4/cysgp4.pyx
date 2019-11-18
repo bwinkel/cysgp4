@@ -665,7 +665,10 @@ cdef class PyObserver(object):
 
         self.thisptr.SetLocation(loc._cobj)
 
-    location = property(_get_location, _set_location, None)
+    loc = property(
+        _get_location, _set_location, None,
+        doc='Geographic location (see also Class documentation).'
+        )
 
 
 cdef class PyEci(object):
@@ -735,7 +738,7 @@ cdef class PyEci(object):
     loc = property(_get_loc, None, None)
     vel = property(_get_vel, None, None)
     geo_loc = property(_get_geo_loc, None, None)
-    dt = property(_get_dt, None, None)
+    pydt = property(_get_dt, None, None)
 
 
 cdef class Satellite(object):
@@ -832,7 +835,7 @@ cdef class Satellite(object):
 
         self._set_mjd = dt.mjd
 
-    datetime = property(_get_datetime, _set_datetime, None, 'datetime')
+    pydt = property(_get_datetime, _set_datetime, None, 'datetime')
 
     def topo_pos(self):
 
