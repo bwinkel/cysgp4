@@ -346,6 +346,37 @@ class TestSatellite:
         assert_allclose(topo_pos.el, el, atol=1e-3)
         assert_allclose(topo_pos.dist, dist, atol=2e-2)
 
+    def test_mjd_caching(self):
+
+        # change cache resolution to 1 second
+        sat = Satellite(self.tle, self.effbg_observer, self.pydt, 1. / 86400)
+        topo_pos = sat.topo_pos()
+
+        assert_allclose(
+            (topo_pos.az, topo_pos.el, topo_pos.dist),
+            (334.789646, -37.384929, 8406.367773)
+            )
+
+        # first half a second change must not trigger re-calculation
+        sat.mjd += 0.5 / 86400.  # 0.5 s
+        topo_pos = sat.topo_pos()
+
+        print(topo_pos.az, topo_pos.el, topo_pos.dist)
+        assert_allclose(
+            (topo_pos.az, topo_pos.el, topo_pos.dist),
+            (334.789646, -37.384929, 8406.367773)
+            )
+
+        # second half a second change must trigger re-calculation
+        sat.mjd += 0.50001 / 86400.  # 0.5 s
+        topo_pos = sat.topo_pos()
+        print(topo_pos.az, topo_pos.el, topo_pos.dist)
+
+        assert_allclose(
+            (topo_pos.az, topo_pos.el, topo_pos.dist),
+            (334.751037, -37.358432, 8402.015607)  # 4 km distance in 1 second
+            )
+
 
 def test_propagate_many():
 

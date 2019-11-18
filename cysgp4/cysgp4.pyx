@@ -769,7 +769,8 @@ cdef class Satellite(object):
         PyCoordTopocentric _topo
         PyCoordGeodetic _geo
 
-        double _mjd, _mjd_cache_resolution
+        # _cmjd holds the mjd for the last calculation time
+        double _cmjd, _mjd_cache_resolution
         python_bool _pos_dirty, _tle_dirty
 
     def __init__(
@@ -805,6 +806,7 @@ cdef class Satellite(object):
         self._obs._cobj.SetLocation(obs._cobj.GetLocation())
         self._pydt = PyDateTime(init=False)
         self._pydt._cobj = DateTime(pydt._cobj.Ticks())
+        self._cmjd = self._pydt.mjd
 
         try:
 
@@ -837,17 +839,17 @@ cdef class Satellite(object):
 
     def _get_mjd(self):
 
-        return self._mjd
+        return self._pydt.mjd
 
     def _set_mjd(self, double mjd):
 
         assert mjd < 1000000., 'warning, make sure to use mjd'
 
-        if fabs(self._mjd - mjd) < self._mjd_cache_resolution:
-            return
+        self._pydt.mjd = mjd
 
-        self._pydt.mjd = self._mjd = mjd
-        self._pos_dirty = <python_bool> True
+        if fabs(self._pydt.mjd - self._cmjd) > self._mjd_cache_resolution:
+
+            self._pos_dirty = <python_bool> True
 
     mjd = property(_get_mjd, _set_mjd, None, 'mjd')
 
@@ -913,6 +915,7 @@ cdef class Satellite(object):
             )
         self._geo._cobj = self._eci._cobj.ToGeodetic()
 
+        self._cmjd = self._pydt.mjd
         self._pos_dirty = <python_bool> False
 
 
