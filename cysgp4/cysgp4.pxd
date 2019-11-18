@@ -45,6 +45,7 @@ cdef extern from 'Tle.h':
             const string & line_one,
             const string & line_two
             ) nogil except +
+        Tle(const Tle& tle) nogil except +
         string ToString() nogil const
         string Name() nogil const
         string Line1() nogil const
@@ -73,8 +74,19 @@ cdef extern from 'SGP4.h':
 
 cdef extern from 'Observer.h':
 
+    # Note, in order to create an instance of Observer on the stack, a
+    # null constructor needs to be present; have to add the following
+    # to Observer.h:
+
+    #     Observer()
+    #         : m_geo(0., 0., 0.),
+    #         m_eci(DateTime(), m_geo)
+    #     {
+    #     }
+
     cdef cppclass Observer:
 
+        Observer() nogil except +
         Observer(
             const double latitude,
             const double longitude,

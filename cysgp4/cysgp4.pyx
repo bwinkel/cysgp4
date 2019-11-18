@@ -624,7 +624,7 @@ cdef class PyObserver(object):
 
     # hold the C++ instance, which we're wrapping
     cdef:
-        Observer *thisptr
+        Observer _cobj
 
     def __init__(
             self,
@@ -641,11 +641,7 @@ cdef class PyObserver(object):
             lat_deg=lat_deg,
             alt_km=alt_km
             )
-        self.thisptr = new Observer(_obs_loc._cobj)
-
-    def __dealloc__(self):
-
-        del self.thisptr
+        self._cobj = Observer(_obs_loc._cobj)
 
     def __str__(self):
 
@@ -658,12 +654,12 @@ cdef class PyObserver(object):
     def _get_location(self):
 
         _obs_loc = PyCoordGeodetic()
-        _obs_loc._cobj = self.thisptr.GetLocation()
+        _obs_loc._cobj = self._cobj.GetLocation()
         return _obs_loc
 
     def _set_location(self, PyCoordGeodetic loc):
 
-        self.thisptr.SetLocation(loc._cobj)
+        self._cobj.SetLocation(loc._cobj)
 
     loc = property(
         _get_location, _set_location, None,
@@ -766,9 +762,9 @@ cdef class Satellite(object):
         SGP4 *thisptr
 
         PyTle _tle
-        PyObserver _observer
+        PyObserver _obs
 
-        PyDateTime _dt
+        PyDateTime _pydt
         PyEci _eci
         PyCoordTopocentric _topo
         PyCoordGeodetic _geo
@@ -779,28 +775,36 @@ cdef class Satellite(object):
     def __init__(
             self,
             PyTle tle,
-            PyObserver observer=None,
+            PyObserver obs=None,
             PyDateTime pydt=None,
             double mjd_cache_resolution=MJD_RESOLUTION,
             ):
         '''
         Constructs a new Satellite object from given TLE
-
-        if observer is None, Effelsberg location is used
         '''
 
-        if observer is None:
+        if obs is None:
 
-            observer = PyObserver()
+            obs = PyObserver()
 
         if pydt is None:
 
             pydt = PyDateTime()
 
         self._mjd_cache_resolution = mjd_cache_resolution
-        self._tle = tle  # copy reference
-        self._observer = observer  # copy reference
-        self._dt = pydt  # copy reference
+
+        # want deep copies to avoid side effects!
+        self._tle = PyTle(
+            tle.thisptr.Name().decode('UTF-8'),
+            tle.thisptr.Line1().decode('UTF-8'),
+            tle.thisptr.Line2().decode('UTF-8'),
+            )
+
+        # important: the class members are not yet initialized at all???
+        self._obs = PyObserver()
+        self._obs._cobj.SetLocation(obs._cobj.GetLocation())
+        self._pydt = PyDateTime(init=False)
+        self._pydt._cobj = DateTime(pydt._cobj.Ticks())
 
         try:
 
@@ -829,6 +833,7 @@ cdef class Satellite(object):
 
         # del self.eci_ptr
         del self.thisptr
+        # del self._tle.thisptr
 
     def _get_mjd(self):
 
@@ -841,19 +846,19 @@ cdef class Satellite(object):
         if fabs(self._mjd - mjd) < self._mjd_cache_resolution:
             return
 
-        self._dt.mjd = self._mjd = mjd
+        self._pydt.mjd = self._mjd = mjd
         self._pos_dirty = <python_bool> True
 
     mjd = property(_get_mjd, _set_mjd, None, 'mjd')
 
     def _get_datetime(self):
 
-        return self._dt
+        return self._pydt
 
-    def _set_datetime(self, dt):
+    def _set_datetime(self, pydt):
 
         # must use the set_mjd method otherwise the caching would not work
-        self._set_mjd(dt.mjd)
+        self._set_mjd(pydt.mjd)
 
     pydt = property(_get_datetime, _set_datetime, None, 'datetime')
 
@@ -892,8 +897,8 @@ cdef class Satellite(object):
         try:
 
             # FindPosition doesn't update ECI time, need to do manually :-/
-            self._eci = PyEci(dt=self._dt)
-            self._eci._cobj = self.thisptr.FindPosition(self._dt._cobj)
+            self._eci = PyEci(pydt=self._pydt)
+            self._eci._cobj = self.thisptr.FindPosition(self._pydt._cobj)
             self._tle_dirty = <python_bool> False
 
         except:
@@ -903,7 +908,7 @@ cdef class Satellite(object):
 
             return
 
-        self._topo._cobj = deref(self._observer.thisptr).GetLookAngle(
+        self._topo._cobj = self._obs._cobj.GetLookAngle(
             self._eci._cobj
             )
         self._geo._cobj = self._eci._cobj.ToGeodetic()
@@ -917,7 +922,7 @@ def propagate_many(mjds, tles, observers=None):
 
         SGP4 *_sgp4_ptr
         Tle *_tle_ptr
-        Observer *_obs_ptr
+        Observer _obs
         Eci _eci
         DateTime _dt
         CoordTopocentric _topo
@@ -975,7 +980,7 @@ def propagate_many(mjds, tles, observers=None):
             # the cdef'ed class members; therefore, we have to maintain
             # arrays of pointers to the sgp4 and observer objects
             _tle_ptr_array[i] = (<PyTle> tle[i]).thisptr
-            _obs_ptr_array[i] = (<PyObserver> obs[i]).thisptr
+            _obs_ptr_array[i] = &(<PyObserver> obs[i])._cobj
 
         for i in prange(size, nogil=True):
 
@@ -993,9 +998,8 @@ def propagate_many(mjds, tles, observers=None):
             _eci = _sgp4_ptr.FindPosition(_dt)
             del _sgp4_ptr
             if do_topo:
-                _obs_ptr = new Observer(_obs_ptr_array[i].GetLocation())
-                _topo = _obs_ptr.GetLookAngle(_eci)
-                del _obs_ptr
+                _obs = Observer(_obs_ptr_array[i].GetLocation())
+                _topo = _obs.GetLookAngle(_eci)
 
             _eci_pos = _eci.Position()
             _eci_vel = _eci.Velocity()

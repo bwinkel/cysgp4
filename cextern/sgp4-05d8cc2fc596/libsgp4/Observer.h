@@ -54,6 +54,12 @@ public:
     {
     }
 
+    Observer()
+        : m_geo(0., 0., 0.),
+        m_eci(DateTime(), m_geo)
+    {
+    }
+
     /**
      * Destructor
      */

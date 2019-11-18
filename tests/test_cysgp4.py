@@ -215,6 +215,9 @@ class TestPyObserver:
 
     def test_constructor(self):
 
+        obs = PyObserver()
+        assert str(obs) == '0.0000d, 0.0000d, 0.0000km'
+
         obs = PyObserver(*self.effbg_observer)
         assert str(obs) == '6.8838d, 50.5250d, 0.3660km'
 
