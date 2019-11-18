@@ -680,26 +680,11 @@ cdef class PyEci(object):
         # hold the C++ instance, which we're wrapping
         Eci _cobj
 
-        PyCoordGeodetic _geo_loc
-        PyDateTime _dt
-
     def __init__(self, PyDateTime dt=None, PyCoordGeodetic geo_loc=None):
         '''
         Constructor PyEci(PyDateTime dt, PyCoordGeodetic geo_loc)
         '''
-
-        if dt is None:
-
-            dt = PyDateTime()
-
-        if geo_loc is None:
-
-            geo_loc = PyCoordGeodetic()
-
-        self._dt = dt
-        self._geo_loc = geo_loc
-
-        self._cobj = Eci(dt._cobj, geo_loc._cobj)
+        self.update(dt, geo_loc)
 
     def __str__(self):
 
@@ -708,6 +693,28 @@ cdef class PyEci(object):
     def __repr__(self):
 
         return '<PyEci: ' + self.__str__() + '>'
+
+    def update(self, PyDateTime pydt=None, PyCoordGeodetic geo_loc=None):
+        '''
+        Update `~cysgp4.PyEci` object.
+
+        Parameters
+        ----------
+        pydt : `~cysgp4.PyDateTime`
+            Date and time.
+        geo_loc : `~cysgp4.PyCoordGeodetic`
+            Geographic location.
+        '''
+
+        if pydt is None:
+
+            pydt = PyDateTime()
+
+        if geo_loc is None:
+
+            geo_loc = PyCoordGeodetic()
+
+        self._cobj = Eci(pydt._cobj, geo_loc._cobj)
 
     def _get_loc(self):
 
@@ -729,16 +736,24 @@ cdef class PyEci(object):
         geo_loc._cobj = self._cobj.ToGeodetic()
         return geo_loc
 
+    def _set_geo_loc(self, PyCoordGeodetic geo_loc):
+
+        self.update(self.pydt, geo_loc)
+
     def _get_dt(self):
 
-        dt = PyDateTime()
-        dt._cobj = self._cobj.GetDateTime()
-        return dt
+        pydt = PyDateTime()
+        pydt._cobj = self._cobj.GetDateTime()
+        return pydt
+
+    def _set_dt(self, PyDateTime pydt):
+
+        self.update(pydt, self.geo_loc)
 
     loc = property(_get_loc, None, None)
     vel = property(_get_vel, None, None)
-    geo_loc = property(_get_geo_loc, None, None)
-    pydt = property(_get_dt, None, None)
+    geo_loc = property(_get_geo_loc, _set_geo_loc, None)
+    pydt = property(_get_dt, _set_dt, None)
 
 
 cdef class Satellite(object):
