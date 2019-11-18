@@ -215,8 +215,16 @@ class TestPyObserver:
 
     def test_constructor(self):
 
-        geo1 = PyObserver(*self.effbg_observer)
-        assert str(geo1) == '6.8838d, 50.5250d, 0.3660km'
+        obs = PyObserver(*self.effbg_observer)
+        assert str(obs) == '6.8838d, 50.5250d, 0.3660km'
+
+    def test_location_property(self):
+
+        obs = PyObserver(*self.effbg_observer)
+        assert str(obs.location) == '6.8838d, 50.5250d, 0.3660km'
+        geo = PyCoordGeodetic(1, 2, 3)
+        obs.location = geo
+        assert str(obs) == '1.0000d, 2.0000d, 3.0000km'
 
 
 class TestSatellite:

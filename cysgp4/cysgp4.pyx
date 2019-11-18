@@ -625,7 +625,6 @@ cdef class PyObserver(object):
     # hold the C++ instance, which we're wrapping
     cdef:
         Observer *thisptr
-        PyCoordGeodetic _obs_loc
 
     def __init__(
             self,
@@ -637,12 +636,12 @@ cdef class PyObserver(object):
         Constructor PyObserver(double lon_deg, double lat_deg, double alt_km)
         '''
 
-        self._obs_loc = PyCoordGeodetic(
+        _obs_loc = PyCoordGeodetic(
             lon_deg=lon_deg,
             lat_deg=lat_deg,
             alt_km=alt_km
             )
-        self.thisptr = new Observer(self._obs_loc._cobj)
+        self.thisptr = new Observer(_obs_loc._cobj)
 
     def __dealloc__(self):
 
@@ -650,7 +649,7 @@ cdef class PyObserver(object):
 
     def __str__(self):
 
-        return self._obs_loc.__str__()
+        return self._get_location().__str__()
 
     def __repr__(self):
 
@@ -658,7 +657,9 @@ cdef class PyObserver(object):
 
     def _get_location(self):
 
-        return self._obs_loc
+        _obs_loc = PyCoordGeodetic()
+        _obs_loc._cobj = self.thisptr.GetLocation()
+        return _obs_loc
 
     def _set_location(self, PyCoordGeodetic loc):
 
