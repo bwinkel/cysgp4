@@ -414,7 +414,7 @@ cdef class PyTle(object):
 
     Returns
     -------
-    pydt : `~cysgp4.PyTle` object
+    tle : `~cysgp4.PyTle` object
 
     Examples
     --------
@@ -488,7 +488,41 @@ cdef class PyTle(object):
 
 cdef class PyCoordGeodetic(object):
     '''
-    Wrapper around (C++) CoordGeodetic struct
+    Thin wrapper around sgp4 (C++) CoordGeodetic struct.
+
+    The CoordGeodetic struct holds a geographic location (latitude,
+    longitude, altitude).
+
+    Parameters
+    ----------
+    lon_deg : float (default: 0.)
+        Longitude of geographic location [deg].
+    lat_deg : float (default: 0.)
+        Latitude of geographic location [deg].
+    alt_km : float (default: 0.)
+        Altitude of geographic location [km].
+
+    Returns
+    -------
+    geo : `~cysgp4.PyCoordGeodetic` object
+
+    Examples
+    --------
+    Constructing and using a `~cysgp4.PyCoordGeodetic` object is
+    straightforward::
+
+        >>> from cysgp4 import PyCoordGeodetic
+
+        >>> lon_deg, lat_deg = 6.88375, 50.525
+        >>> alt_km = 0.366
+        >>> geo = PyCoordGeodetic(lon_deg, lat_deg, alt_km)
+        >>> geo
+        <PyCoordGeodetic: 6.8838d, 50.5250d, 0.3660km>
+
+        >>> # Access is also possible via properties, e.g.:
+        >>> geo.lon
+        6.88375
+        >>> geo.alt = 0.4
     '''
 
     # hold the C++ instance, which we're wrapping
@@ -541,14 +575,68 @@ cdef class PyCoordGeodetic(object):
 
         self._cobj.altitude = alt_km
 
-    lon = property(_get_lon, _set_lon, None)
-    lat = property(_get_lat, _set_lat, None)
-    alt = property(_get_alt, _set_alt, None)
+    lon = property(
+        _get_lon, _set_lon, None,
+        doc='Geographic longitude [deg] (see also Class documentation).'
+        )
+    lat = property(
+        _get_lat, _set_lat, None,
+        doc='Geographic latitude [deg] (see also Class documentation).'
+        )
+    alt = property(
+        _get_alt, _set_alt, None,
+        doc='Geographic altitude [km] (see also Class documentation).'
+        )
 
 
 cdef class PyCoordTopocentric(object):
     '''
-    Wrapper around (C++) CoordTopocentric struct
+    Thin wrapper around sgp4 (C++) CoordTopocentric struct.
+
+    The CoordTopocentric struct holds a topocentric location
+    (azimuth, elevation, range/distance and distance/range rate).
+
+    Note: the topocentric position of a satellite is always relative to
+    an observer (in SGP4 the observer is defined in geographic coordinates).
+    The distance and distance change (aka range rate) is thus the distance
+    between the satellite and the observer. However, this struct/class
+    only holds the azimuth, elevation, distance and distance rate parameters,
+    but contains no information on the observer. It is only useful in
+    conjuction with a `~cysgp4.PyObserver` (which holds a reference to a
+    geographic location) and a datetime; see `~cysgp4.Satellite`.
+
+    Parameters
+    ----------
+    az_deg : float (default: 0.)
+        Azimuth of topocentric location [deg].
+    el_deg : float (default: 0.)
+        Elevation of topocentric location [deg].
+    dist_km : float (default: 0.)
+        Distance/range of topocentric location [km].
+    dist_rate_km_per_s : float (default: 0.)
+        Distance/range rate of topocentric location [km/s].
+
+    Returns
+    -------
+    topo : `~cysgp4.PyCoordTopocentric` object
+
+    Examples
+    --------
+    Constructing and using a `~cysgp4.PyCoordTopocentric` object is
+    straightforward::
+
+        >>> from cysgp4 import PyCoordTopocentric
+
+        >>> az_deg, el_deg = 130.1, 10.53
+        >>> dist_km, dist_rate_kms = 1200., 0.03
+        >>> topo = PyCoordTopocentric(az_deg, el_deg, dist_km, dist_rate_kms)
+        >>> topo
+        <PyCoordTopocentric: 130.1000d, 10.5300d, 1200.0000km, 0.0300km/s>
+
+        >>> # Access is also possible via properties, e.g.:
+        >>> topo.az
+        130.1
+        >>> topo.dist = 1000.
     '''
 
     # hold the C++ instance, which we're wrapping
@@ -611,15 +699,67 @@ cdef class PyCoordTopocentric(object):
 
         self._cobj.distance_rate = dist_rate_km_per_s
 
-    az = property(_get_az, _set_az, None)
-    el = property(_get_el, _set_el, None)
-    dist = property(_get_dist, _set_dist, None)
-    dist_rate = property(_get_dist_rate, _set_dist_rate, None)
+    az = property(
+        _get_az, _set_az, None,
+        doc='Topocentric azimuth [deg] (see also Class documentation).'
+        )
+    el = property(
+        _get_el, _set_el, None,
+        doc='Topocentric elevation [deg] (see also Class documentation).'
+        )
+    dist = property(
+        _get_dist, _set_dist, None,
+        doc='Topocentric distance [km] (see also Class documentation).'
+        )
+    dist_rate = property(
+        _get_dist_rate, _set_dist_rate, None,
+        doc='Topocentric distance rate [km/s] (see also Class documentation).'
+        )
 
 
 cdef class PyObserver(object):
     '''
-    Wrapper around (C++) Observer class
+    Thin wrapper around sgp4 (C++) Observer class.
+
+    The Observer class holds the location (as ECI, see `~cysgp4.PyEci`) of
+    an observer.
+
+    Note: Usually, a datetime is attached to an ECI location in sgp4.
+    However, the Observer class has no interface to set the datetime
+    and internally it is always set to zero. This is an odd design choice,
+    because a geographic location is not fixed in the ECI system if
+    time passes.
+
+    Parameters
+    ----------
+    lon_deg : float (default: 0.)
+        Longitude of observer (geographic location) [deg].
+    lat_deg : float (default: 0.)
+        Latitude of observer (geographic location) [deg].
+    alt_km : float (default: 0.)
+        Altitude of observer (geographic location) [km].
+
+    Returns
+    -------
+    obs : `~cysgp4.PyObserver` object
+
+    Examples
+    --------
+    Constructing and using a `~cysgp4.PyObserver` object is
+    straightforward::
+
+        >>> from cysgp4 import PyObserver, PyCoordGeodetic
+
+        >>> lon_deg, lat_deg = 6.88375, 50.525
+        >>> alt_km = 0.366
+        >>> obs = PyObserver(lon_deg, lat_deg, alt_km)
+        >>> obs
+        <PyObserver: 6.8838d, 50.5250d, 0.3660km>
+
+        >>> # Access is also possible via location property:
+        >>> obs.loc
+        <PyCoordGeodetic: 6.8838d, 50.5250d, 0.3660km>
+        >>> obs.loc = PyCoordGeodetic(1, 2, 3)
     '''
 
     # hold the C++ instance, which we're wrapping
@@ -669,18 +809,60 @@ cdef class PyObserver(object):
 
 cdef class PyEci(object):
     '''
-    Wrapper around (C++) Eci class
-    '''
+    Thin wrapper around sgp4 (C++) Eci class.
 
+    The Eci class holds an `ECI location
+    <https://en.wikipedia.org/wiki/Earth-centered_inertial>`_
+    (latitude, longitude, altitude) for a particular datetime.
+
+    Note, internally, the coordinates (and velocities) are stored in
+    Cartesian form (read-only!). One can access these, via the
+    `~cysgp4.PyEci.loc` and `~cysgp4.PyEci.vel` properties. Setting
+    new parameters is only possible via a geographic location.
+
+    Parameters
+    ----------
+    pydt : `~cysgp4.PyDateTime`
+        Date and time.
+    geo_loc : `~cysgp4.PyCoordGeodetic`
+        Geographic location.
+
+    Returns
+    -------
+    eci : `~cysgp4.PyEci` object
+
+    Examples
+    --------
+    Constructing and using a `~cysgp4.PyEci` object is
+    straightforward::
+
+        >>> from cysgp4 import PyEci, PyCoordGeodetic, PyDateTime
+
+        >>> pydt = PyDateTime.from_mjd(55555.)
+        >>> lon_deg, lat_deg = 6.88375, 50.525
+        >>> alt_km = 0.366
+        >>> geo = PyCoordGeodetic(lon_deg, lat_deg, alt_km)
+        >>> eci = PyEci(pydt, geo)
+        >>> eci
+        <PyEci: 6.8837d, 50.5250d, 0.3660km 2010-12-25 00:00:00.000000 UTC>
+
+        >>> # Access is also possible via properties, e.g.:
+        >>> eci.loc
+        (-725.3304166274728, 3997.924210010933, 4900.402205553537)
+        >>> eci.pydt = PyDateTime.from_mjd(55556.)
+
+        >>> # or the update method:
+        >>> eci.update(pydt, PyCoordGeodetic(0, 0, 0))
+    '''
     cdef:
         # hold the C++ instance, which we're wrapping
         Eci _cobj
 
-    def __init__(self, PyDateTime dt=None, PyCoordGeodetic geo_loc=None):
+    def __init__(self, PyDateTime pydt=None, PyCoordGeodetic geo_loc=None):
         '''
-        Constructor PyEci(PyDateTime dt, PyCoordGeodetic geo_loc)
+        Constructor PyEci(PyDateTime pydt, PyCoordGeodetic geo_loc)
         '''
-        self.update(dt, geo_loc)
+        self.update(pydt, geo_loc)
 
     def __str__(self):
 
@@ -746,15 +928,101 @@ cdef class PyEci(object):
 
         self.update(pydt, self.geo_loc)
 
-    loc = property(_get_loc, None, None)
-    vel = property(_get_vel, None, None)
-    geo_loc = property(_get_geo_loc, _set_geo_loc, None)
-    pydt = property(_get_dt, _set_dt, None)
+    loc = property(
+        _get_loc, None, None,
+        doc='Cartesian location (readonly, see also Class documentation).'
+        )
+    vel = property(
+        _get_vel, None, None,
+        doc='Cartesian velocity (readonly, see also Class documentation).'
+        )
+    geo_loc = property(
+        _get_geo_loc, _set_geo_loc, None,
+        doc='Geographic location (see also Class documentation).'
+        )
+    pydt = property(
+        _get_dt, _set_dt, None,
+        doc='Datetime (see also Class documentation).'
+        )
 
 
 cdef class Satellite(object):
     '''
-    Calculates apparent positions of satellite for a given observer and TLE
+    Calculate position of a satellite at a given time.
+
+    The satellite is defined via a TLE (see `~cysgp4.PyTle`). Furthermore,
+    for apparent positions of the satellite, an observer (see
+    `~cysgp4.PyObserver`) needs to be defined.
+
+    The position calculations are lazy, i.e., only calculated if the newly
+    requested time differs by a certain amount from the last time at which
+    a calculation was performed. The granularity of this "cache" can be
+    defined via the `mjd_cache_resolution` parameter.
+
+    Parameters
+    ----------
+    tle : `~cysgp4.PyTle`
+        TLE instance of the satellite of interest.
+    obs : `~cysgp4.PyObserver` or None (default: None)
+        Observer instance. If `None` then the observer location is set to
+        (0 deg, 0 deg, 0 km).
+    pydt : `~cysgp4.PyDateTime` or `None` (default: None)
+        Date and time at which to calculate the position. If `None` then
+        the current datetime is used, as given by a call to
+        `~datetime.datetime.now()`.
+    mjd_cache_resolution : double (default: 0.001)
+        Granularity of the internal cache [s]. Satellite positions are
+        calculated only if the newly requested datetime differs by more than
+        this from the previous calculation.
+
+    Returns
+    -------
+    sat : `~cysgp4.Satellite` object
+
+    Examples
+    --------
+    The following demonstrates how a typical use of the `~cysgp4.Satellite`
+    class would look like::
+
+        >>> from cysgp4 import *
+
+        >>> pydt = PyDateTime.from_mjd(58805.57)
+        >>> lon_deg, lat_deg = 6.88375, 50.525
+        >>> alt_km = 0.366
+        >>> obs = PyObserver(lon_deg, lat_deg, alt_km)
+
+        >>> hst_tle = PyTle(
+        ... 'HST',
+        ... '1 20580U 90037B   19321.38711875  .00000471  00000-0  17700-4 0  9991',
+        ... '2 20580  28.4699 288.8102 0002495 321.7771 171.5855 15.09299865423838',
+        ... )
+
+        >>> sat = Satellite(hst_tle, obs, pydt)
+        >>> # can now query positions, also for different times
+        >>> sat.eci_pos().loc  # ECI cartesian position
+        (5879.5931344459295, 1545.7455647032068, 3287.4155452595)
+        >>> sat.eci_pos().vel  # ECI cartesian velocity
+        (-1.8205895517672226, 7.374044252723081, -0.20697960810978586)
+        >>> sat.geo_pos()  # geographic position
+        <PyCoordGeodetic: 112.2146d, 28.5509d, 538.0186km>
+        >>> sat.topo_pos()  # topocentric position
+        <PyCoordTopocentric: 60.2453d, -35.6844d, 8314.5683km, 3.5087km/s>
+
+        >>> # change time
+        >>> sat.mjd += 1 / 720.  # one minute later
+        >>> sat.topo_pos()
+        <PyCoordTopocentric: 54.8446d, -38.2749d, 8734.9195km, 3.4885km/s>
+
+        >>> # change by less than cache resolution (1 ms)
+        >>> sat.topo_pos().az, sat.topo_pos().el
+        (54.84463503781068, -38.274852915850126)
+        >>> sat.mjd += 0.0005 / 86400.  # 0.5 ms
+        >>> sat.topo_pos().az, sat.topo_pos().el
+        (54.84463503781068, -38.274852915850126)
+        >>> # change by another 0.5 ms triggers re-calculation
+        >>> sat.mjd += 0.00051 / 86400.
+        >>> sat.topo_pos().az, sat.topo_pos().el
+        (54.844568313870965, -38.274885794151324)
     '''
 
     cdef:
