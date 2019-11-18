@@ -1196,6 +1196,7 @@ def propagate_many(mjds, tles, observers=None):
         Observer _obs
         Eci _eci
         DateTime _dt
+        CoordGeodetic _geo
         CoordTopocentric _topo
         Vector _eci_pos, _eci_vel
 
@@ -1203,22 +1204,34 @@ def propagate_many(mjds, tles, observers=None):
         np.ndarray[object] tle, obs
         double[::1] eci_x_v, eci_y_v, eci_z_v
         double[::1] eci_vx_v, eci_vy_v, eci_vz_v
-        double[::1] az_v, el_v, dist_v, dist_rate_v
-        int i, size
-        bint do_topo = True
+        double[::1] lon_v, lat_v, alt_v  # geodetic
+        double[::1] az_v, el_v, dist_v, dist_rate_v  # topocentric
+        int i, size, n, pnum
 
         tle_ptr_t* _tle_ptr_array
         obs_ptr_t* _obs_ptr_array
 
     if observers is None:
         observers = PyObserver()
-        do_topo = False
+
+    # TODO: allocate only those arrays, which are actually requested
+    # ("do_topo" etc.)
+
+    pnum = 0
+    if do_eci_pos:
+        pnum += 3
+    if do_eci_vel:
+        pnum += 3
+    if do_geo:
+        pnum += 3
+    if do_topo:
+        pnum += 4
 
     it = np.nditer(
-        [tles, observers, mjds] + [None] * 10,
+        [tles, observers, mjds] + [None] * pnum,
         flags=['external_loop', 'buffered', 'delay_bufalloc', 'refs_ok'],
-        op_flags=[['readonly']] * 3 + [['readwrite', 'allocate']] * 10,
-        op_dtypes=['object', 'object', 'float64'] + ['float64'] * 10
+        op_flags=[['readonly']] * 3 + [['readwrite', 'allocate']] * pnum,
+        op_dtypes=['object', 'object', 'float64'] + ['float64'] * pnum
         )
 
     # it would be better to use the context manager but
@@ -1231,16 +1244,23 @@ def propagate_many(mjds, tles, observers=None):
         tle = itup[0]
         obs = itup[1]
         mjd = itup[2]
-        eci_x_v = itup[3]
-        eci_y_v = itup[4]
-        eci_z_v = itup[5]
-        eci_vx_v = itup[6]
-        eci_vy_v = itup[7]
-        eci_vz_v = itup[8]
-        az_v = itup[9]
-        el_v = itup[10]
-        dist_v = itup[11]
-        dist_rate_v = itup[12]
+
+        n = 3
+        if do_eci_pos:
+            eci_x_v, eci_y_v, eci_z_v = itup[n:n + 3]
+            n += 3
+
+        if do_eci_vel:
+            eci_vx_v, eci_vy_v, eci_vz_v = itup[n:n + 3]
+            n += 3
+
+        if do_geo:
+            lon_v, lat_v, alt_v = itup[n:n + 3]
+            n += 3
+
+        if do_topo:
+            az_v, el_v, dist_v, dist_rate_v = itup[n:n + 4]
+            n += 4
 
         size = mjd.shape[0]
         _tle_ptr_array = array_new[tle_ptr_t](size)
@@ -1268,28 +1288,53 @@ def propagate_many(mjds, tles, observers=None):
             _sgp4_ptr = new SGP4(deref(_tle_ptr))
             _eci = _sgp4_ptr.FindPosition(_dt)
             del _sgp4_ptr
+
+            if do_eci_pos:
+                _eci_pos = _eci.Position()
+                eci_x_v[i] = _eci_pos.x
+                eci_y_v[i] = _eci_pos.y
+                eci_z_v[i] = _eci_pos.z
+
+            if do_eci_vel:
+                _eci_vel = _eci.Velocity()
+                eci_vx_v[i] = _eci_vel.x
+                eci_vy_v[i] = _eci_vel.y
+                eci_vz_v[i] = _eci_vel.z
+
+            if do_geo:
+                _geo = _eci.ToGeodetic()
+                lon_v[i] = _geo.longitude * RAD2DEG
+                lat_v[i] = _geo.latitude * RAD2DEG
+                alt_v[i] = _geo.altitude
+
             if do_topo:
                 _obs = Observer(_obs_ptr_array[i].GetLocation())
                 _topo = _obs.GetLookAngle(_eci)
-
-            _eci_pos = _eci.Position()
-            _eci_vel = _eci.Velocity()
-            eci_x_v[i] = _eci_pos.x
-            eci_y_v[i] = _eci_pos.y
-            eci_z_v[i] = _eci_pos.z
-            eci_vx_v[i] = _eci_vel.x
-            eci_vy_v[i] = _eci_vel.y
-            eci_vz_v[i] = _eci_vel.z
-            az_v[i] = _topo.azimuth * RAD2DEG
-            el_v[i] = _topo.elevation * RAD2DEG
-            dist_v[i] = _topo.distance
-            dist_rate_v[i] = _topo.distance_rate
+                az_v[i] = _topo.azimuth * RAD2DEG
+                el_v[i] = _topo.elevation * RAD2DEG
+                dist_v[i] = _topo.distance
+                dist_rate_v[i] = _topo.distance_rate
 
         array_delete(_tle_ptr_array)
         array_delete(_obs_ptr_array)
 
-    if do_topo:
-        return it.operands[3:6], it.operands[6:9], it.operands[9:13]
-    else:
-        return it.operands[3:6], it.operands[6:9]
+    result = {}
 
+    n = 3
+    if do_eci_pos:
+        result['eci_pos'] = it.operands[n:n + 3]
+        n += 3
+
+    if do_eci_vel:
+        result['eci_vel'] = it.operands[n:n + 3]
+        n += 3
+
+    if do_geo:
+        result['geo'] = it.operands[n:n + 3]
+        n += 3
+
+    if do_topo:
+        result['topo'] = it.operands[n:n + 4]
+        n += 4
+
+    return result

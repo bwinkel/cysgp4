@@ -383,10 +383,14 @@ def test_propagate_many():
     tles = PyTle(*TLE_ISS)
     observers = PyObserver(6.88375, 50.525, 0.366)
     mjds = np.linspace(56458.123, 56459.123, 4)
-    eci_pos, eci_vel, topo_pos = propagate_many(mjds, tles, observers)
+    result = propagate_many(mjds, tles, observers)
+    eci_pos, eci_vel = result['eci_pos'], result['eci_vel']
+    geo_pos = result['geo']
+    topo_pos = result['topo']
 
     print(eci_pos)
     print(eci_vel)
+    print(geo_pos)
     print(topo_pos)
     assert_allclose(
         eci_pos,
@@ -421,6 +425,22 @@ def test_propagate_many():
         )
 
     assert_allclose(
+        geo_pos,
+        (
+            np.array([
+                -136.627540, -170.697920, 112.553254, 46.159782
+                ]),
+            np.array([
+                45.289346, 38.923546, -7.296947, -48.125882
+                ]),
+            np.array([
+                411.566712, 413.350097, 419.680645, 438.181917
+                ])
+            ),
+        atol=1.e-5
+        )
+
+    assert_allclose(
         topo_pos,
         (
             np.array([
@@ -445,13 +465,24 @@ def test_propagate_many_broadcast():
     tles = np.array([PyTle(*TLE_ISS), PyTle(*TLE_GPS)])[:, np.newaxis]
     observers = PyObserver(6.88375, 50.525, 0.366)
     mjds = np.linspace(56458.123, 56459.123, 4)[np.newaxis, :]
-    eci_pos, eci_vel, topo_pos = propagate_many(mjds, tles, observers)
-    assert eci_pos[0].shape == (2, 4)
+    result = propagate_many(mjds, tles, observers)
+
+    assert result['eci_pos'][0].shape == (2, 4)
 
 
-def test_propagate_many_no_topo():
+def test_propagate_many_pos_switches():
 
     tles = PyTle(*TLE_ISS)
     mjds = np.linspace(56458.123, 56459.123, 4)
-    eci_pos, eci_vel = propagate_many(mjds, tles)
-    assert eci_pos[0].shape == (4,)
+
+    result = propagate_many(
+        mjds, tles,
+        do_eci_pos=True, do_eci_vel=True, do_geo=True, do_topo=True,
+        )
+    assert all(k in result for k in ['eci_pos', 'eci_vel', 'geo', 'topo'])
+
+    result = propagate_many(
+        mjds, tles,
+        do_eci_pos=False, do_eci_vel=True, do_geo=True, do_topo=True,
+        )
+    assert ('eci_pos' not in result) and ('eci_vel' in result)
