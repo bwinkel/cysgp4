@@ -49,6 +49,18 @@ cdef extern from 'Tle.h':
         string Name() nogil const
         string Line1() nogil const
         string Line2() nogil const
+        string IntDesignator() nogil const
+        DateTime Epoch() nogil const
+        double MeanMotionDt2() nogil const
+        double MeanMotionDdt6() nogil const
+        double BStar() const
+        double Inclination(bool in_degrees) nogil const
+        double RightAscendingNode(const bool in_degrees) nogil const
+        double Eccentricity() nogil const
+        double ArgumentPerigee(const bool in_degrees) nogil const
+        double MeanAnomaly(const bool in_degrees) nogil const
+        double MeanMotion() nogil const
+        unsigned int OrbitNumber() nogil const
 
 
 cdef extern from 'SGP4.h':
