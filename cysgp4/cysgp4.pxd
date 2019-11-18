@@ -69,7 +69,7 @@ cdef extern from 'SGP4.h':
     cdef cppclass SGP4:
         SGP4(const Tle& tle) nogil except +
 
-        Eci FindPosition(const DateTime& date) nogil const
+        Eci FindPosition(const DateTime& date) nogil except +
 
 
 cdef extern from 'Observer.h':

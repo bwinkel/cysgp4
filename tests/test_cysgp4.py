@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import importlib
+import requests
 import pytest
 import datetime
 import numpy as np
@@ -486,3 +487,55 @@ def test_propagate_many_pos_switches():
         do_eci_pos=False, do_eci_vel=True, do_geo=True, do_topo=True,
         )
     assert ('eci_pos' not in result) and ('eci_vel' in result)
+
+
+def _propagate_prepare():
+
+    url = 'http://celestrak.com/NORAD/elements/science.txt'
+    ctrak_science = requests.get(url)
+    all_lines = ctrak_science.text.split('\r\n')
+    tle_list = list(zip(*tuple(
+        all_lines[idx::3] for idx in range(3)
+        )))
+    tles = np.array([
+        PyTle(*tle) for tle in tle_list
+        ])[np.newaxis, np.newaxis, :20]
+    observers = np.array([
+        PyObserver(6.88375, 50.525, 0.366),
+        PyObserver(16.88375, 50.525, 0.366),
+        ])[np.newaxis, :, np.newaxis]
+    mjds = np.linspace(58805.5, 58806.5, 1000)[:, np.newaxis, np.newaxis]
+
+    return mjds, tles, observers
+
+
+def _propagate_many_cysgp4():
+
+    propagate_many(*_propagate_prepare())
+
+
+def _propagate_single_cysgp4():
+
+    propagate_many_slow(*_propagate_prepare())
+
+
+def test_propagate_many_cysgp4():
+
+    res = _propagate_many_cysgp4()
+
+
+def test_propagate_single_cysgp4():
+
+    res = _propagate_single_cysgp4()
+    # print(res)
+    # assert False
+
+
+def test_propagate_many_cysgp4_benchmark(benchmark):
+
+    benchmark(_propagate_many_cysgp4)
+
+
+def test_propagate_single_cysgp4_benchmark(benchmark):
+
+    benchmark(_propagate_single_cysgp4)

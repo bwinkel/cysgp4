@@ -42,6 +42,7 @@ from __future__ import unicode_literals
 cimport cython
 from cython.parallel import prange, parallel
 cimport numpy as np
+cimport openmp
 from numpy cimport PyArray_MultiIter_DATA as Py_Iter_DATA
 from cython.operator cimport dereference as deref
 from cython.operator cimport address as addr
@@ -71,8 +72,26 @@ ctypedef Observer* obs_ptr_t
 __all__ = [
     'PyDateTime', 'PyTle', 'PyObserver',
     'PyCoordGeodetic', 'PyCoordTopocentric', 'PyEci',
-    'Satellite', 'propagate_many',
+    'Satellite', 'propagate_many', 'propagate_many_slow', 'set_num_threads',
     ]
+
+
+def set_num_threads(int nthreads):
+    '''
+    Change maximum number of threads to use.
+
+    Parameters
+    ----------
+    nthreads - int
+        Number of threads to use.
+
+    Notes
+    -----
+    - This can also be controlled by setting the environment variable
+      `OMP_NUM_THREADS`.
+    '''
+
+    openmp.omp_set_num_threads(nthreads)
 
 
 cdef inline long long ticks_from_mjd(double mjd) nogil:
@@ -202,6 +221,11 @@ cdef class PyDateTime(object):
         Internally, DateTime objects store time on a linear scale, "ticks",
         which is the number of micro-seconds since 1. January 0001, 00:00.
 
+        Parameters
+        ----------
+        ticks : unsigned long long
+            Number of micro-seconds since 1. January 0001, 00:00.
+
         Returns
         -------
         pydt : `~cysgp4.PyDateTime` object
@@ -229,6 +253,11 @@ cdef class PyDateTime(object):
         `Modified Julian Date (MJD)
         <https://en.wikipedia.org/wiki/Julian_day#Variants>`_, is a
         timescale, which is often used in astronomy.
+
+        Parameters
+        ----------
+        mjd : double
+            Modified Julian Date.
 
         Returns
         -------
@@ -427,10 +456,10 @@ cdef class PyTle(object):
         >>> url = 'http://celestrak.com/NORAD/elements/science.txt'
         >>> ctrak_science = requests.get(url)
         >>> all_lines = ctrak_science.text.split('\r\n')
-        >>> tle_list = list(zip(
-        ...     *tuple(all_lines[idx::3]
-        ...     for idx in range(3))
-        ...     ))
+        >>> tle_list = list(zip(*tuple(
+        ...     all_lines[idx::3]
+        ...     for idx in range(3)
+        ...     )))
         >>> len(tle_list)
         >>> print(*tle_list[1], sep='\n')
         HST
@@ -1076,16 +1105,8 @@ cdef class Satellite(object):
         self._pydt._cobj = DateTime(pydt._cobj.Ticks())
         self._cmjd = self._pydt.mjd
 
-        try:
-
-            self.thisptr = new SGP4(deref(tle.thisptr))
-            self._tle_dirty = <python_bool> False
-
-        except:
-
-            print('SatelliteException catched')
-            self._tle_dirty = <python_bool> True
-
+        self.thisptr = new SGP4(deref(tle.thisptr))
+        self._tle_dirty = <python_bool> False
 
         # the following is important, otherwise self._topo and self._geo will
         # just be None after _refresh_coords()
@@ -1119,7 +1140,10 @@ cdef class Satellite(object):
 
             self._pos_dirty = <python_bool> True
 
-    mjd = property(_get_mjd, _set_mjd, None, 'mjd')
+    mjd = property(
+        _get_mjd, _set_mjd, None,
+        doc='Modified Julian Date (see also Class documentation).'
+        )
 
     def _get_datetime(self):
 
@@ -1130,9 +1154,24 @@ cdef class Satellite(object):
         # must use the set_mjd method otherwise the caching would not work
         self._set_mjd(pydt.mjd)
 
-    pydt = property(_get_datetime, _set_datetime, None, 'datetime')
+    pydt = property(
+        _get_datetime, _set_datetime, None,
+        doc='Datetime (see also Class documentation).'
+        )
 
     def topo_pos(self):
+        '''
+        Topocentric position of satellite w.r.t. given observer.
+
+        Lazily calculated, i.e., only if difference to the timestamp
+        for which the previous calculation was performed is larger
+        than the MJD cache resolution (see class documentation).
+
+        Returns
+        ----------
+        topo : `~cysgp4.PyCoordTopocentric`
+            Topocentric position of satellite w.r.t. given observer.
+        '''
 
         if self._pos_dirty:
             self._refresh_coords()
@@ -1143,6 +1182,18 @@ cdef class Satellite(object):
         return self._topo
 
     def geo_pos(self):
+        '''
+        Geographic (geodetic) position of satellite.
+
+        Lazily calculated, i.e., only if difference to the timestamp
+        for which the previous calculation was performed is larger
+        than the MJD cache resolution (see class documentation).
+
+        Returns
+        ----------
+        geo : `~cysgp4.PyCoordGeodetic`
+            Geographic position of satellite.
+        '''
 
         if self._pos_dirty:
             self._refresh_coords()
@@ -1153,6 +1204,18 @@ cdef class Satellite(object):
         return self._geo
 
     def eci_pos(self):
+        '''
+        ECI position of satellite.
+
+        Lazily calculated, i.e., only if difference to the timestamp
+        for which the previous calculation was performed is larger
+        than the MJD cache resolution (see class documentation).
+
+        Returns
+        ----------
+        eci : `~cysgp4.PyEci`
+            ECI position of satellite.
+        '''
 
         if self._pos_dirty:
             self._refresh_coords()
@@ -1164,19 +1227,10 @@ cdef class Satellite(object):
 
     def _refresh_coords(self):
 
-        try:
-
-            # FindPosition doesn't update ECI time, need to do manually :-/
-            self._eci = PyEci(pydt=self._pydt)
-            self._eci._cobj = self.thisptr.FindPosition(self._pydt._cobj)
-            self._tle_dirty = <python_bool> False
-
-        except:
-
-            print('SatelliteException catched')
-            self._tle_dirty = <python_bool> True
-
-            return
+        # FindPosition doesn't update ECI time, need to do manually :-/
+        self._eci = PyEci(pydt=self._pydt)
+        self._eci._cobj = self.thisptr.FindPosition(self._pydt._cobj)
+        self._tle_dirty = <python_bool> False
 
         self._topo._cobj = self._obs._cobj.GetLookAngle(
             self._eci._cobj
@@ -1187,7 +1241,95 @@ cdef class Satellite(object):
         self._pos_dirty = <python_bool> False
 
 
-def propagate_many(mjds, tles, observers=None):
+def propagate_many(
+        mjds, tles, observers=None,
+        bint do_eci_pos=True, bint do_eci_vel=True,
+        bint do_geo=True, bint do_topo=True,
+        ):
+    '''
+    Calculate positions of many satellites at a various times at once.
+
+    This is an array interface to the sgp4 calculations, which allows to
+    perform calculations for different satellite TLEs, observers and times
+    in a parallelized manner. `~numpy` broadcasting rules apply.
+
+    Satellite are defined via TLEs (see `~cysgp4.PyTle`). The
+    `~.cysgp4.propagate_many` function works with a single (scalar) PyTle
+    object or a list/array of them. The same is true for the `mjds` and
+    optional `observers` parameters, which must be a scalar (a double and
+    `~cysgp4.PyObserver` instance, respectively) or a list/array of them.
+
+    As in most use cases, a large number of positions is probably queried,
+    the returned values do not use the `~cysgp4.PyEci` or
+    `~cysgp4.PyCoordTopocentric` classes, but pack everything in 3D arrays.
+    This is not only faster, but makes it easier to further process the
+    results.
+
+    For parallelization, `OpenMP <https://www.openmp.org/>`_ is utilized.
+    To change the number of CPU cores that are used, one can either set
+    the environment variable `OMP_NUM_THREADS` or use
+    `~cysgp4.set_num_threads`.
+
+    Parameters
+    ----------
+    mjds : `~numpy.ndarray`, `~list`, or scalar of float
+        Modified Julian Date.
+    tles : `~numpy.ndarray`, `~list`, or scalar of `~cysgp4.PyTle`
+        TLE instance of the satellite of interest.
+    observers : `~numpy.ndarray`, `~list`, or scalar of `~cysgp4.PyObserver`
+                or None (default: None)
+        Observer instance. If `None` then the observer location is set to
+        (0 deg, 0 deg, 0 km).
+
+    Returns
+    -------
+    sat : `~cysgp4.Satellite` object
+
+    Examples
+    --------
+    The following demonstrates how a typical use of the `~cysgp4.Satellite`
+    class would look like::
+
+        >>> from cysgp4 import *
+
+        >>> pydt = PyDateTime.from_mjd(58805.57)
+        >>> lon_deg, lat_deg = 6.88375, 50.525
+        >>> alt_km = 0.366
+        >>> obs = PyObserver(lon_deg, lat_deg, alt_km)
+
+        >>> hst_tle = PyTle(
+        ... 'HST',
+        ... '1 20580U 90037B   19321.38711875  .00000471  00000-0  17700-4 0  9991',
+        ... '2 20580  28.4699 288.8102 0002495 321.7771 171.5855 15.09299865423838',
+        ... )
+
+        >>> sat = Satellite(hst_tle, obs, pydt)
+        >>> # can now query positions, also for different times
+        >>> sat.eci_pos().loc  # ECI cartesian position
+        (5879.5931344459295, 1545.7455647032068, 3287.4155452595)
+        >>> sat.eci_pos().vel  # ECI cartesian velocity
+        (-1.8205895517672226, 7.374044252723081, -0.20697960810978586)
+        >>> sat.geo_pos()  # geographic position
+        <PyCoordGeodetic: 112.2146d, 28.5509d, 538.0186km>
+        >>> sat.topo_pos()  # topocentric position
+        <PyCoordTopocentric: 60.2453d, -35.6844d, 8314.5683km, 3.5087km/s>
+
+        >>> # change time
+        >>> sat.mjd += 1 / 720.  # one minute later
+        >>> sat.topo_pos()
+        <PyCoordTopocentric: 54.8446d, -38.2749d, 8734.9195km, 3.4885km/s>
+
+        >>> # change by less than cache resolution (1 ms)
+        >>> sat.topo_pos().az, sat.topo_pos().el
+        (54.84463503781068, -38.274852915850126)
+        >>> sat.mjd += 0.0005 / 86400.  # 0.5 ms
+        >>> sat.topo_pos().az, sat.topo_pos().el
+        (54.84463503781068, -38.274852915850126)
+        >>> # change by another 0.5 ms triggers re-calculation
+        >>> sat.mjd += 0.00051 / 86400.
+        >>> sat.topo_pos().az, sat.topo_pos().el
+        (54.844568313870965, -38.274885794151324)
+    '''
 
     cdef:
 
@@ -1317,6 +1459,95 @@ def propagate_many(mjds, tles, observers=None):
 
         array_delete(_tle_ptr_array)
         array_delete(_obs_ptr_array)
+
+    result = {}
+
+    n = 3
+    if do_eci_pos:
+        result['eci_pos'] = it.operands[n:n + 3]
+        n += 3
+
+    if do_eci_vel:
+        result['eci_vel'] = it.operands[n:n + 3]
+        n += 3
+
+    if do_geo:
+        result['geo'] = it.operands[n:n + 3]
+        n += 3
+
+    if do_topo:
+        result['topo'] = it.operands[n:n + 4]
+        n += 4
+
+    return result
+
+
+def propagate_many_slow(
+        mjds, tles, observers=None,
+        bint do_eci_pos=True, bint do_eci_vel=True,
+        bint do_geo=True, bint do_topo=True,
+        ):
+
+    pnum = 0
+    if do_eci_pos:
+        pnum += 3
+    if do_eci_vel:
+        pnum += 3
+    if do_geo:
+        pnum += 3
+    if do_topo:
+        pnum += 4
+
+    it = np.nditer(
+        [tles, observers, mjds] + [None] * pnum,
+        flags=['external_loop', 'buffered', 'delay_bufalloc', 'refs_ok'],
+        op_flags=[['readonly']] * 3 + [['readwrite', 'allocate']] * pnum,
+        op_dtypes=['object', 'object', 'float64'] + ['float64'] * pnum
+        )
+
+    it.reset()
+    for itup in it:
+
+        tle = itup[0]
+        obs = itup[1]
+        mjd = itup[2]
+
+        size = mjd.shape[0]
+        for i in range(size):
+
+            sat = Satellite(tle[i], obs[i], PyDateTime.from_mjd(mjd[i]))
+            eci = sat.eci_pos()
+            geo_pos = sat.geo_pos()
+            topo_pos = sat.topo_pos()
+
+            eci_pos_x, eci_pos_y, eci_pos_z = eci.loc
+            eci_vel_x, eci_vel_y, eci_vel_z = eci.vel
+
+            n = 3
+            if do_eci_pos:
+                itup[n + 0][i] = eci_pos_x
+                itup[n + 1][i] = eci_pos_y
+                itup[n + 2][i] = eci_pos_z
+                n += 3
+
+            if do_eci_vel:
+                itup[n + 0][i] = eci_vel_x
+                itup[n + 1][i] = eci_vel_y
+                itup[n + 2][i] = eci_vel_z
+                n += 3
+
+            if do_geo:
+                itup[n + 0][i] = geo_pos.lon
+                itup[n + 1][i] = geo_pos.lat
+                itup[n + 2][i] = geo_pos.alt
+                n += 3
+
+            if do_topo:
+                itup[n + 0][i] = topo_pos.az
+                itup[n + 1][i] = topo_pos.el
+                itup[n + 2][i] = topo_pos.dist
+                itup[n + 3][i] = topo_pos.dist_rate
+                n += 4
 
     result = {}
 
