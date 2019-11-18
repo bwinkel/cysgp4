@@ -780,7 +780,7 @@ cdef class Satellite(object):
             self,
             PyTle tle,
             PyObserver observer=None,
-            object dt=None,
+            PyDateTime pydt=None,
             double mjd_cache_resolution=MJD_RESOLUTION,
             ):
         '''
@@ -793,9 +793,14 @@ cdef class Satellite(object):
 
             observer = PyObserver()
 
+        if pydt is None:
+
+            pydt = PyDateTime()
+
         self._mjd_cache_resolution = mjd_cache_resolution
         self._tle = tle  # copy reference
         self._observer = observer  # copy reference
+        self._dt = pydt  # copy reference
 
         try:
 
@@ -814,7 +819,6 @@ cdef class Satellite(object):
         # initialize workspaces, otherwise we cannot assign values in
         # _refresh_coords (would produce segfault)
         # note: it is not sufficient to define these as class members (above)
-        self._dt = PyDateTime(dt)  # initialize with current datetime
         self._eci = PyEci()
         self._topo = PyCoordTopocentric()
         self._geo = PyCoordGeodetic()
@@ -848,7 +852,8 @@ cdef class Satellite(object):
 
     def _set_datetime(self, dt):
 
-        self._set_mjd = dt.mjd
+        # must use the set_mjd method otherwise the caching would not work
+        self._set_mjd(dt.mjd)
 
     pydt = property(_get_datetime, _set_datetime, None, 'datetime')
 

@@ -235,7 +235,7 @@ class TestSatellite:
         self.tle = PyTle(*self.tle_tup)
 
         self.dt_tup = (2013, 6, 15, 2, 57, 7, 200000)
-        self.dt = PyDateTime(datetime.datetime(*self.dt_tup))
+        self.pydt = PyDateTime(datetime.datetime(*self.dt_tup))
         self.mjd = 56458.123
         self.effbg_tup = (6.88375, 50.525, 0.366)
         self.effbg_tup_m = (6.88375, 50.525, 366.)
@@ -252,12 +252,15 @@ class TestSatellite:
 
     def test_constructor(self):
 
+        Satellite(self.tle)
         Satellite(self.tle, self.effbg_observer)
+        Satellite(self.tle, self.effbg_observer, self.pydt)
+        Satellite(self.tle, self.effbg_observer, self.pydt, 1 / 86400.)
 
     def test_eci_position(self):
 
-        sat = Satellite(self.tle, self.effbg_observer)
-        sat.mjd = self.mjd
+        sat = Satellite(self.tle, self.effbg_observer, self.pydt)
+        # sat.mjd = self.mjd
         # print(sat.dt)
         eci_pos = sat.eci_pos()
 
@@ -277,8 +280,8 @@ class TestSatellite:
 
     def test_geo_position(self):
 
-        sat = Satellite(self.tle, self.effbg_observer)
-        sat.mjd = self.mjd
+        sat = Satellite(self.tle, self.effbg_observer, self.pydt)
+        # sat.mjd = self.mjd
         # print(sat.dt)
         eci_pos = sat.eci_pos()
         geo_pos = sat.geo_pos()
@@ -293,8 +296,8 @@ class TestSatellite:
 
     def test_topo_position(self):
 
-        sat = Satellite(self.tle, self.effbg_observer)
-        sat.mjd = self.mjd
+        sat = Satellite(self.tle, self.effbg_observer, self.pydt)
+        # sat.mjd = self.mjd
         # print(sat.dt)
         topo_pos = sat.topo_pos()
 
@@ -326,8 +329,8 @@ class TestSatellite:
         az %= 360.
         print(az, el, dist)
 
-        sat = Satellite(self.tle, self.effbg_observer)
-        sat.mjd = self.mjd
+        sat = Satellite(self.tle, self.effbg_observer, self.pydt)
+        # sat.mjd = self.mjd
         # print(sat.pydt)
         eci_pos = sat.eci_pos()
         topo_pos = sat.topo_pos()
