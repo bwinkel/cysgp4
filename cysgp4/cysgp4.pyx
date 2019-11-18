@@ -628,9 +628,9 @@ cdef class PyObserver(object):
 
     def __init__(
             self,
-            double lon_deg=6.883750,
-            double lat_deg=50.525,
-            double alt_km=0.319
+            double lon_deg=0,
+            double lat_deg=0,
+            double alt_km=0,
             ):
         '''
         Constructor PyObserver(double lon_deg, double lat_deg, double alt_km)
