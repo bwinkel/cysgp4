@@ -95,6 +95,9 @@ setup(
     ext_modules=[
         SGP_EXT,
         ],
+    # package_data={
+    #     'tests': ['tests/data/science.txt']
+    #     },
     zip_safe=False,
     # url='https://github.com/bwinkel/cyaatm/',
     # download_url='https://github.com/bwinkel/cyaatm/tarball/0.1.0',

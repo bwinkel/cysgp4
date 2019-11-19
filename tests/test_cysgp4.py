@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import importlib
+import os
 import requests
 import pytest
 import datetime
@@ -28,6 +29,12 @@ TLE_GPS = (
     '1 24876U 97035A   19309.58152857 -.00000011  00000-0  00000+0 0  9996',
     '2 24876  55.4542 192.9394 0037899  66.9931 293.4794  2.00564219163301',
     )
+TLE_MMS = (  # this fails if MJD is very old
+    'MMS 1',
+    '1 40482U 15011A   19320.57120432 -.00000010  00000-0  00000+0 0  9996',
+    '2 40482  21.0630 120.0377 8869973  16.2077  55.8249  0.28561246 10609',
+    )
+
 
 
 class TestPyDateTime:
@@ -491,9 +498,15 @@ def test_propagate_many_pos_switches():
 
 def _propagate_prepare():
 
-    url = 'http://celestrak.com/NORAD/elements/science.txt'
-    ctrak_science = requests.get(url)
-    all_lines = ctrak_science.text.split('\r\n')
+    # url = 'http://celestrak.com/NORAD/elements/science.txt'
+    # ctrak_science = requests.get(url)
+    # all_lines = ctrak_science.text.split('\r\n')
+
+    this_dir, this_filename = os.path.split(__file__)
+    fname = os.path.join(this_dir, 'data', 'science.txt')
+    with open(fname, 'r') as f:
+        all_lines = [s.strip() for s in f.readlines()]
+
     tle_list = list(zip(*tuple(
         all_lines[idx::3] for idx in range(3)
         )))
