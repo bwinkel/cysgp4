@@ -1375,10 +1375,10 @@ def propagate_many(
 
         np.ndarray[double] mjd
         np.ndarray[object] tle, obs
-        double[::1] eci_x_v, eci_y_v, eci_z_v
-        double[::1] eci_vx_v, eci_vy_v, eci_vz_v
-        double[::1] lon_v, lat_v, alt_v  # geodetic
-        double[::1] az_v, el_v, dist_v, dist_rate_v  # topocentric
+        double[:, ::1] eci_pos_v
+        double[:, ::1] eci_vel_v
+        double[:, ::1] geo_v  # geodetic
+        double[:, ::1] topo_v  # topocentric
         int i, size, n, pnum
 
         tle_ptr_t* _tle_ptr_array
@@ -1391,20 +1391,25 @@ def propagate_many(
     # ("do_topo" etc.)
 
     pnum = 0
+    out_dts = []
     if do_eci_pos:
-        pnum += 3
+        out_dts.append(np.dtype(('float64', 3)))
+        pnum += 1
     if do_eci_vel:
-        pnum += 3
+        out_dts.append(np.dtype(('float64', 3)))
+        pnum += 1
     if do_geo:
-        pnum += 3
+        out_dts.append(np.dtype(('float64', 3)))
+        pnum += 1
     if do_topo:
-        pnum += 4
+        out_dts.append(np.dtype(('float64', 4)))
+        pnum += 1
 
     it = np.nditer(
         [tles, observers, mjds] + [None] * pnum,
         flags=['external_loop', 'buffered', 'delay_bufalloc', 'refs_ok'],
         op_flags=[['readonly']] * 3 + [['readwrite', 'allocate']] * pnum,
-        op_dtypes=['object', 'object', 'float64'] + ['float64'] * pnum
+        op_dtypes=['object', 'object', 'float64'] + out_dts
         )
 
     # it would be better to use the context manager but
@@ -1420,20 +1425,20 @@ def propagate_many(
 
         n = 3
         if do_eci_pos:
-            eci_x_v, eci_y_v, eci_z_v = itup[n:n + 3]
-            n += 3
+            eci_pos_v = itup[n]
+            n += 1
 
         if do_eci_vel:
-            eci_vx_v, eci_vy_v, eci_vz_v = itup[n:n + 3]
-            n += 3
+            eci_vel_v = itup[n]
+            n += 1
 
         if do_geo:
-            lon_v, lat_v, alt_v = itup[n:n + 3]
-            n += 3
+            geo_v = itup[n]
+            n += 1
 
         if do_topo:
-            az_v, el_v, dist_v, dist_rate_v = itup[n:n + 4]
-            n += 4
+            topo_v = itup[n]
+            n += 1
 
         size = mjd.shape[0]
         _tle_ptr_array = array_new[tle_ptr_t](size)
@@ -1464,29 +1469,29 @@ def propagate_many(
 
             if do_eci_pos:
                 _eci_pos = _eci.Position()
-                eci_x_v[i] = _eci_pos.x
-                eci_y_v[i] = _eci_pos.y
-                eci_z_v[i] = _eci_pos.z
+                eci_pos_v[i, 0] = _eci_pos.x
+                eci_pos_v[i, 1] = _eci_pos.y
+                eci_pos_v[i, 2] = _eci_pos.z
 
             if do_eci_vel:
                 _eci_vel = _eci.Velocity()
-                eci_vx_v[i] = _eci_vel.x
-                eci_vy_v[i] = _eci_vel.y
-                eci_vz_v[i] = _eci_vel.z
+                eci_vel_v[i, 0] = _eci_vel.x
+                eci_vel_v[i, 1] = _eci_vel.y
+                eci_vel_v[i, 2] = _eci_vel.z
 
             if do_geo:
                 _geo = _eci.ToGeodetic()
-                lon_v[i] = _geo.longitude * RAD2DEG
-                lat_v[i] = _geo.latitude * RAD2DEG
-                alt_v[i] = _geo.altitude
+                geo_v[i, 0] = _geo.longitude * RAD2DEG
+                geo_v[i, 1] = _geo.latitude * RAD2DEG
+                geo_v[i, 2] = _geo.altitude
 
             if do_topo:
                 _obs = Observer(_obs_ptr_array[i].GetLocation())
                 _topo = _obs.GetLookAngle(_eci)
-                az_v[i] = _topo.azimuth * RAD2DEG
-                el_v[i] = _topo.elevation * RAD2DEG
-                dist_v[i] = _topo.distance
-                dist_rate_v[i] = _topo.distance_rate
+                topo_v[i, 0] = _topo.azimuth * RAD2DEG
+                topo_v[i, 1] = _topo.elevation * RAD2DEG
+                topo_v[i, 2] = _topo.distance
+                topo_v[i, 3] = _topo.distance_rate
 
         array_delete(_tle_ptr_array)
         array_delete(_obs_ptr_array)
@@ -1495,20 +1500,20 @@ def propagate_many(
 
     n = 3
     if do_eci_pos:
-        result['eci_pos'] = np.array(it.operands[n:n + 3])
-        n += 3
+        result['eci_pos'] = it.operands[n]
+        n += 1
 
     if do_eci_vel:
-        result['eci_vel'] = np.array(it.operands[n:n + 3])
-        n += 3
+        result['eci_vel'] = it.operands[n]
+        n += 1
 
     if do_geo:
-        result['geo'] = np.array(it.operands[n:n + 3])
-        n += 3
+        result['geo'] = it.operands[n]
+        n += 1
 
     if do_topo:
-        result['topo'] = np.array(it.operands[n:n + 4])
-        n += 4
+        result['topo'] = it.operands[n]
+        n += 1
 
     return result
 
@@ -1525,20 +1530,25 @@ def propagate_many_slow(
     '''
 
     pnum = 0
+    out_dts = []
     if do_eci_pos:
-        pnum += 3
+        out_dts.append(np.dtype(('float64', 3)))
+        pnum += 1
     if do_eci_vel:
-        pnum += 3
+        out_dts.append(np.dtype(('float64', 3)))
+        pnum += 1
     if do_geo:
-        pnum += 3
+        out_dts.append(np.dtype(('float64', 3)))
+        pnum += 1
     if do_topo:
-        pnum += 4
+        out_dts.append(np.dtype(('float64', 4)))
+        pnum += 1
 
     it = np.nditer(
         [tles, observers, mjds] + [None] * pnum,
         flags=['external_loop', 'buffered', 'delay_bufalloc', 'refs_ok'],
         op_flags=[['readonly']] * 3 + [['readwrite', 'allocate']] * pnum,
-        op_dtypes=['object', 'object', 'float64'] + ['float64'] * pnum
+        op_dtypes=['object', 'object', 'float64'] + out_dts
         )
 
     it.reset()
@@ -1561,47 +1571,47 @@ def propagate_many_slow(
 
             n = 3
             if do_eci_pos:
-                itup[n + 0][i] = eci_pos_x
-                itup[n + 1][i] = eci_pos_y
-                itup[n + 2][i] = eci_pos_z
-                n += 3
+                itup[n][i][0] = eci_pos_x
+                itup[n][i][1] = eci_pos_y
+                itup[n][i][2] = eci_pos_z
+                n += 1
 
             if do_eci_vel:
-                itup[n + 0][i] = eci_vel_x
-                itup[n + 1][i] = eci_vel_y
-                itup[n + 2][i] = eci_vel_z
-                n += 3
+                itup[n][i][0] = eci_vel_x
+                itup[n][i][1] = eci_vel_y
+                itup[n][i][2] = eci_vel_z
+                n += 1
 
             if do_geo:
-                itup[n + 0][i] = geo_pos.lon
-                itup[n + 1][i] = geo_pos.lat
-                itup[n + 2][i] = geo_pos.alt
-                n += 3
+                itup[n][i][0] = geo_pos.lon
+                itup[n][i][1] = geo_pos.lat
+                itup[n][i][2] = geo_pos.alt
+                n += 1
 
             if do_topo:
-                itup[n + 0][i] = topo_pos.az
-                itup[n + 1][i] = topo_pos.el
-                itup[n + 2][i] = topo_pos.dist
-                itup[n + 3][i] = topo_pos.dist_rate
-                n += 4
+                itup[n][i][0] = topo_pos.az
+                itup[n][i][1] = topo_pos.el
+                itup[n][i][2] = topo_pos.dist
+                itup[n][i][3] = topo_pos.dist_rate
+                n += 1
 
     result = {}
 
     n = 3
     if do_eci_pos:
-        result['eci_pos'] = np.array(it.operands[n:n + 3])
-        n += 3
+        result['eci_pos'] = it.operands[n]
+        n += 1
 
     if do_eci_vel:
-        result['eci_vel'] = np.array(it.operands[n:n + 3])
-        n += 3
+        result['eci_vel'] = it.operands[n]
+        n += 1
 
     if do_geo:
-        result['geo'] = np.array(it.operands[n:n + 3])
-        n += 3
+        result['geo'] = it.operands[n]
+        n += 1
 
     if do_topo:
-        result['topo'] = np.array(it.operands[n:n + 4])
-        n += 4
+        result['topo'] = it.operands[n]
+        n += 1
 
     return result

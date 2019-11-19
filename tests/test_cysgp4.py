@@ -396,74 +396,52 @@ def test_propagate_many():
     geo_pos = result['geo']
     topo_pos = result['topo']
 
+    print(eci_pos.shape, topo_pos.shape)
     print(eci_pos)
     print(eci_vel)
     print(geo_pos)
     print(topo_pos)
     assert_allclose(
         eci_pos,
-        (
-            np.array([
-                -4728.184444, -1147.648025, 3478.052600, 4540.345522
-                ]),
-            np.array([
-                730.892025, -5164.259228, -5776.901511, -398.376705
-                ]),
-            np.array([
-                4802.515276, 4245.417168, -858.022863, -5052.505474
-                ])
-            ),
+        np.array([
+            [-4728.184444, 730.892025, 4802.515276],
+            [-1147.648025, -5164.259228, 4245.417168],
+            [3478.052600, -5776.901511, -858.022863],
+            [4540.345522, -398.3767047, -5052.505474],
+            ]),
         atol=1.e-5
         )
 
     assert_allclose(
         eci_vel,
-        (
-            np.array([
-                1.530454, 5.324882, 3.719869, -1.505247
-                ]),
-            np.array([
-                -7.065375, -4.172626, 3.104738, 7.243366
-                ]),
-            np.array([
-                2.574385, -3.615363, -5.930719, -1.925367
-                ])
-            ),
+        np.array([
+            [1.530454, -7.065375, 2.574385],
+            [5.324882, -4.172626, -3.615363],
+            [3.719869, 3.104738, -5.930719],
+            [-1.505247, 7.243366, -1.925367],
+            ]),
         atol=1.e-5
         )
 
     assert_allclose(
         geo_pos,
-        (
-            np.array([
-                -136.627540, -170.697920, 112.553254, 46.159782
-                ]),
-            np.array([
-                45.289346, 38.923546, -7.296947, -48.125882
-                ]),
-            np.array([
-                411.566712, 413.350097, 419.680645, 438.181917
-                ])
-            ),
+        np.array([
+            [-136.627536, 45.289346, 411.566712],
+            [-170.697920, 38.923546, 413.350097],
+            [112.553254, -7.296947, 419.680645],
+            [46.159782, -48.125882, 438.181917],
+            ]),
         atol=1.e-5
         )
 
     assert_allclose(
         topo_pos,
-        (
-            np.array([
-                334.789646, 358.119800, 82.269620, 153.995031
-                ]),
-            np.array([
-                -37.384929, -43.467272, -51.326038, -50.639247
-                ]),
-            np.array([
-                8406.367773, 9374.294558, 10485.152119, 10376.500729
-                ]),
-            np.array([
-                -4.351749, 3.058513, 4.306016, 3.230162
-                ])
-            ),
+        np.array([
+            [334.789646, -37.384929, 8406.367770, -4.351749],
+            [358.119800, -43.467272, 9374.294560, 3.058513],
+            [82.269620, -51.326038, 10485.152100, 4.306016],
+            [153.995031, -50.639241, 10376.500700, 3.230162],
+            ]),
         atol=1.e-5
         )
 
@@ -475,7 +453,7 @@ def test_propagate_many_broadcast():
     mjds = np.linspace(56458.123, 56459.123, 4)[np.newaxis, :]
     result = propagate_many(mjds, tles, observers)
 
-    assert result['eci_pos'][0].shape == (2, 4)
+    assert result['eci_pos'][..., 0].shape == (2, 4)
 
 
 def test_propagate_many_pos_switches():
@@ -524,24 +502,22 @@ def _propagate_prepare():
 
 def _propagate_many_cysgp4():
 
-    propagate_many(*_propagate_prepare())
+    return propagate_many(*_propagate_prepare())
 
 
 def _propagate_single_cysgp4():
 
-    propagate_many_slow(*_propagate_prepare())
+    return propagate_many_slow(*_propagate_prepare())
 
 
-def test_propagate_many_cysgp4():
+def test_propagate_many_vs_single_cysgp4():
 
-    res = _propagate_many_cysgp4()
+    res_many = _propagate_many_cysgp4()
+    res_single = _propagate_single_cysgp4()
 
+    for k in ['eci_pos', 'eci_vel', 'geo', 'topo']:
 
-def test_propagate_single_cysgp4():
-
-    res = _propagate_single_cysgp4()
-    # print(res)
-    # assert False
+        assert_allclose(res_many[k], res_single[k], atol=1.e-5)
 
 
 def test_propagate_many_cysgp4_benchmark(benchmark):
