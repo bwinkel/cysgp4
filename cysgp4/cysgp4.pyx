@@ -1253,6 +1253,10 @@ def propagate_many(
     perform calculations for different satellite TLEs, observers and times
     in a parallelized manner. `~numpy` broadcasting rules apply.
 
+    With the Boolean parameters, `do_eci_pos`, `do_eci_vel`, `do_geo`, and
+    `do_topo` the user can decide, which position frames are returned
+    in the output dictionary.
+
     Satellite are defined via TLEs (see `~cysgp4.PyTle`). The
     `~.cysgp4.propagate_many` function works with a single (scalar) PyTle
     object or a list/array of them. The same is true for the `mjds` and
@@ -1280,55 +1284,82 @@ def propagate_many(
                 or None (default: None)
         Observer instance. If `None` then the observer location is set to
         (0 deg, 0 deg, 0 km).
+    do_eci_pos : Boolean, optional (default: True)
+        Whether to include ECI cartesian positions in the result.
+    do_eci_vel : Boolean, optional (default: True)
+        Whether to include ECI cartesian velocity in the result.
+    do_geo : Boolean, optional (default: True)
+        Whether to include geographic/geodetic positions in the result.
+    do_topo : Boolean, optional (default: True)
+        Whether to include topocentric positions in the result.
 
     Returns
     -------
-    sat : `~cysgp4.Satellite` object
+    result : dictionary
+        Resulting positions for each requested frame:
+
+        eci_pos : `~numpy.ndarray` of float
+            Satellites ECI cartesian positions. First dimension (columns)
+            has length 3, one for each of `x`, `y`, and `z`. Remaining
+            dimensions are determined by the (broadcasted) shape of the
+            inputs `mjd`, `tles`, and `observers`.
+        eci_vel : `~numpy.ndarray` of float
+            Satellites ECI cartesian velicities. First dimension (columns)
+            has length 3, one for each of `v_x`, `v_y`, and `v_z`. Remaining
+            dimensions are determined by the (broadcasted) shape of the
+            inputs `mjd`, `tles`, and `observers`.
+        geo : `~numpy.ndarray` of float
+            Satellites Geodetic positions. First dimension (columns)
+            has length 3, one for each of `lon`, `lat`, and `alt`. Remaining
+            dimensions are determined by the (broadcasted) shape of the
+            inputs `mjd`, `tles`, and `observers`.
+        topo : `~numpy.ndarray` of float
+            Satellites Topocentric positions. First dimension (columns)
+            has length 4, one for each of `az`, `el`, `dist`, and
+            `dist_rate`. Remaining dimensions are determined by the
+            (broadcasted) shape of the inputs `mjd`, `tles`, and `observers`.
 
     Examples
     --------
-    The following demonstrates how a typical use of the `~cysgp4.Satellite`
-    class would look like::
+    The following demonstrates how to use the `~cysgp4.propagate_many`
+    function::
 
-        >>> from cysgp4 import *
+        >>> import requests
+        >>> import numpy as np
+        >>> from cysgp4 import PyTle, PyObserver, propagate_many
 
-        >>> pydt = PyDateTime.from_mjd(58805.57)
-        >>> lon_deg, lat_deg = 6.88375, 50.525
-        >>> alt_km = 0.366
-        >>> obs = PyObserver(lon_deg, lat_deg, alt_km)
+        >>> url = 'http://celestrak.com/NORAD/elements/science.txt'
+        >>> ctrak_science = requests.get(url)
+        >>> all_lines = ctrak_science.text.split('\r\n')
 
-        >>> hst_tle = PyTle(
-        ... 'HST',
-        ... '1 20580U 90037B   19321.38711875  .00000471  00000-0  17700-4 0  9991',
-        ... '2 20580  28.4699 288.8102 0002495 321.7771 171.5855 15.09299865423838',
-        ... )
+        >>> tle_list = list(zip(*tuple(
+        ...     all_lines[idx::3] for idx in range(3)
+        ...     )))
+        >>> tles = np.array([
+        ...     PyTle(*tle) for tle in tle_list
+        ...     ])[np.newaxis, np.newaxis, :20]  # use first 20 TLEs
+        >>> observers = np.array([
+        ...     PyObserver(6.88375, 50.525, 0.366),
+        ...     PyObserver(16.88375, 50.525, 0.366),
+        ...     ])[np.newaxis, :, np.newaxis]
+        >>> mjds = np.linspace(
+        ...     58805.5, 58806.5, 1000  # 1000 time steps
+        ...     )[:, np.newaxis, np.newaxis]
 
-        >>> sat = Satellite(hst_tle, obs, pydt)
-        >>> # can now query positions, also for different times
-        >>> sat.eci_pos().loc  # ECI cartesian position
-        (5879.5931344459295, 1545.7455647032068, 3287.4155452595)
-        >>> sat.eci_pos().vel  # ECI cartesian velocity
-        (-1.8205895517672226, 7.374044252723081, -0.20697960810978586)
-        >>> sat.geo_pos()  # geographic position
-        <PyCoordGeodetic: 112.2146d, 28.5509d, 538.0186km>
-        >>> sat.topo_pos()  # topocentric position
-        <PyCoordTopocentric: 60.2453d, -35.6844d, 8314.5683km, 3.5087km/s>
+        >>> result = propagate_many(mjds, tles, observers)
+        >>> print(result.keys())
+        dict_keys(['eci_pos', 'eci_vel', 'geo', 'topo'])
 
-        >>> # change time
-        >>> sat.mjd += 1 / 720.  # one minute later
-        >>> sat.topo_pos()
-        <PyCoordTopocentric: 54.8446d, -38.2749d, 8734.9195km, 3.4885km/s>
+        >>> result['eci_pos'].shape, result['topo'].shape
+        >>> print(result['eci_pos'].shape, result['topo'].shape)
+        (3, 1000, 2, 20) (4, 1000, 2, 20)
 
-        >>> # change by less than cache resolution (1 ms)
-        >>> sat.topo_pos().az, sat.topo_pos().el
-        (54.84463503781068, -38.274852915850126)
-        >>> sat.mjd += 0.0005 / 86400.  # 0.5 ms
-        >>> sat.topo_pos().az, sat.topo_pos().el
-        (54.84463503781068, -38.274852915850126)
-        >>> # change by another 0.5 ms triggers re-calculation
-        >>> sat.mjd += 0.00051 / 86400.
-        >>> sat.topo_pos().az, sat.topo_pos().el
-        (54.844568313870965, -38.274885794151324)
+        >>> result = propagate_many(
+        ...     mjds, tles, observers,
+        ...     do_eci_pos=False, do_eci_vel=False, do_geo=False, do_topo=True
+        ...     )
+        >>> print(result.keys())
+        dict_keys(['topo'])
     '''
 
     cdef:
@@ -1464,19 +1495,19 @@ def propagate_many(
 
     n = 3
     if do_eci_pos:
-        result['eci_pos'] = it.operands[n:n + 3]
+        result['eci_pos'] = np.array(it.operands[n:n + 3])
         n += 3
 
     if do_eci_vel:
-        result['eci_vel'] = it.operands[n:n + 3]
+        result['eci_vel'] = np.array(it.operands[n:n + 3])
         n += 3
 
     if do_geo:
-        result['geo'] = it.operands[n:n + 3]
+        result['geo'] = np.array(it.operands[n:n + 3])
         n += 3
 
     if do_topo:
-        result['topo'] = it.operands[n:n + 4]
+        result['topo'] = np.array(it.operands[n:n + 4])
         n += 4
 
     return result
@@ -1487,6 +1518,11 @@ def propagate_many_slow(
         bint do_eci_pos=True, bint do_eci_vel=True,
         bint do_geo=True, bint do_topo=True,
         ):
+    '''
+    This is a slow (non-parallelized, Python-looping) version of
+    `~cysgp4.propagate_many` that is meant for testing and benchmarking
+    only. It has the same interface.
+    '''
 
     pnum = 0
     if do_eci_pos:
@@ -1553,19 +1589,19 @@ def propagate_many_slow(
 
     n = 3
     if do_eci_pos:
-        result['eci_pos'] = it.operands[n:n + 3]
+        result['eci_pos'] = np.array(it.operands[n:n + 3])
         n += 3
 
     if do_eci_vel:
-        result['eci_vel'] = it.operands[n:n + 3]
+        result['eci_vel'] = np.array(it.operands[n:n + 3])
         n += 3
 
     if do_geo:
-        result['geo'] = it.operands[n:n + 3]
+        result['geo'] = np.array(it.operands[n:n + 3])
         n += 3
 
     if do_topo:
-        result['topo'] = it.operands[n:n + 4]
+        result['topo'] = np.array(it.operands[n:n + 4])
         n += 4
 
     return result
