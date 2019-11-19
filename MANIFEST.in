@@ -3,5 +3,7 @@ recursive-include cextern/sgp4-05d8cc2fc596/libsgp4/ *.h
 recursive-include cysgp4 *.pyx
 recursive-include cysgp4 *.pxd
 recursive-include cysgp4 *.py
+recursive-include cysgp4/tests/data/*
 exclude .gitignore .git build
-include COPYING README.md MANIFEST.in setup.cfg pip-requirements
+include COPYING* README.md MANIFEST.in setup.cfg pip-requirements
+include tox.ini pyproject.toml

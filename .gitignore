@@ -3,5 +3,9 @@ build
 dist
 cextern
 cysgp4/cysgp4.cpp
+.eggs
+.tox
 .cache
+*.pyc
+*.so
 tests/__pycache__

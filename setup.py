@@ -75,7 +75,8 @@ for e in [SGP_EXT]:
 
 setup(
     name='cysgp4',
-    version='0.1.0',
+    # version='0.1.0',
+    use_scm_version=True,
     author='Benjamin Winkel',
     author_email='bwinkel@mpifr.de',
     description=(
@@ -86,10 +87,10 @@ setup(
     from two-line elements (TLE).''',
     install_requires=[
         'setuptools',
-        'cython>=0.27.1',
-        'numpy>=1.11',
-        # 'astropy>=1.0',
+        'cython',
+        'numpy>=1.13.1',
         ],
+    tests_require=['pytest', 'numpy>=1.13.1', 'sgp4'],
     packages=['cysgp4'],
     cmdclass={'build_ext': build_ext},
     ext_modules=[
@@ -102,6 +103,4 @@ setup(
     # url='https://github.com/bwinkel/cyaatm/',
     # download_url='https://github.com/bwinkel/cyaatm/tarball/0.1.0',
     # keywords=['astronomy']
-    setup_requires=['pytest-runner'],
-    tests_require=['pytest'],
     )

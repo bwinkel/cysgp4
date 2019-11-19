@@ -3,7 +3,7 @@
 
 import importlib
 import os
-import requests
+# import requests
 import pytest
 import datetime
 import numpy as np
