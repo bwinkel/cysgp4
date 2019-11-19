@@ -1265,7 +1265,7 @@ def propagate_many(
 
     As in most use cases, a large number of positions is probably queried,
     the returned values do not use the `~cysgp4.PyEci` or
-    `~cysgp4.PyCoordTopocentric` classes, but pack everything in 3D arrays.
+    `~cysgp4.PyCoordTopocentric` classes, but pack everything in arrays.
     This is not only faster, but makes it easier to further process the
     results.
 
@@ -1299,25 +1299,25 @@ def propagate_many(
         Resulting positions for each requested frame:
 
         eci_pos : `~numpy.ndarray` of float
-            Satellites ECI cartesian positions. First dimension (columns)
-            has length 3, one for each of `x`, `y`, and `z`. Remaining
-            dimensions are determined by the (broadcasted) shape of the
-            inputs `mjd`, `tles`, and `observers`.
+            Satellites ECI cartesian positions. Last dimension has length 3,
+            one for each of `x`, `y`, and `z`. First dimensions are
+            determined by the (broadcasted) shape of the inputs `mjd`,
+            `tles`, and `observers`.
         eci_vel : `~numpy.ndarray` of float
-            Satellites ECI cartesian velicities. First dimension (columns)
-            has length 3, one for each of `v_x`, `v_y`, and `v_z`. Remaining
-            dimensions are determined by the (broadcasted) shape of the
-            inputs `mjd`, `tles`, and `observers`.
+            Satellites ECI cartesian velicities. Last dimension has length 3,
+            one for each of `v_x`, `v_y`, and `v_z`. First dimensions are
+            determined by the (broadcasted) shape of the inputs `mjd`,
+            `tles`, and `observers`.
         geo : `~numpy.ndarray` of float
-            Satellites Geodetic positions. First dimension (columns)
-            has length 3, one for each of `lon`, `lat`, and `alt`. Remaining
+            Satellites Geodetic positions. Last dimension has length 3, one
+            for each of `lon`, `lat`, and `alt`. First dimensions are
+            determined by the (broadcasted) shape of the inputs `mjd`,
+            `tles`, and `observers`.
+        topo : `~numpy.ndarray` of float
+            Satellites Topocentric positions. Last dimension has length 4,
+            one for each of `az`, `el`, `dist`, and `dist_rate`. First
             dimensions are determined by the (broadcasted) shape of the
             inputs `mjd`, `tles`, and `observers`.
-        topo : `~numpy.ndarray` of float
-            Satellites Topocentric positions. First dimension (columns)
-            has length 4, one for each of `az`, `el`, `dist`, and
-            `dist_rate`. Remaining dimensions are determined by the
-            (broadcasted) shape of the inputs `mjd`, `tles`, and `observers`.
 
     Examples
     --------
@@ -1350,9 +1350,11 @@ def propagate_many(
         >>> print(result.keys())
         dict_keys(['eci_pos', 'eci_vel', 'geo', 'topo'])
 
-        >>> result['eci_pos'].shape, result['topo'].shape
+        >>> # shapes are as follows
+        >>> print(np.broadcast(mjds, tles, observers).shape)
+        (1000, 2, 20)
         >>> print(result['eci_pos'].shape, result['topo'].shape)
-        (3, 1000, 2, 20) (4, 1000, 2, 20)
+        (1000, 2, 20, 3) (1000, 2, 20, 4)
 
         >>> result = propagate_many(
         ...     mjds, tles, observers,
