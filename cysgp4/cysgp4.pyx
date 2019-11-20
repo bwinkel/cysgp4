@@ -238,6 +238,7 @@ cdef class PyDateTime(object):
             >>> pydt = PyDateTime.from_ticks(ticks)
             >>> pydt
             <PyDateTime: 1858-11-17 00:00:00.000000 UTC>
+
         '''
 
         dt = cls(dt=None, init=False)
@@ -271,6 +272,7 @@ cdef class PyDateTime(object):
             >>> pydt = PyDateTime.from_mjd(mjd)
             >>> pydt
             <PyDateTime: 2013-06-15 02:57:07.199999 UTC>
+
         '''
 
         dt = cls(dt=None, init=False)
@@ -455,13 +457,13 @@ cdef class PyTle(object):
 
         >>> url = 'http://celestrak.com/NORAD/elements/science.txt'
         >>> ctrak_science = requests.get(url)
-        >>> all_lines = ctrak_science.text.split('\r\n')
+        >>> all_lines = ctrak_science.text.split('\\r\\n')
         >>> tle_list = list(zip(*tuple(
         ...     all_lines[idx::3]
         ...     for idx in range(3)
         ...     )))
         >>> len(tle_list)
-        >>> print(*tle_list[1], sep='\n')
+        >>> print(*tle_list[1], sep='\\n')
         HST
         1 20580U 90037B   19321.38711875  .00000471  00000-0  17700-4 0  9991
         2 20580  28.4699 288.8102 0002495 321.7771 171.5855 15.09299865423838
@@ -483,6 +485,7 @@ cdef class PyTle(object):
         Argument Perigee:     321.77710000
         Mean Anomaly:         171.58550000
         Mean Motion:           15.09299865
+
     '''
 
     # hold the C++ instance, which we're wrapping
@@ -552,6 +555,7 @@ cdef class PyCoordGeodetic(object):
         >>> geo.lon
         6.88375
         >>> geo.alt = 0.4
+
     '''
 
     # hold the C++ instance, which we're wrapping
@@ -666,6 +670,7 @@ cdef class PyCoordTopocentric(object):
         >>> topo.az
         130.1
         >>> topo.dist = 1000.
+
     '''
 
     # hold the C++ instance, which we're wrapping
@@ -789,6 +794,7 @@ cdef class PyObserver(object):
         >>> obs.loc
         <PyCoordGeodetic: 6.8838d, 50.5250d, 0.3660km>
         >>> obs.loc = PyCoordGeodetic(1, 2, 3)
+
     '''
 
     # hold the C++ instance, which we're wrapping
@@ -882,6 +888,7 @@ cdef class PyEci(object):
 
         >>> # or the update method:
         >>> eci.update(pydt, PyCoordGeodetic(0, 0, 0))
+
     '''
     cdef:
         # hold the C++ instance, which we're wrapping
@@ -1052,6 +1059,7 @@ cdef class Satellite(object):
         >>> sat.mjd += 0.00051 / 86400.
         >>> sat.topo_pos().az, sat.topo_pos().el
         (54.844568313870965, -38.274885794151324)
+
     '''
 
     cdef:
@@ -1280,8 +1288,7 @@ def propagate_many(
         Modified Julian Date.
     tles : `~numpy.ndarray`, `~list`, or scalar of `~cysgp4.PyTle`
         TLE instance of the satellite of interest.
-    observers : `~numpy.ndarray`, `~list`, or scalar of `~cysgp4.PyObserver`
-                or None (default: None)
+    observers : `~numpy.ndarray`, `~list`, or scalar of `~cysgp4.PyObserver` or None (default: None)
         Observer instance. If `None` then the observer location is set to
         (0 deg, 0 deg, 0 km).
     do_eci_pos : Boolean, optional (default: True)
@@ -1295,29 +1302,32 @@ def propagate_many(
 
     Returns
     -------
-    result : dictionary
+    result : dict
         Resulting positions for each requested frame:
 
-        eci_pos : `~numpy.ndarray` of float
-            Satellites ECI cartesian positions. Last dimension has length 3,
-            one for each of `x`, `y`, and `z`. First dimensions are
-            determined by the (broadcasted) shape of the inputs `mjd`,
-            `tles`, and `observers`.
-        eci_vel : `~numpy.ndarray` of float
-            Satellites ECI cartesian velicities. Last dimension has length 3,
-            one for each of `v_x`, `v_y`, and `v_z`. First dimensions are
-            determined by the (broadcasted) shape of the inputs `mjd`,
-            `tles`, and `observers`.
-        geo : `~numpy.ndarray` of float
-            Satellites Geodetic positions. Last dimension has length 3, one
-            for each of `lon`, `lat`, and `alt`. First dimensions are
-            determined by the (broadcasted) shape of the inputs `mjd`,
-            `tles`, and `observers`.
-        topo : `~numpy.ndarray` of float
-            Satellites Topocentric positions. Last dimension has length 4,
-            one for each of `az`, `el`, `dist`, and `dist_rate`. First
-            dimensions are determined by the (broadcasted) shape of the
-            inputs `mjd`, `tles`, and `observers`.
+        - `eci_pos` : `~numpy.ndarray` of float
+          Satellites ECI cartesian positions. Last dimension has length 3,
+          one for each of `x`, `y`, and `z`. First dimensions are
+          determined by the (broadcasted) shape of the inputs `mjd`,
+          `tles`, and `observers`.
+
+        - `eci_vel` : `~numpy.ndarray` of float
+          Satellites ECI cartesian velicities. Last dimension has length 3,
+          one for each of `v_x`, `v_y`, and `v_z`. First dimensions are
+          determined by the (broadcasted) shape of the inputs `mjd`,
+          `tles`, and `observers`.
+
+        - `geo` : `~numpy.ndarray` of float
+          Satellites Geodetic positions. Last dimension has length 3, one
+          for each of `lon`, `lat`, and `alt`. First dimensions are
+          determined by the (broadcasted) shape of the inputs `mjd`,
+          `tles`, and `observers`.
+
+        - `topo` : `~numpy.ndarray` of float
+          Satellites Topocentric positions. Last dimension has length 4,
+          one for each of `az`, `el`, `dist`, and `dist_rate`. First
+          dimensions are determined by the (broadcasted) shape of the
+          inputs `mjd`, `tles`, and `observers`.
 
     Examples
     --------
@@ -1330,7 +1340,7 @@ def propagate_many(
 
         >>> url = 'http://celestrak.com/NORAD/elements/science.txt'
         >>> ctrak_science = requests.get(url)
-        >>> all_lines = ctrak_science.text.split('\r\n')
+        >>> all_lines = ctrak_science.text.split('\\r\\n')
 
         >>> tle_list = list(zip(*tuple(
         ...     all_lines[idx::3] for idx in range(3)
@@ -1362,6 +1372,7 @@ def propagate_many(
         ...     )
         >>> print(result.keys())
         dict_keys(['topo'])
+
     '''
 
     cdef:

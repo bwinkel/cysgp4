@@ -7,6 +7,26 @@ from Cython.Distutils import build_ext
 import numpy
 import platform
 import glob
+try:
+    from configparser import ConfigParser
+except ImportError:
+    from ConfigParser import ConfigParser
+
+
+# Get some values from the setup.cfg
+conf = ConfigParser()
+conf.read(['setup.cfg'])
+metadata = dict(conf.items('metadata'))
+
+PACKAGENAME = metadata.get('package_name', 'cysgp4')
+DESCRIPTION = metadata.get('description', 'Cysgp4: a wrapper around the SGP4 package, for sat TLE calculations')
+LONG_DESCRIPTION = metadata.get('long_description', '')
+AUTHOR = metadata.get('author', 'Benjamin Winkel')
+AUTHOR_EMAIL = metadata.get('author_email', '')
+LICENSE = metadata.get('license', 'unknown')
+URL = metadata.get('url', 'https://github.com/bwinkel/cysgp4')
+__minimum_python_version__ = metadata.get("minimum_python_version", "3.5")
+
 
 EX_COMP_ARGS = []
 if 'mac' in platform.system().lower():
@@ -74,17 +94,21 @@ for e in [SGP_EXT]:
 
 
 setup(
-    name='cysgp4',
+    name=PACKAGENAME,
     # version='0.1.0',
-    use_scm_version=True,
-    author='Benjamin Winkel',
-    author_email='bwinkel@mpifr.de',
-    description=(
-        'cysgp4: a wrapper around the SGP4 package, for sat TLE calculations'
-        ),
-    long_description='''cysgp4 ... Cython-powered wrapper of the
-    sgp4lib (Daniel Warner) library to compute satellite positions
-    from two-line elements (TLE).''',
+    use_scm_version=True,  # provides version
+    # use  the following to read version in package files
+    # from pkg_resources import get_distribution, DistributionNotFound
+    # try:
+    #     __version__ = get_distribution(__name__).version
+    # except DistributionNotFound:
+    #     # package is not installed
+    #     pass
+    author=AUTHOR,
+    author_email=AUTHOR_EMAIL,
+    description=DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
+    license=LICENSE,
     install_requires=[
         'setuptools',
         'cython',
@@ -103,4 +127,5 @@ setup(
     # url='https://github.com/bwinkel/cyaatm/',
     # download_url='https://github.com/bwinkel/cyaatm/tarball/0.1.0',
     # keywords=['astronomy']
+    python_requires='>={}'.format(__minimum_python_version__),
     )

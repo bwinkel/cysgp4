@@ -7,3 +7,5 @@ recursive-include cysgp4/tests/data/*
 exclude .gitignore .git build
 include COPYING* README.md MANIFEST.in setup.cfg pip-requirements
 include tox.ini pyproject.toml
+include docs/conf.py docs/make.bat docs/Makefile
+recursive-include docs *.rst

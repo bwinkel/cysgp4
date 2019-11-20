@@ -8,4 +8,6 @@ cysgp4/cysgp4.cpp
 .cache
 *.pyc
 *.so
+docs/_build
+docs/api
 tests/__pycache__
