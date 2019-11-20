@@ -36,7 +36,6 @@ TLE_MMS = (  # this fails if MJD is very old
     )
 
 
-
 class TestPyDateTime:
 
     def setup(self):
@@ -122,6 +121,12 @@ class TestPyTle:
             assert s1.strip() == s2.strip()
 
         assert repr(tle1) == '<PyTle: ISS (ZARYA)>'
+
+    def test_tle_strings(self):
+
+        tle = PyTle(*self.tle_tup)
+        for s1, s2 in zip(self.tle_tup, tle.tle_strings()):
+            assert s1.strip() == s2.strip()
 
     def test_exception_checksum(self):
         '''
@@ -474,6 +479,107 @@ def test_propagate_many_pos_switches():
     assert ('eci_pos' not in result) and ('eci_vel' in result)
 
 
+def propagate_many_sgp4(
+        mjds, tles, observers=None,
+        do_eci_pos=True, do_eci_vel=True,
+        # bint do_geo=True, bint do_topo=True,
+        ):
+    '''
+    This is an sgp4-based variant (non-parallelized, Python-looping) of
+    `~cysgp4.propagate_many` that is meant for testing and benchmarking
+    only. It has the same interface.
+    '''
+
+    pnum = 0
+    out_dts = []
+    if do_eci_pos:
+        out_dts.append(np.dtype(('float64', 3)))
+        pnum += 1
+    if do_eci_vel:
+        out_dts.append(np.dtype(('float64', 3)))
+        pnum += 1
+    # if do_geo:
+    #     out_dts.append(np.dtype(('float64', 3)))
+    #     pnum += 1
+    # if do_topo:
+    #     out_dts.append(np.dtype(('float64', 4)))
+    #     pnum += 1
+
+    it = np.nditer(
+        [tles, observers, mjds] + [None] * pnum,
+        flags=['external_loop', 'buffered', 'delay_bufalloc', 'refs_ok'],
+        op_flags=[['readonly']] * 3 + [['readwrite', 'allocate']] * pnum,
+        op_dtypes=['object', 'object', 'float64'] + out_dts
+        )
+
+    it.reset()
+    for itup in it:
+
+        tle = itup[0]
+        obs = itup[1]
+        mjd = itup[2]
+
+        size = mjd.shape[0]
+        for i in range(size):
+
+            dt_tup = PyDateTime.from_mjd(mjd[i]).get_datetime_tuple()
+            line1, line2 = tle[i].tle_strings()[1:]
+            sat = twoline2rv(line1, line2, wgs72)
+            pos, vel = sat.propagate(
+                *dt_tup[:-2], dt_tup[-2] + dt_tup[-1] / 1e6
+                )
+
+            eci_pos_x, eci_pos_y, eci_pos_z = pos
+            eci_vel_x, eci_vel_y, eci_vel_z = vel
+
+            n = 3
+            if do_eci_pos:
+                itup[n][i][0] = eci_pos_x
+                itup[n][i][1] = eci_pos_y
+                itup[n][i][2] = eci_pos_z
+                n += 1
+
+            if do_eci_vel:
+                itup[n][i][0] = eci_vel_x
+                itup[n][i][1] = eci_vel_y
+                itup[n][i][2] = eci_vel_z
+                n += 1
+
+            # if do_geo:
+            #     itup[n][i][0] = geo_pos.lon
+            #     itup[n][i][1] = geo_pos.lat
+            #     itup[n][i][2] = geo_pos.alt
+            #     n += 1
+
+            # if do_topo:
+            #     itup[n][i][0] = topo_pos.az
+            #     itup[n][i][1] = topo_pos.el
+            #     itup[n][i][2] = topo_pos.dist
+            #     itup[n][i][3] = topo_pos.dist_rate
+            #     n += 1
+
+    result = {}
+
+    n = 3
+    if do_eci_pos:
+        result['eci_pos'] = it.operands[n]
+        n += 1
+
+    if do_eci_vel:
+        result['eci_vel'] = it.operands[n]
+        n += 1
+
+    # if do_geo:
+    #     result['geo'] = it.operands[n]
+    #     n += 1
+
+    # if do_topo:
+    #     result['topo'] = it.operands[n]
+    #     n += 1
+
+    return result
+
+
 def _propagate_prepare():
 
     # url = 'http://celestrak.com/NORAD/elements/science.txt'
@@ -505,19 +611,50 @@ def _propagate_many_cysgp4():
     return propagate_many(*_propagate_prepare())
 
 
-def _propagate_single_cysgp4():
+def _propagate_many_cysgp4_slow():
 
     return propagate_many_slow(*_propagate_prepare())
 
 
-def test_propagate_many_vs_single_cysgp4():
+def _propagate_many_sgp4():
+
+    return propagate_many_sgp4(*_propagate_prepare())
+
+
+def test_propagate_many_cysgp4_vs_many_cysgp4_slow():
 
     res_many = _propagate_many_cysgp4()
-    res_single = _propagate_single_cysgp4()
+    res_many_slow = _propagate_many_cysgp4_slow()
 
     for k in ['eci_pos', 'eci_vel', 'geo', 'topo']:
 
-        assert_allclose(res_many[k], res_single[k], atol=1.e-5)
+        assert_allclose(res_many[k], res_many_slow[k], atol=1.e-5)
+
+
+@pytest.mark.xfail
+def test_propagate_many_cysgp4_vs_many_sgp4():
+    '''
+    Currently, very distant satellites can have a relatively large deviation
+    of almost 1%. The problem with "rtol" is, that it doesn't work with
+    positive vs. negative numbers (which happens when the satellite crosses
+    zero in x, y or z)
+    '''
+
+    res_many = _propagate_many_cysgp4()
+    res_many_sgp4 = _propagate_many_sgp4()
+
+    # idxs = np.where(np.abs(res_many['eci_pos'] - res_many_sgp4['eci_pos']) > 1.e-2)
+
+    # sat_idxs = np.unique(idxs[2])
+    # for sat_idx in sat_idxs:
+    #     mask = sat_idx == idxs[2]
+    #     tidxs = tuple(idx[mask] for idx in idxs)
+    #     print(sat_idx)
+    #     print(res_many['eci_pos'][tidxs])
+    #     print(res_many_sgp4['eci_pos'][tidxs])
+
+    assert_allclose(res_many['eci_pos'], res_many_sgp4['eci_pos'], rtol=1.e-2)
+    assert_allclose(res_many['eci_vel'], res_many_sgp4['eci_vel'], rtol=1.e-5)
 
 
 def test_propagate_many_cysgp4_benchmark(benchmark):
@@ -525,6 +662,11 @@ def test_propagate_many_cysgp4_benchmark(benchmark):
     benchmark(_propagate_many_cysgp4)
 
 
-def test_propagate_single_cysgp4_benchmark(benchmark):
+def test_propagate_many_cysgp4_slow_benchmark(benchmark):
 
-    benchmark(_propagate_single_cysgp4)
+    benchmark(_propagate_many_cysgp4_slow)
+
+
+def test_propagate_many_sgp4_benchmark(benchmark):
+
+    benchmark(_propagate_many_sgp4)

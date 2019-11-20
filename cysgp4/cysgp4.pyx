@@ -280,9 +280,9 @@ cdef class PyDateTime(object):
 
         return dt
 
-    def _get_datetime(self):
+    def get_datetime_tuple(self):
 
-        return datetime(
+        return (
             self._cobj.Year(),
             self._cobj.Month(),
             self._cobj.Day(),
@@ -291,6 +291,10 @@ cdef class PyDateTime(object):
             self._cobj.Second(),
             self._cobj.Microsecond(),
             )
+
+    def _get_datetime(self):
+
+        return datetime(*self.get_datetime_tuple())
 
     def _set_datetime(self, dt):
         '''
@@ -516,6 +520,14 @@ cdef class PyTle(object):
     def __repr__(self):
 
         return '<PyTle: ' + self.thisptr.Name().decode('UTF-8') + '>'
+
+    def tle_strings(self):
+
+        return (
+            self.thisptr.Name().decode('UTF-8'),
+            self.thisptr.Line1().decode('UTF-8'),
+            self.thisptr.Line2().decode('UTF-8'),
+            )
 
 
 cdef class PyCoordGeodetic(object):
@@ -1576,8 +1588,6 @@ def propagate_many_slow(
 
             sat = Satellite(tle[i], obs[i], PyDateTime.from_mjd(mjd[i]))
             eci = sat.eci_pos()
-            geo_pos = sat.geo_pos()
-            topo_pos = sat.topo_pos()
 
             eci_pos_x, eci_pos_y, eci_pos_z = eci.loc
             eci_vel_x, eci_vel_y, eci_vel_z = eci.vel
@@ -1596,12 +1606,14 @@ def propagate_many_slow(
                 n += 1
 
             if do_geo:
+                geo_pos = sat.geo_pos()
                 itup[n][i][0] = geo_pos.lon
                 itup[n][i][1] = geo_pos.lat
                 itup[n][i][2] = geo_pos.alt
                 n += 1
 
             if do_topo:
+                topo_pos = sat.topo_pos()
                 itup[n][i][0] = topo_pos.az
                 itup[n][i][1] = topo_pos.el
                 itup[n][i][2] = topo_pos.dist
