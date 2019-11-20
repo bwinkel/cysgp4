@@ -7,12 +7,12 @@ Requirements
 
 cysgp4 has the following strict requirements:
 
-- `Python <http://www.python.org/>`__ 3.5 or later
+- `Python <http://www.python.org/>`_ 3.5 or later
 
-- `setuptools <https://setuptools.readthedocs.io/en/latest/>`__: Used for the package
-  installation.
+- `setuptools <https://setuptools.readthedocs.io/en/latest/>`_: Used for the
+  package installation.
 
-- `NumPy <http://www.numpy.org/>`__ 1.13 or later
+- `NumPy <http://www.numpy.org/>`_ 1.13 or later
 
 
 Installing cysgp4
@@ -32,7 +32,8 @@ great `Anaconda Python distribution <https://www.anaconda.com/>`_:
 Using pip
 -------------
 
-To install cysgp4 with `pip <http://www.pip-installer.org/en/latest/>`__, simply run
+To install cysgp4 with `pip <http://www.pip-installer.org/en/latest/>`_,
+simply run
 
 .. code-block:: bash
 
@@ -59,7 +60,7 @@ To install cysgp4 with `pip <http://www.pip-installer.org/en/latest/>`__, simply
     installation.  In this case you may consider using the ``--user`` option
     to install the package into your home directory.  You can read more
     about how to do this in the `pip documentation
-    <https://pip.pypa.io/en/stable/user_guide/#user-installs>`__.
+    <https://pip.pypa.io/en/stable/user_guide/#user-installs>`_.
 
     We recommend to use a Python distribution, such as `Anaconda
     <https://www.continuum.io/downloads>`_, especially, if you are on
@@ -87,9 +88,10 @@ Then go into the cysgp4 source directory and run:
 
 .. code-block:: bash
 
-    python setup.py install
+    pip install .
 
-Again, consider the ``--user`` option or even better use a python distribution
+Again, consider the ``--user`` option or even better use `virtualenv
+<https://pypi.org/project/virtualenv/>`_ or a Python distribution
 such as `Anaconda <https://www.continuum.io/downloads>`_ to avoid messing up
 the system-wide Python installation.
 
@@ -99,7 +101,8 @@ the system-wide Python installation.
 Installation on Windows
 -----------------------
 
-Note that for Windows machines we provide a binary wheel (Python 3.5+ only) via `PyPI`_ and installation is as easy as with Linux:
+Note that for Windows machines we provide a binary wheel (Python 3.5+ only)
+via `PyPI`_ and installation is as easy as with Linux:
 
 .. code-block:: bash
 
@@ -108,12 +111,13 @@ Note that for Windows machines we provide a binary wheel (Python 3.5+ only) via 
 .. note::
 
     If you are desperate, you can install cysgp4 from source even on Windows.
-    You'll need to install a suitable C-compiler; `see here
-    <https://matthew-brett.github.io/pydagogue/python_msvc.html#visual-studio-versions-used-to-compile-distributed-python-binaries>`__. The cysgp4
+    You'll need to install a suitable C++-compiler; `see here
+    <https://matthew-brett.github.io/pydagogue/python_msvc.html#visual-studio-
+    versions-used-to-compile-distributed-python-binaries>`_. The cysgp4
     package needs Python 3.5 or later, which means VC++ Version 14 is
     mandatory. The easiest way to obtain it, is by installing the
     `Visual C++ 2015 Build Tools
-    <http://landinghub.visualstudio.com/visual-cpp-build-tools>`__ which is
+    <http://landinghub.visualstudio.com/visual-cpp-build-tools>`_ which is
     "only" 4 GBytes large...
 
 
@@ -122,7 +126,7 @@ Note that for Windows machines we provide a binary wheel (Python 3.5+ only) via 
 Installation on MacOS
 ---------------------
 
-Installation on MacOS can be a bit tricky, because the standard C compiler
+Installation on MacOS can be a bit tricky, because the standard C++ compiler
 does not support OpenMP. We provide wheels on PyPI, such that you can
 
 .. code-block:: bash
@@ -204,7 +208,7 @@ Then follow the instructions in :ref:`source_install`.
 
         conda install -c conda-forge clang_osx-64 clangxx_osx-64 llvm-openmp openmp
 
-    The `cysgp4` package on `conda-forge <https://conda-forge.org/>`__
+    The `cysgp4` package on `conda-forge <https://conda-forge.org/>`_
     was created using the latter approach.
 
 
@@ -213,24 +217,29 @@ Then follow the instructions in :ref:`source_install`.
 Testing an installed cysgp4
 ----------------------------
 
-The easiest way to test if your installed version of cysgp4 is running
-correctly, is to use the `~cysgp4.test()` function::
+The easiest way to test if your installed version of cysgp4 is running::
 
-    import cysgp4
-    cysgp4.test()
-
-The tests should run and print out any failures, which you can report at
-the `cysgp4 issue tracker <http://github.com/bwinkel/cysgp4/issues>`__.
+    pytest --pyargs cysgp4.tests
 
 .. note::
 
     This way of running the tests may not work if you do it in the
     cysgp4 source distribution directory.
 
+It is also possible to use the `~cysgp4.test()` function::
 
-If you prefer testing on the command line and usually work with the source
-code, you can also do
+    import cysgp4
+    cysgp4.test()
+
+but currently, this will only work, if the user has `Astropy`_ installed
+(this may change soon).
+The tests should run and print out any failures, which you could report at
+the `cysgp4 issue tracker <http://github.com/bwinkel/cysgp4/issues>`_.
+
+If you prefer testing on the command line and want to develop in the source
+code, you can also utilize `tox <https://pypi.org/project/tox/>`_ and
+run the following in the source directory:
 
 .. code-block:: bash
 
-    python setup.py test
+    tox -e test

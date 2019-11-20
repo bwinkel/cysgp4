@@ -3,3 +3,4 @@
 
 from .cysgp4 import *
 from .version import __version__
+from .init_testrunner import *

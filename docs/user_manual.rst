@@ -11,12 +11,26 @@ Cysgp4 user manual
 Introduction
 ============
 
+TODO
 
+Using cysgp4
+============
+
+TODO
+
+
+Benchmarks
+==========
+
+TODO
 
 See Also
 ========
 
-- `Cygrid paper <http://adsabs.harvard.edu/abs/2016A%26A...591A..12W>`_: B. Winkel, D. Lenz & L. Flöer: *Cygrid: A fast Cython-powered convolution-based gridding module for Python*, Astronomy & Astrophysics, Volume 591, A 12, 2016.
+- `C++ SGP4 Satellite Library <https://www.danrw.com/sgp4/>`_ by Daniel Warner
+- `sgp4 Python package <https://pypi.org/project/sgp4/>`_ by Brandon Rhodes
+- `Two-line element strings (TLE)
+  <https://en.wikipedia.org/wiki/Two-line_element_set>`_
 
 
 Reference/API
