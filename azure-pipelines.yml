@@ -8,7 +8,7 @@ trigger:
 
 variables:
   - twine.username: __token__
-  - is.tag: ${{ startsWith(variables['Build.SourceBranch'], "refs\/tags\/") }}
+  - is.tag: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
 
 jobs:
 - job:
@@ -33,7 +33,9 @@ jobs:
 
   steps:
 
-  - bash: echo "is.tag" $IS_TAG
+  - bash: |
+      echo "Build.SourceBranch" $BUILD_SOURCEBRANCH
+      echo "is.tag" $IS_TAG
     displayName: Test tag
 
   # - bash: echo "##vso[task.prependpath]$CONDA/bin"
