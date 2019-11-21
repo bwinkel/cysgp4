@@ -18,6 +18,11 @@ skip_pycraf = pytest.mark.skipif(
     importlib.util.find_spec('pycraf') is None,
     reason='"pycraf" package not installed'
     )
+# if you want to test this locally: pytest -p no:benchmark cysgp4
+skip_benchmark = pytest.mark.skipif(
+    importlib.util.find_spec('benchmark') is None,
+    reason='"benchmark" fixture not installed'
+    )
 
 TLE_ISS = (
     'ISS (ZARYA)',
@@ -668,16 +673,19 @@ def test_propagate_many_cysgp4_vs_many_sgp4():
     assert_allclose(res_many['eci_vel'], res_many_sgp4['eci_vel'], rtol=1.e-5)
 
 
+@skip_benchmark
 def test_propagate_many_cysgp4_benchmark(benchmark):
 
     benchmark(_propagate_many_cysgp4)
 
 
+@skip_benchmark
 def test_propagate_many_cysgp4_slow_benchmark(benchmark):
 
     benchmark(_propagate_many_cysgp4_slow)
 
 
+@skip_benchmark
 def test_propagate_many_sgp4_benchmark(benchmark):
 
     benchmark(_propagate_many_sgp4)
