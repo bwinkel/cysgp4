@@ -7,8 +7,8 @@ trigger:
     - master
 
 variables:
-  - twine.username: __token__
-  - is.tag: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
+  twine.username: __token__
+  is.tag: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
 
 jobs:
 - job:
