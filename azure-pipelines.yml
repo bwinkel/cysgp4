@@ -1,8 +1,21 @@
+trigger:
+  tags:
+    include:
+    - v*
+  branches:
+    include:
+    - master
+
+variables:
+  - twine.username: __token__
+  - is.tag: ${{ startsWith(variables['Build.SourceBranch'], "refs\/tags\/") }}
+
 jobs:
 - job:
   displayName: ubuntu-16.04
   pool:
     vmImage: 'ubuntu-16.04'
+
   strategy:
     matrix:
       # Python27:
@@ -12,36 +25,58 @@ jobs:
         python.version: '3.6'
         numpy.version: '1.13.1'
         do.docs: ${{ true }}
+        do.dist: ${{ true }}
       Python37:
         python.version: '3.7'
         numpy.version: '1.14.5'
+        do.dist: ${{ true }}
 
   steps:
-  - bash: echo "##vso[task.prependpath]$CONDA/bin"
-    displayName: Add conda to PATH
 
-  - bash: conda create --yes --quiet --name cysgp4-env -c conda-forge
-    displayName: Create Anaconda environment
+  - bash: echo "is.tag" $IS_TAG
+    displayName: Test tag
 
-  - bash: |
-      source activate cysgp4-env
-      conda install --yes --quiet --name cysgp4-env -c conda-forge python=$PYTHON_VERSION numpy==$NUMPY_VERSION
-    displayName: Install Anaconda packages
+  # - bash: echo "##vso[task.prependpath]$CONDA/bin"
+  #   displayName: Add conda to PATH
 
-  - bash: |
-      source activate cysgp4-env
-      conda install --yes --quiet --name cysgp4-env -c conda-forge pytest sgp4
-      pip install pytest-azurepipelines
-      pip install -e .
-      pytest cysgp4
-    displayName: Testing
+  # - bash: conda create --yes --quiet --name cysgp4-env -c conda-forge
+  #   displayName: Create Anaconda environment
 
-  - bash: |
-      source activate cysgp4-env
-      conda install --yes --quiet --name cysgp4-env -c conda-forge astropy sphinx-astropy
-      sphinx-build docs docs/_build/html -W -b html
-    displayName: Make docs
-    condition: and(succeeded(), eq(variables['do.docs'], ${{ true }}))
+  # - bash: |
+  #     source activate cysgp4-env
+  #     conda install --yes --quiet --name cysgp4-env -c conda-forge python=$PYTHON_VERSION numpy==$NUMPY_VERSION
+  #   displayName: Install Anaconda packages
+
+  # - bash: |
+  #     source activate cysgp4-env
+  #     conda install --yes --quiet --name cysgp4-env -c conda-forge pytest sgp4
+  #     pip install pytest-azurepipelines
+  #     pip install -e .
+  #     pytest cysgp4
+  #   displayName: Testing
+
+  # - bash: |
+  #     source activate cysgp4-env
+  #     conda install --yes --quiet --name cysgp4-env -c conda-forge astropy sphinx-astropy
+  #     sphinx-build docs docs/_build/html -W -b html
+  #   displayName: Make docs
+  #   condition: and(succeeded(), eq(variables['do.docs'], ${{ true }}))
+
+  # - bash: |
+  #     source activate cysgp4-env
+  #     conda install --yes --quiet --name cysgp4-env -c conda-forge twine
+  #     python setup.py sdist
+  #     # python setup.py bdist_wheel
+  #     python -m twine upload dist/*.tar.gz
+  #     # python -m twine upload dist/*.whl
+  #   displayName: Upload to PyPI
+  #   condition: and(succeeded(), eq(variables['do.dist'], ${{ true }}))
+
+
+
+
+
+
 
 # - job:
 #   displayName: macOS-10.13
