@@ -1,0 +1,110 @@
+jobs:
+- job:
+  displayName: ubuntu-16.04
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      # Python27:
+      #   python.version: '2.7'
+      #   numpy.version: '1.13.1'
+      # Python36:
+      #   python.version: '3.6'
+      #   numpy.version: '1.13.1'
+      Python37:
+        python.version: '3.7'
+        numpy.version: '1.14.5'
+
+  steps:
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to PATH
+
+  - bash: conda create --yes --quiet --name cysgp4-env
+    displayName: Create Anaconda environment
+
+  - bash: |
+      source activate cysgp4-env
+      conda install --yes --quiet --name cysgp4-env python=$PYTHON_VERSION numpy==$NUMPY_VERSION
+    displayName: Install Anaconda packages
+
+  - bash: |
+      source activate cysgp4-env
+      pip install pytest pytest-azurepipelines
+      pytest
+    displayName: pytest
+
+# - job:
+#   displayName: macOS-10.13
+#   pool:
+#     vmImage: 'macOS-10.13'
+#   strategy:
+#     matrix:
+#       Python27:
+#         python.version: '2.7'
+#       Python36:
+#         python.version: '3.6'
+
+#   steps:
+#   - bash: echo "##vso[task.prependpath]$CONDA/bin"
+#     displayName: Add conda to PATH
+
+#   - bash: conda create --yes --quiet --name cysgp4-env
+#     displayName: Create Anaconda environment
+
+#   - bash: |
+#       source activate cysgp4-env
+#       conda install --yes --quiet --name cysgp4-env python=$PYTHON_VERSION numpy
+#       pip install pytest pytest-azurepipelines
+#     displayName: Install Anaconda packages
+
+#   - bash: |
+#       source activate cysgp4-env
+#       pytest
+#     displayName: pytest
+
+# - job:
+#   displayName: vs2017-win2016
+#   pool:
+#     vmImage: 'vs2017-win2016'
+#   strategy:
+#     matrix:
+#       Python27:
+#         python.version: '2.7'
+#       Python36:
+#         python.version: '3.6'
+
+#   steps:
+#   - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
+#     displayName: Add conda to PATH
+
+#   - script: conda create --yes --quiet --name cysgp4-env
+#     displayName: Create Anaconda environment
+
+#   - script: |
+#       call activate cysgp4-env
+#       conda install --yes --quiet --name cysgp4-env python=%PYTHON_VERSION% numpy
+#     displayName: Install Anaconda packages
+
+#   - script: |
+#       call activate cysgp4-env
+#       pip install pytest pytest-azurepipelines
+#       pytest
+#     displayName: pytest
+
+# - job:
+#   displayName: From environment.yml
+#   pool:
+#     vmImage: 'ubuntu-16.04'
+
+#   steps:
+#   - bash: echo "##vso[task.prependpath]$CONDA/bin"
+#     displayName: Add conda to PATH
+
+#   - script: conda env create --quiet --file environment.yml
+#     displayName: Create Anaconda environment
+
+#   - bash: |
+#       source activate env-from-yaml
+#       pip install pytest pytest-azurepipelines
+#       pytest
+#     displayName: pytest
