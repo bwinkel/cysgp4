@@ -1,8 +1,22 @@
+trigger:
+  tags:
+    include:
+    - v*
+  branches:
+    include:
+    - master
+
+variables:
+  twine.username: __token__
+  # is.tag: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
+  is.tag: true
+
 jobs:
 - job:
   displayName: ubuntu-16.04
   pool:
     vmImage: 'ubuntu-16.04'
+
   strategy:
     matrix:
       # Python27:
@@ -12,11 +26,23 @@ jobs:
         python.version: '3.6'
         numpy.version: '1.13.1'
         do.docs: ${{ true }}
+        do.dist: ${{ eq(variables['is.tag'], true) }}
       Python37:
         python.version: '3.7'
         numpy.version: '1.14.5'
+        do.dist: ${{ eq(variables['is.tag'], true) }}
 
   steps:
+
+  - bash: |
+      echo "Build.SourceBranch" $BUILD_SOURCEBRANCH
+      echo "is.tag" $IS_TAG
+      echo "do.docs" $DO_DOCS
+      echo "do.dist" $DO_DIST
+      echo "python.version" $PYTHON_VERSION
+      echo "numpy.version" $NUMPY_VERSION
+    displayName: Show Vars
+
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to PATH
 
@@ -41,7 +67,23 @@ jobs:
       conda install --yes --quiet --name cysgp4-env -c conda-forge astropy sphinx-astropy
       sphinx-build docs docs/_build/html -W -b html
     displayName: Make docs
-    condition: and(succeeded(), eq(variables['do.docs'], ${{ true }}))
+    condition: and(succeeded(), eq(variables['do.docs'], true))
+
+  - bash: |
+      source activate cysgp4-env
+      conda install --yes --quiet --name cysgp4-env -c conda-forge twine
+      python setup.py sdist
+      # python setup.py bdist_wheel
+      python -m twine upload dist/*.tar.gz
+      # python -m twine upload dist/*.whl
+    displayName: Upload to PyPI
+    condition: and(succeeded(), eq(variables['do.dist'], true))
+
+
+
+
+
+
 
 # - job:
 #   displayName: macOS-10.13
