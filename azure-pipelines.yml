@@ -8,9 +8,10 @@ jobs:
       # Python27:
       #   python.version: '2.7'
       #   numpy.version: '1.13.1'
-      # Python36:
-      #   python.version: '3.6'
-      #   numpy.version: '1.13.1'
+      Python36:
+        python.version: '3.6'
+        numpy.version: '1.13.1'
+        do.docs: ${{ true }}
       Python37:
         python.version: '3.7'
         numpy.version: '1.14.5'
@@ -33,7 +34,14 @@ jobs:
       pip install pytest-azurepipelines
       pip install -e .
       pytest cysgp4
-    displayName: pytest
+    displayName: Testing
+
+  - bash: |
+      source activate cysgp4-env
+      conda install --yes --quiet --name cysgp4-env -c conda-forge astropy sphinx-astropy
+      sphinx-build docs docs/_build/html -W -b html
+    displayName: Make docs
+    condition: and(succeeded(), eq(variables['do.docs'], ${{ true }}))
 
 # - job:
 #   displayName: macOS-10.13
