@@ -29,7 +29,8 @@ jobs:
 
   - bash: |
       source activate cysgp4-env
-      pip install pytest pytest-azurepipelines
+      conda install --yes --quiet --name cysgp4-env -c conda-forge pytest sgp4
+      pip install pytest-azurepipelines
       pip install -e .
       pytest cysgp4
     displayName: pytest
