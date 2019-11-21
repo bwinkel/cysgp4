@@ -19,18 +19,19 @@ jobs:
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to PATH
 
-  - bash: conda create --yes --quiet --name cysgp4-env
+  - bash: conda create --yes --quiet --name cysgp4-env -c conda-forge
     displayName: Create Anaconda environment
 
   - bash: |
       source activate cysgp4-env
-      conda install --yes --quiet --name cysgp4-env python=$PYTHON_VERSION numpy==$NUMPY_VERSION
+      conda install --yes --quiet --name cysgp4-env -c conda-forge python=$PYTHON_VERSION numpy==$NUMPY_VERSION
     displayName: Install Anaconda packages
 
   - bash: |
       source activate cysgp4-env
       pip install pytest pytest-azurepipelines
-      pytest
+      pip install -e .
+      pytest cysgp4
     displayName: pytest
 
 # - job:
