@@ -36,6 +36,37 @@ from libcpp.string cimport string
 from libcpp cimport bool
 
 
+cdef extern from 'Globals.h':
+
+    cdef:
+        const double kAE
+        const double kQ0
+        const double kS0
+        const double kMU
+        const double kXKMPER  # Earth Radius (major aka "a")
+        const double kXJ2
+        const double kXJ3
+        const double kXJ4
+        const double kXKE
+        const double kCK2
+        const double kCK4
+        const double kQOMS2T
+        const double kS
+        const double kPI
+        const double kTWOPI
+        const double kTWOTHIRD
+        const double kTHDT
+        const double kF  # Earth flattening
+        const double kOMEGA_E
+        const double kAU
+        const double kSECONDS_PER_DAY
+        const double kMINUTES_PER_DAY
+        const double kHOURS_PER_DAY
+        const double kEPOCH_JAN1_00H_1900
+        const double kEPOCH_JAN1_12H_1900
+        const double kEPOCH_JAN1_12H_2000
+
+
 cdef extern from 'Tle.h':
 
     cdef cppclass Tle:

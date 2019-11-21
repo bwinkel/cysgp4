@@ -179,6 +179,17 @@ class TestPyCoordGeodetic:
         geo1 = PyCoordGeodetic(*self.geo_coord)
         assert str(geo1) == '6.8838d, 50.5250d, 0.3660km'
 
+    def test_ecef(self):
+
+        geo = PyCoordGeodetic(*self.geo_coord)
+
+        print(geo.ecef)
+        assert_allclose(
+            geo.ecef,
+            (4033.8986696677143, 486.99458429181357, 4900.402205553537),
+            atol=1.e-3
+            )
+
 
 class TestPyCoordTopocentric:
 

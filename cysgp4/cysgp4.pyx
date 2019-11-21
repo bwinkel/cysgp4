@@ -49,7 +49,7 @@ from cython.operator cimport address as addr
 from cython.operator cimport preincrement as inc
 from cpython cimport bool as python_bool
 from libcpp cimport bool as cpp_bool
-from libc.math cimport M_PI, floor, fabs, fmod
+from libc.math cimport M_PI, floor, fabs, fmod, sqrt, sin, cos
 from .cysgp4 cimport *
 
 from datetime import datetime
@@ -118,6 +118,34 @@ cdef inline double mjd_from_ticks(long long ticks) nogil:
 
     ticks -= MJD0_TICKS
     return ticks / 8.64e10
+
+
+cdef inline (double, double, double) ecef_from_geo(
+        double lon_rad, double lat_rad, double alt_km
+        ) nogil:
+    '''
+    Return ECEF (Cartesian) in km.
+
+    https://en.wikipedia.org/wiki/Geographic_coordinate_conversion
+    '''
+
+    cdef:
+
+        double a = kXKMPER
+        double b = kXKMPER * (1. - kF)
+
+        double slam = sin(lon_rad)
+        double clam = cos(lon_rad)
+        double sphi = sin(lat_rad)
+        double cphi = cos(lat_rad)
+
+        double N = a ** 2 / sqrt(a ** 2 * cphi ** 2 + b ** 2 * sphi ** 2)
+
+        double x = (N + alt_km) * cphi * clam
+        double y = (N + alt_km) * cphi * slam
+        double z = (b ** 2 / a ** 2 * N + alt_km) * sphi
+
+    return x, y, z
 
 
 cdef class PyDateTime(object):
@@ -620,6 +648,18 @@ cdef class PyCoordGeodetic(object):
 
         self._cobj.altitude = alt_km
 
+    def _get_ecef(self):
+
+        cdef double x, y, z
+
+        (x, y, z) = ecef_from_geo(
+            self._cobj.longitude,
+            self._cobj.latitude,
+            self._cobj.altitude,
+            )
+
+        return x, y, z
+
     lon = property(
         _get_lon, _set_lon, None,
         doc='Geographic longitude [deg] (see also Class documentation).'
@@ -631,6 +671,10 @@ cdef class PyCoordGeodetic(object):
     alt = property(
         _get_alt, _set_alt, None,
         doc='Geographic altitude [km] (see also Class documentation).'
+        )
+    ecef = property(
+        _get_ecef, None, None,
+        doc='ECEF [km] (Earth-centered, Earth-fixed frame; x, y, z).'
         )
 
 
