@@ -349,7 +349,8 @@ class TestSatellite:
         from pycraf import satellite
 
         tle_string = '\n'.join(self.tle_tup)
-        location = EarthLocation.from_geodetic(*self.effbg_tup_m, 'WGS72')
+        loc_tup = tuple(list(self.effbg_tup_m) + ['WGS72'])
+        location = EarthLocation.from_geodetic(*loc_tup)
         sat_obs = satellite.SatelliteObserver(location)
         dt = datetime.datetime(*self.dt_tup)
         obstime = time.Time(dt)

@@ -64,15 +64,19 @@ jobs:
     displayName: Install Anaconda packages
 
   - bash: |
-      source activate cysgp4-env
+      # source activate cysgp4-env
+      pip install -e .
+    displayName: Building
+
+  - bash: |
+      # source activate cysgp4-env
       conda install --yes --quiet --name cysgp4-env -c conda-forge pytest sgp4
       pip install pytest-azurepipelines
-      pip install -e .
       pytest cysgp4
     displayName: Testing
 
   - bash: |
-      source activate cysgp4-env
+      # source activate cysgp4-env
       conda install --yes --quiet --name cysgp4-env -c conda-forge astropy sphinx-astropy
       sphinx-build docs docs/_build/html -W -b html
     displayName: Make docs
@@ -84,7 +88,7 @@ jobs:
     displayName: 'Twine Authenticate'
 
   - bash: |
-      source activate cysgp4-env
+      # source activate cysgp4-env
       conda install --yes --quiet --name cysgp4-env -c conda-forge twine wheel
       python setup.py sdist
       # python setup.py bdist_wheel
