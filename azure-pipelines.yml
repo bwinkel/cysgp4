@@ -7,9 +7,9 @@ trigger:
     - master
 
 variables:
-  twine.username: __token__
-  # is.tag: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
-  is.tag: true
+  # twine.username: __token__
+  is.tag: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
+  # is.tag: true
 
 jobs:
 - job:
@@ -19,18 +19,27 @@ jobs:
 
   strategy:
     matrix:
-      # Python27:
-      #   python.version: '2.7'
+      Python27:
+        python.version: '2.7'
+        numpy.version: '1.13.1'
+        do.dist: ${{ eq(variables['is.tag'], true) }}
+      # Python35:
+      #   python.version: '3.5'
       #   numpy.version: '1.13.1'
+      #   do.dist: ${{ eq(variables['is.tag'], true) }}
       Python36:
         python.version: '3.6'
         numpy.version: '1.13.1'
         do.docs: ${{ true }}
         do.dist: ${{ eq(variables['is.tag'], true) }}
-      Python37:
-        python.version: '3.7'
-        numpy.version: '1.14.5'
-        do.dist: ${{ eq(variables['is.tag'], true) }}
+      # Python37:
+      #   python.version: '3.7'
+      #   numpy.version: '1.14.5'
+      #   do.dist: ${{ eq(variables['is.tag'], true) }}
+      # Python37:
+      #   python.version: '3.8'
+      #   numpy.version: '1.14.5'
+      #   do.dist: ${{ eq(variables['is.tag'], true) }}
 
   steps:
 
@@ -69,13 +78,18 @@ jobs:
     displayName: Make docs
     condition: and(succeeded(), eq(variables['do.docs'], true))
 
+  - task: TwineAuthenticate@1
+    displayName: 'Twine Authenticate'
+    inputs:
+      pythonUploadServiceConnection: pypi
+
   - bash: |
       source activate cysgp4-env
       conda install --yes --quiet --name cysgp4-env -c conda-forge twine
       python setup.py sdist
       # python setup.py bdist_wheel
-      python -m twine upload dist/*.tar.gz
-      # python -m twine upload dist/*.whl
+      python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH) dist/*.tar.gz
+      # python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH)  dist/*.whl
     displayName: Upload to PyPI
     condition: and(succeeded(), eq(variables['do.dist'], true))
 
