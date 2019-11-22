@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Installation &#8212; cysgp4 v0.2.13</title>
+    <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <script type="text/javascript" src="_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Importing cysgp4" href="importing_cysgp4.html" />
+    <link rel="prev" title="cysgp4 Documentation" href="index.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="index.html"><span id="logotext1">cysgp4</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="genindex.html">Index</a></li>
+    <li><a title="Module Index" href="py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="importing_cysgp4.html" title="Importing cysgp4">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="index.html" title="cysgp4 Documentation">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="index.html">cysgp4 v0.2.13</a>
+	 &#187;
+      </li>
+      
+      <li>Installation</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>cysgp4 has the following strict requirements:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.python.org/">Python</a> 3.5 or later</p></li>
+<li><p><a class="reference external" href="https://setuptools.readthedocs.io/en/latest/">setuptools</a>: Used for the
+package installation.</p></li>
+<li><p><a class="reference external" href="http://www.numpy.org/">NumPy</a> 1.13 or later</p></li>
+</ul>
+</div>
+<div class="section" id="installing-cysgp4">
+<h2>Installing cysgp4<a class="headerlink" href="#installing-cysgp4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="using-anaconda">
+<h3>Using Anaconda<a class="headerlink" href="#using-anaconda" title="Permalink to this headline">¶</a></h3>
+<p>The easiest way to install <code class="xref py py-obj docutils literal notranslate"><span class="pre">cysgp4</span></code> is certainly to make use of the
+great <a class="reference external" href="https://www.anaconda.com/">Anaconda Python distribution</a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install cysgp4 -c conda-forge
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-pip">
+<h3>Using pip<a class="headerlink" href="#using-pip" title="Permalink to this headline">¶</a></h3>
+<p>To install cysgp4 with <a class="reference external" href="http://www.pip-installer.org/en/latest/">pip</a>,
+simply run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install cysgp4
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You may need a C++ compiler (e.g., <code class="docutils literal notranslate"><span class="pre">g++</span></code>) with OpenMP support to be
+installed for the installation to succeed, if no <a class="reference external" href="https://pythonwheels.com/">binary wheel</a> is available for your OS and Python version
+on the <a class="reference external" href="https://pypi.org/project/cysgp4/#files">Python Package Index</a></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">--no-deps</span></code> flag if you already have dependency packages
+installed, since otherwise pip will sometimes try to “help” you
+by upgrading your installation, which may not always be desired.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you get a <code class="docutils literal notranslate"><span class="pre">PermissionError</span></code> this means that you do not have the
+required administrative access to install new packages to your Python
+installation.  In this case you may consider using the <code class="docutils literal notranslate"><span class="pre">--user</span></code> option
+to install the package into your home directory.  You can read more
+about how to do this in the <a class="reference external" href="https://pip.pypa.io/en/stable/user_guide/#user-installs">pip documentation</a>.</p>
+<p>We recommend to use a Python distribution, such as <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a>, especially, if you are on
+<a class="reference internal" href="#windows-install"><span class="std std-ref">Installation on Windows</span></a>.</p>
+<p>Do <strong>not</strong> install cysgp4 or other third-party packages using <code class="docutils literal notranslate"><span class="pre">sudo</span></code>
+unless you are fully aware of the risks.</p>
+</div>
+</div>
+<div class="section" id="installation-from-source">
+<span id="source-install"></span><h3>Installation from source<a class="headerlink" href="#installation-from-source" title="Permalink to this headline">¶</a></h3>
+<p>There are two options, if you want to build cysgp4 from sources. Either, you
+install the tar-ball (<code class="xref py py-obj docutils literal notranslate"><span class="pre">*.tar.gz</span></code> file) from <a class="reference external" href="https://pypi.python.org/pypi/cysgp4">PyPI</a> and extract it to the directory of
+your choice, or, if you always want to stay up-to-date, clone the git
+repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/bwinkel/cysgp4
+</pre></div>
+</div>
+<p>Then go into the cysgp4 source directory and run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install .
+</pre></div>
+</div>
+<p>Again, consider the <code class="docutils literal notranslate"><span class="pre">--user</span></code> option or even better use <a class="reference external" href="https://pypi.org/project/virtualenv/">virtualenv</a> or a Python distribution
+such as <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a> to avoid messing up
+the system-wide Python installation.</p>
+</div>
+<div class="section" id="installation-on-windows">
+<span id="windows-install"></span><h3>Installation on Windows<a class="headerlink" href="#installation-on-windows" title="Permalink to this headline">¶</a></h3>
+<p>Note that for Windows machines we provide a binary wheel (Python 3.5+ only)
+via <a class="reference external" href="https://pypi.python.org/pypi/cysgp4">PyPI</a> and installation is as easy as with Linux:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install cysgp4
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you are desperate, you can install cysgp4 from source even on Windows.
+You’ll need to install a suitable C++-compiler; <a class="reference external" href="https://matthew-brett.github.io/pydagogue/python_msvc.html#visual-studio-versions-used-to-compile-distributed-python-binaries">see here</a>. The cysgp4
+package needs Python 3.5 or later, which means VC++ Version 14 is
+mandatory. The easiest way to obtain it, is by installing the
+<a class="reference external" href="http://landinghub.visualstudio.com/visual-cpp-build-tools">Visual C++ 2015 Build Tools</a> which is
+“only” 4 GBytes large…</p>
+</div>
+</div>
+<div class="section" id="installation-on-macos">
+<span id="macos-install"></span><h3>Installation on MacOS<a class="headerlink" href="#installation-on-macos" title="Permalink to this headline">¶</a></h3>
+<p>Installation on MacOS can be a bit tricky, because the standard C++ compiler
+does not support OpenMP. We provide wheels on PyPI, such that you can</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install cysgp4
+</pre></div>
+</div>
+<p>however, you need to have the GCC C++ compiler (see below), otherwise you’ll
+likely get some error message.</p>
+<p>Also, if you want to install from source, you must have a C++ compiler. There
+are basically two options, using the gcc suite (recommended) or clang/LLVM.</p>
+<div class="section" id="gcc">
+<h4>gcc<a class="headerlink" href="#gcc" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew install gcc
+brew link --overwrite gcc
+</pre></div>
+</div>
+<p>You may have to set build-related environment variables to point towards the
+gcc compilers instead of the standard clang:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">CC</span><span class="o">=</span><span class="s2">&quot;gcc-8&quot;</span>
+<span class="nb">export</span> <span class="nv">CXX</span><span class="o">=</span><span class="s2">&quot;g++-8&quot;</span>
+<span class="nb">export</span> <span class="nv">CPP</span><span class="o">=</span><span class="s2">&quot;g++-8&quot;</span>
+<span class="nb">export</span> <span class="nv">LD</span><span class="o">=</span><span class="s2">&quot;gcc-8&quot;</span>
+<span class="nb">export</span> <span class="nv">LDFLAGS</span><span class="o">=</span><span class="s2">&quot;-Wl,-rpath,/usr/local/opt/gcc/lib/gcc/8/&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Replace the version (“8”) in the above lines with the actually installed
+gcc version!</p>
+</div>
+<p>Then follow the instructions in <a class="reference internal" href="#source-install"><span class="std std-ref">Installation from source</span></a>.</p>
+</div>
+<div class="section" id="clang-llvm">
+<h4>clang/LLVM<a class="headerlink" href="#clang-llvm" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew update
+brew install llvm
+
+<span class="nb">export</span> <span class="nv">CC</span><span class="o">=</span><span class="s1">&#39;/usr/local/opt/llvm/bin/clang&#39;</span>
+<span class="nb">export</span> <span class="nv">CXX</span><span class="o">=</span><span class="s1">&#39;/usr/local/opt/llvm/bin/clang++&#39;</span>
+<span class="nb">export</span> <span class="nv">CXX11</span><span class="o">=</span><span class="s1">&#39;/usr/local/opt/llvm/bin/clang++&#39;</span>
+<span class="nb">export</span> <span class="nv">LDFLAGS</span><span class="o">=</span><span class="s1">&#39;-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib -lgomp&#39;</span>
+<span class="nb">export</span> <span class="nv">CPPFLAGS</span><span class="o">=</span><span class="s1">&#39;-I/usr/local/opt/llvm/include -stdlib=libc++&#39;</span>
+</pre></div>
+</div>
+<p>Then follow the instructions in <a class="reference internal" href="#source-install"><span class="std std-ref">Installation from source</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The MacOS wheel, which we provide on PyPI (for pip installation)
+was built using clang/LLVM. So it may happen that you run into binary
+incompatibilities if you use a different compiler suite on your computer.
+In such cases it may be necessary to build cysgp4 from source using
+your own compiler. Sometimes even different compiler versions
+(e.g. gcc 6.3 instead of gcc 6.4) can lead to problems.
+Please write a ticket, if you run into trouble.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Again, if you’re on Anaconda, things get (often) much simpler:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge gcc
+</pre></div>
+</div>
+</div></blockquote>
+<p>This will install the gcc compiler suite into your Anaconda installation
+and the instructions in <a class="reference internal" href="#source-install"><span class="std std-ref">Installation from source</span></a> should work out-of-the-box.
+If you prefer clang/LLVM, the following should install the necessary
+conda packages:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge clang_osx-64 clangxx_osx-64 llvm-openmp openmp
+</pre></div>
+</div>
+</div></blockquote>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">cysgp4</span></code> package on <a class="reference external" href="https://conda-forge.org/">conda-forge</a>
+was created using the latter approach.</p>
+</div>
+</div>
+</div>
+<div class="section" id="testing-an-installed-cysgp4">
+<span id="testing-installed-cysgp4"></span><h3>Testing an installed cysgp4<a class="headerlink" href="#testing-an-installed-cysgp4" title="Permalink to this headline">¶</a></h3>
+<p>The easiest way to test if your installed version of cysgp4 is running:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="o">--</span><span class="n">pyargs</span> <span class="n">cysgp4</span><span class="o">.</span><span class="n">tests</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This way of running the tests may not work if you do it in the
+cysgp4 source distribution directory.</p>
+</div>
+<p>It is also possible to use the <a class="reference internal" href="api/cysgp4.test.html#cysgp4.test" title="cysgp4.test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test()</span></code></a> function:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cysgp4</span>
+<span class="n">cysgp4</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>but currently, this will only work, if the user has <a class="reference external" href="https://www.astropy.org">Astropy</a> installed
+(this may change soon).
+The tests should run and print out any failures, which you could report at
+the <a class="reference external" href="http://github.com/bwinkel/cysgp4/issues">cysgp4 issue tracker</a>.</p>
+<p>If you prefer testing on the command line and want to develop in the source
+code, you can also utilize <a class="reference external" href="https://pypi.org/project/tox/">tox</a> and
+run the following in the source directory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox -e <span class="nb">test</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#installing-cysgp4">Installing cysgp4</a><ul>
+<li><a class="reference internal" href="#using-anaconda">Using Anaconda</a></li>
+<li><a class="reference internal" href="#using-pip">Using pip</a></li>
+<li><a class="reference internal" href="#installation-from-source">Installation from source</a></li>
+<li><a class="reference internal" href="#installation-on-windows">Installation on Windows</a></li>
+<li><a class="reference internal" href="#installation-on-macos">Installation on MacOS</a><ul>
+<li><a class="reference internal" href="#gcc">gcc</a></li>
+<li><a class="reference internal" href="#clang-llvm">clang/LLVM</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#testing-an-installed-cysgp4">Testing an installed cysgp4</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="_sources/install.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2019, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
+    Last built 22 Nov 2019. <br/>
+  </p>
+</footer>
+  </body>
+</html>

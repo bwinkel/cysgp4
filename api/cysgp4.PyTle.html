@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>PyTle &#8212; cysgp4 v0.2.13</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Satellite" href="cysgp4.Satellite.html" />
+    <link rel="prev" title="PyObserver" href="cysgp4.PyObserver.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">cysgp4</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="cysgp4.Satellite.html" title="Satellite">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="cysgp4.PyObserver.html" title="PyObserver">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">cysgp4 v0.2.13</a>
+	 &#187;
+      </li>
+      <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
+      
+      <li>PyTle</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pytle">
+<h1>PyTle<a class="headerlink" href="#pytle" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="cysgp4.PyTle">
+<em class="property">class </em><code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">PyTle</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">line_one</em>, <em class="sig-param">line_two</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyTle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Thin wrapper around sgp4 (C++) Tle class.</p>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">Two-line element sets</a> contain the
+parameters necessary to describe a satellite’s orbit (around Earth).
+Although the name suggests that two lines of strings are used,
+in practice often three lines are defined, the first containing a
+satellite name (and/or) ID. It is important to note that for many
+satellites, the corresponding TLEs get outdated quickly. Especially for
+low earth orbit satellites, one should query up-to-date information
+at least once per day.</p>
+<p><a class="reference internal" href="#cysgp4.PyTle" title="cysgp4.PyTle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTle</span></code></a> is only used to parse the TLE strings and store the
+orbital parameters for use by other sgp4 routines.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>Name/ID of satellite.</p>
+</dd>
+<dt><strong>line_one</strong><span class="classifier">str</span></dt><dd><p>First TLE line string.</p>
+</dd>
+<dt><strong>line_two</strong><span class="classifier">str</span></dt><dd><p>Second TLE line string.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>tle</strong><span class="classifier"><a class="reference internal" href="#cysgp4.PyTle" title="cysgp4.PyTle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTle</span></code></a> object</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>TLEs can be obtained from many sources, such as
+<a class="reference external" href="https://celestrak.com/">https://celestrak.com/</a>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">requests</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="k">import</span> <span class="n">PyTle</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://celestrak.com/NORAD/elements/science.txt&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ctrak_science</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">all_lines</span> <span class="o">=</span> <span class="n">ctrak_science</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tle_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="nb">tuple</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">all_lines</span><span class="p">[</span><span class="n">idx</span><span class="p">::</span><span class="mi">3</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">tle_list</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">tle_list</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="go">HST</span>
+<span class="go">1 20580U 90037B   19321.38711875  .00000471  00000-0  17700-4 0  9991</span>
+<span class="go">2 20580  28.4699 288.8102 0002495 321.7771 171.5855 15.09299865423838</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hst_tle</span> <span class="o">=</span> <span class="n">PyTle</span><span class="p">(</span><span class="o">*</span><span class="n">tle_list</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hst_tle</span>
+<span class="go">&lt;PyTle: HST                     &gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">hst_tle</span><span class="p">)</span>
+<span class="go">Norad Number:         20580</span>
+<span class="go">Int. Designator:      90037B</span>
+<span class="go">Epoch:                2019-11-17 09:17:27.060000 UTC</span>
+<span class="go">Orbit Number:         42383</span>
+<span class="go">Mean Motion Dt2:        0.00000471</span>
+<span class="go">Mean Motion Ddt6:       0.00000000</span>
+<span class="go">Eccentricity:           0.00024950</span>
+<span class="go">BStar:                  0.00001770</span>
+<span class="go">Inclination:           28.46990000</span>
+<span class="go">Right Ascending Node: 288.81020000</span>
+<span class="go">Argument Perigee:     321.77710000</span>
+<span class="go">Mean Anomaly:         171.58550000</span>
+<span class="go">Mean Motion:           15.09299865</span>
+</pre></div>
+</div>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyTle.tle_strings" title="cysgp4.PyTle.tle_strings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_strings</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="method">
+<dt id="cysgp4.PyTle.tle_strings">
+<code class="sig-name descname">tle_strings</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyTle.tle_strings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">PyTle</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/cysgp4.PyTle.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2019, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
+    Last built 22 Nov 2019. <br/>
+  </p>
+</footer>
+  </body>
+</html>

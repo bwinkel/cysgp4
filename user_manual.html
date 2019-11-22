@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Cysgp4 user manual &#8212; cysgp4 v0.2.13</title>
+    <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <script type="text/javascript" src="_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="propagate_many" href="api/cysgp4.propagate_many.html" />
+    <link rel="prev" title="Cysgp4 quick tour" href="quick_tour.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="index.html"><span id="logotext1">cysgp4</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="genindex.html">Index</a></li>
+    <li><a title="Module Index" href="py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="api/cysgp4.propagate_many.html" title="propagate_many">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="quick_tour.html" title="Cysgp4 quick tour">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="index.html">cysgp4 v0.2.13</a>
+	 &#187;
+      </li>
+      
+      <li>Cysgp4 user manual</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="cysgp4-user-manual">
+<h1>Cysgp4 user manual<a class="headerlink" href="#cysgp4-user-manual" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+<div class="section" id="using-cysgp4">
+<h2>Using cysgp4<a class="headerlink" href="#using-cysgp4" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+<div class="section" id="benchmarks">
+<h2>Benchmarks<a class="headerlink" href="#benchmarks" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+<div class="section" id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.danrw.com/sgp4/">C++ SGP4 Satellite Library</a> by Daniel Warner</p></li>
+<li><p><a class="reference external" href="https://pypi.org/project/sgp4/">sgp4 Python package</a> by Brandon Rhodes</p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">Two-line element strings (TLE)</a></p></li>
+</ul>
+</div>
+<div class="section" id="reference-api">
+<h2>Reference/API<a class="headerlink" href="#reference-api" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="cysgp4-package">
+<h3>cysgp4 Package<a class="headerlink" href="#cysgp4-package" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="functions">
+<h4>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a>(mjds, tles[, observers])</p></td>
+<td><p>Calculate positions of many satellites at a various times at once.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.propagate_many_slow.html#cysgp4.propagate_many_slow" title="cysgp4.propagate_many_slow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many_slow</span></code></a>(mjds, tles[, observers])</p></td>
+<td><p>This is a slow (non-parallelized, Python-looping) version of <a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a> that is meant for testing and benchmarking only.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.set_num_threads.html#cysgp4.set_num_threads" title="cysgp4.set_num_threads"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_num_threads</span></code></a>(int nthreads)</p></td>
+<td><p>Change maximum number of threads to use.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.test.html#cysgp4.test" title="cysgp4.test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test</span></code></a>(\*\*kwargs)</p></td>
+<td><p>Run the tests for the package.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="classes">
+<h4>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.PyCoordGeodetic.html#cysgp4.PyCoordGeodetic" title="cysgp4.PyCoordGeodetic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyCoordGeodetic</span></code></a>(double lon_deg=0, …)</p></td>
+<td><p>Thin wrapper around sgp4 (C++) CoordGeodetic struct.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.PyCoordTopocentric.html#cysgp4.PyCoordTopocentric" title="cysgp4.PyCoordTopocentric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyCoordTopocentric</span></code></a>(double az_deg=0, …)</p></td>
+<td><p>Thin wrapper around sgp4 (C++) CoordTopocentric struct.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.PyDateTime.html#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a>([dt, init])</p></td>
+<td><p>Thin wrapper around sgp4 (C++) DateTime class.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.PyEci.html#cysgp4.PyEci" title="cysgp4.PyEci"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyEci</span></code></a>(PyDateTime pydt=None, …)</p></td>
+<td><p>Thin wrapper around sgp4 (C++) Eci class.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.PyObserver.html#cysgp4.PyObserver" title="cysgp4.PyObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyObserver</span></code></a>(double lon_deg=0, …)</p></td>
+<td><p>Thin wrapper around sgp4 (C++) Observer class.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.PyTle.html#cysgp4.PyTle" title="cysgp4.PyTle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTle</span></code></a>(name, line_one, line_two)</p></td>
+<td><p>Thin wrapper around sgp4 (C++) Tle class.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.Satellite.html#cysgp4.Satellite" title="cysgp4.Satellite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Satellite</span></code></a>(PyTle tle, PyObserver obs=None, …)</p></td>
+<td><p>Calculate position of a satellite at a given time.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">Cysgp4 user manual</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#using-cysgp4">Using cysgp4</a></li>
+<li><a class="reference internal" href="#benchmarks">Benchmarks</a></li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+<li><a class="reference internal" href="#reference-api">Reference/API</a><ul>
+<li><a class="reference internal" href="#cysgp4-package">cysgp4 Package</a><ul>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="_sources/user_manual.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2019, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
+    Last built 22 Nov 2019. <br/>
+  </p>
+</footer>
+  </body>
+</html>

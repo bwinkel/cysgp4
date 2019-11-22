@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Satellite &#8212; cysgp4 v0.2.13</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Licenses" href="../license.html" />
+    <link rel="prev" title="PyTle" href="cysgp4.PyTle.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">cysgp4</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="../license.html" title="Licenses">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="cysgp4.PyTle.html" title="PyTle">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">cysgp4 v0.2.13</a>
+	 &#187;
+      </li>
+      <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
+      
+      <li>Satellite</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="satellite">
+<h1>Satellite<a class="headerlink" href="#satellite" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="cysgp4.Satellite">
+<em class="property">class </em><code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">Satellite</code><span class="sig-paren">(</span><em class="sig-param">PyTle tle</em>, <em class="sig-param">PyObserver obs=None</em>, <em class="sig-param">PyDateTime pydt=None</em>, <em class="sig-param">double mjd_cache_resolution=MJD_RESOLUTION</em>, <em class="sig-param">unicode on_error=u'raise'</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.Satellite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Calculate position of a satellite at a given time.</p>
+<p>The satellite is defined via a TLE (see <a class="reference internal" href="cysgp4.PyTle.html#cysgp4.PyTle" title="cysgp4.PyTle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTle</span></code></a>). Furthermore,
+for apparent positions of the satellite, an observer (see
+<a class="reference internal" href="cysgp4.PyObserver.html#cysgp4.PyObserver" title="cysgp4.PyObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyObserver</span></code></a>) needs to be defined.</p>
+<p>The position calculations are lazy, i.e., only calculated if the newly
+requested time differs by a certain amount from the last time at which
+a calculation was performed. The granularity of this “cache” can be
+defined via the <code class="xref py py-obj docutils literal notranslate"><span class="pre">mjd_cache_resolution</span></code> parameter.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>tle</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyTle.html#cysgp4.PyTle" title="cysgp4.PyTle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTle</span></code></a></span></dt><dd><p>TLE instance of the satellite of interest.</p>
+</dd>
+<dt><strong>obs</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyObserver.html#cysgp4.PyObserver" title="cysgp4.PyObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyObserver</span></code></a> or None (default: None)</span></dt><dd><p>Observer instance. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then the observer location is set to
+(0 deg, 0 deg, 0 km).</p>
+</dd>
+<dt><strong>pydt</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyDateTime.html#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> (default: None)</span></dt><dd><p>Date and time at which to calculate the position. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then
+the current datetime is used, as given by a call to
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">now()</span></code>.</p>
+</dd>
+<dt><strong>mjd_cache_resolution</strong><span class="classifier">double (default: 0.001)</span></dt><dd><p>Granularity of the internal cache [s]. Satellite positions are
+calculated only if the newly requested datetime differs by more than
+this from the previous calculation.</p>
+</dd>
+<dt><strong>on_error</strong><span class="classifier">str, optional (either ‘raise’ or ‘coerce_to_nan’, default: ‘raise’)</span></dt><dd><p>If the underlying SGP C++ library throws an error (which often
+happens if one works with times that are strongly deviating from
+the TLE epoch), a Python RuntimeError is usually thrown. For batch
+processing, this is not always desirable. If
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">on_error</span> <span class="pre">=</span> <span class="pre">'coerce_to_nan'</span></code> then C++ errors will be suppressed and
+the resulting position vectors will be converted to NaN-values
+instead.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>sat</strong><span class="classifier"><a class="reference internal" href="#cysgp4.Satellite" title="cysgp4.Satellite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Satellite</span></code></a> object</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>The following demonstrates how a typical use of the <a class="reference internal" href="#cysgp4.Satellite" title="cysgp4.Satellite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Satellite</span></code></a>
+class would look like:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span> <span class="o">=</span> <span class="n">PyDateTime</span><span class="o">.</span><span class="n">from_mjd</span><span class="p">(</span><span class="mf">58805.57</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lon_deg</span><span class="p">,</span> <span class="n">lat_deg</span> <span class="o">=</span> <span class="mf">6.88375</span><span class="p">,</span> <span class="mf">50.525</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alt_km</span> <span class="o">=</span> <span class="mf">0.366</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obs</span> <span class="o">=</span> <span class="n">PyObserver</span><span class="p">(</span><span class="n">lon_deg</span><span class="p">,</span> <span class="n">lat_deg</span><span class="p">,</span> <span class="n">alt_km</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hst_tle</span> <span class="o">=</span> <span class="n">PyTle</span><span class="p">(</span>
+<span class="gp">... </span><span class="s1">&#39;HST&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;1 20580U 90037B   19321.38711875  .00000471  00000-0  17700-4 0  9991&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;2 20580  28.4699 288.8102 0002495 321.7771 171.5855 15.09299865423838&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span> <span class="o">=</span> <span class="n">Satellite</span><span class="p">(</span><span class="n">hst_tle</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">pydt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># can now query positions, also for different times</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">eci_pos</span><span class="p">()</span><span class="o">.</span><span class="n">loc</span>  <span class="c1"># ECI cartesian position</span>
+<span class="go">(5879.5931344459295, 1545.7455647032068, 3287.4155452595)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">eci_pos</span><span class="p">()</span><span class="o">.</span><span class="n">vel</span>  <span class="c1"># ECI cartesian velocity</span>
+<span class="go">(-1.8205895517672226, 7.374044252723081, -0.20697960810978586)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">geo_pos</span><span class="p">()</span>  <span class="c1"># geographic position</span>
+<span class="go">&lt;PyCoordGeodetic: 112.2146d, 28.5509d, 538.0186km&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">topo_pos</span><span class="p">()</span>  <span class="c1"># topocentric position</span>
+<span class="go">&lt;PyCoordTopocentric: 60.2453d, -35.6844d, 8314.5683km, 3.5087km/s&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># change time</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">mjd</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">/</span> <span class="mf">720.</span>  <span class="c1"># one minute later</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">topo_pos</span><span class="p">()</span>
+<span class="go">&lt;PyCoordTopocentric: 54.8446d, -38.2749d, 8734.9195km, 3.4885km/s&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># change by less than cache resolution (1 ms)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">topo_pos</span><span class="p">()</span><span class="o">.</span><span class="n">az</span><span class="p">,</span> <span class="n">sat</span><span class="o">.</span><span class="n">topo_pos</span><span class="p">()</span><span class="o">.</span><span class="n">el</span>
+<span class="go">(54.84463503781068, -38.274852915850126)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">mjd</span> <span class="o">+=</span> <span class="mf">0.0005</span> <span class="o">/</span> <span class="mf">86400.</span>  <span class="c1"># 0.5 ms</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">topo_pos</span><span class="p">()</span><span class="o">.</span><span class="n">az</span><span class="p">,</span> <span class="n">sat</span><span class="o">.</span><span class="n">topo_pos</span><span class="p">()</span><span class="o">.</span><span class="n">el</span>
+<span class="go">(54.84463503781068, -38.274852915850126)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># change by another 0.5 ms triggers re-calculation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">mjd</span> <span class="o">+=</span> <span class="mf">0.00051</span> <span class="o">/</span> <span class="mf">86400.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">topo_pos</span><span class="p">()</span><span class="o">.</span><span class="n">az</span><span class="p">,</span> <span class="n">sat</span><span class="o">.</span><span class="n">topo_pos</span><span class="p">()</span><span class="o">.</span><span class="n">el</span>
+<span class="go">(54.844568313870965, -38.274885794151324)</span>
+</pre></div>
+</div>
+<p>Constructs a new Satellite object from given TLE</p>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.Satellite.mjd" title="cysgp4.Satellite.mjd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mjd</span></code></a></p></td>
+<td><p>Modified Julian Date (see also Class documentation).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.Satellite.pydt" title="cysgp4.Satellite.pydt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydt</span></code></a></p></td>
+<td><p>Datetime (see also Class documentation).</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.Satellite.eci_pos" title="cysgp4.Satellite.eci_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eci_pos</span></code></a>(self)</p></td>
+<td><p>ECI position of satellite.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.Satellite.geo_pos" title="cysgp4.Satellite.geo_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geo_pos</span></code></a>(self)</p></td>
+<td><p>Geographic (geodetic) position of satellite.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.Satellite.topo_pos" title="cysgp4.Satellite.topo_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">topo_pos</span></code></a>(self)</p></td>
+<td><p>Topocentric position of satellite w.r.t.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="attribute">
+<dt id="cysgp4.Satellite.mjd">
+<code class="sig-name descname">mjd</code><a class="headerlink" href="#cysgp4.Satellite.mjd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modified Julian Date (see also Class documentation).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.Satellite.pydt">
+<code class="sig-name descname">pydt</code><a class="headerlink" href="#cysgp4.Satellite.pydt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Datetime (see also Class documentation).</p>
+</dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="method">
+<dt id="cysgp4.Satellite.eci_pos">
+<code class="sig-name descname">eci_pos</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.Satellite.eci_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>ECI position of satellite.</p>
+<p>Lazily calculated, i.e., only if difference to the timestamp
+for which the previous calculation was performed is larger
+than the MJD cache resolution (see class documentation).</p>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>eci</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyEci.html#cysgp4.PyEci" title="cysgp4.PyEci"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyEci</span></code></a></span></dt><dd><p>ECI position of satellite.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="cysgp4.Satellite.geo_pos">
+<code class="sig-name descname">geo_pos</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.Satellite.geo_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Geographic (geodetic) position of satellite.</p>
+<p>Lazily calculated, i.e., only if difference to the timestamp
+for which the previous calculation was performed is larger
+than the MJD cache resolution (see class documentation).</p>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>geo</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyCoordGeodetic.html#cysgp4.PyCoordGeodetic" title="cysgp4.PyCoordGeodetic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyCoordGeodetic</span></code></a></span></dt><dd><p>Geographic position of satellite.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="cysgp4.Satellite.topo_pos">
+<code class="sig-name descname">topo_pos</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.Satellite.topo_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Topocentric position of satellite w.r.t. given observer.</p>
+<p>Lazily calculated, i.e., only if difference to the timestamp
+for which the previous calculation was performed is larger
+than the MJD cache resolution (see class documentation).</p>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>topo</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyCoordTopocentric.html#cysgp4.PyCoordTopocentric" title="cysgp4.PyCoordTopocentric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyCoordTopocentric</span></code></a></span></dt><dd><p>Topocentric position of satellite w.r.t. given observer.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">Satellite</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/cysgp4.Satellite.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2019, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
+    Last built 22 Nov 2019. <br/>
+  </p>
+</footer>
+  </body>
+</html>

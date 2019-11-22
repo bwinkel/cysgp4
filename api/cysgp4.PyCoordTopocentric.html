@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>PyCoordTopocentric &#8212; cysgp4 v0.2.13</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="PyDateTime" href="cysgp4.PyDateTime.html" />
+    <link rel="prev" title="PyCoordGeodetic" href="cysgp4.PyCoordGeodetic.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">cysgp4</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="cysgp4.PyDateTime.html" title="PyDateTime">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="cysgp4.PyCoordGeodetic.html" title="PyCoordGeodetic">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">cysgp4 v0.2.13</a>
+	 &#187;
+      </li>
+      <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
+      
+      <li>PyCoordTopocentric</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pycoordtopocentric">
+<h1>PyCoordTopocentric<a class="headerlink" href="#pycoordtopocentric" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="cysgp4.PyCoordTopocentric">
+<em class="property">class </em><code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">PyCoordTopocentric</code><span class="sig-paren">(</span><em class="sig-param">double az_deg=0</em>, <em class="sig-param">double el_deg=0</em>, <em class="sig-param">double dist_km=0</em>, <em class="sig-param">double dist_rate_km_per_s=0</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyCoordTopocentric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Thin wrapper around sgp4 (C++) CoordTopocentric struct.</p>
+<p>The CoordTopocentric struct holds a topocentric location
+(azimuth, elevation, range/distance and distance/range rate).</p>
+<p>Note: the topocentric position of a satellite is always relative to
+an observer (in SGP4 the observer is defined in geographic coordinates).
+The distance and distance change (aka range rate) is thus the distance
+between the satellite and the observer. However, this struct/class
+only holds the azimuth, elevation, distance and distance rate parameters,
+but contains no information on the observer. It is only useful in
+conjuction with a <a class="reference internal" href="cysgp4.PyObserver.html#cysgp4.PyObserver" title="cysgp4.PyObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyObserver</span></code></a> (which holds a reference to a
+geographic location) and a datetime; see <a class="reference internal" href="cysgp4.Satellite.html#cysgp4.Satellite" title="cysgp4.Satellite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Satellite</span></code></a>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>az_deg</strong><span class="classifier">float (default: 0.)</span></dt><dd><p>Azimuth of topocentric location [deg].</p>
+</dd>
+<dt><strong>el_deg</strong><span class="classifier">float (default: 0.)</span></dt><dd><p>Elevation of topocentric location [deg].</p>
+</dd>
+<dt><strong>dist_km</strong><span class="classifier">float (default: 0.)</span></dt><dd><p>Distance/range of topocentric location [km].</p>
+</dd>
+<dt><strong>dist_rate_km_per_s</strong><span class="classifier">float (default: 0.)</span></dt><dd><p>Distance/range rate of topocentric location [km/s].</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>topo</strong><span class="classifier"><a class="reference internal" href="#cysgp4.PyCoordTopocentric" title="cysgp4.PyCoordTopocentric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyCoordTopocentric</span></code></a> object</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Constructing and using a <a class="reference internal" href="#cysgp4.PyCoordTopocentric" title="cysgp4.PyCoordTopocentric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyCoordTopocentric</span></code></a> object is
+straightforward:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="k">import</span> <span class="n">PyCoordTopocentric</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">az_deg</span><span class="p">,</span> <span class="n">el_deg</span> <span class="o">=</span> <span class="mf">130.1</span><span class="p">,</span> <span class="mf">10.53</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dist_km</span><span class="p">,</span> <span class="n">dist_rate_kms</span> <span class="o">=</span> <span class="mf">1200.</span><span class="p">,</span> <span class="mf">0.03</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">topo</span> <span class="o">=</span> <span class="n">PyCoordTopocentric</span><span class="p">(</span><span class="n">az_deg</span><span class="p">,</span> <span class="n">el_deg</span><span class="p">,</span> <span class="n">dist_km</span><span class="p">,</span> <span class="n">dist_rate_kms</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">topo</span>
+<span class="go">&lt;PyCoordTopocentric: 130.1000d, 10.5300d, 1200.0000km, 0.0300km/s&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Access is also possible via properties, e.g.:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">topo</span><span class="o">.</span><span class="n">az</span>
+<span class="go">130.1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">topo</span><span class="o">.</span><span class="n">dist</span> <span class="o">=</span> <span class="mf">1000.</span>
+</pre></div>
+</div>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyCoordTopocentric.az" title="cysgp4.PyCoordTopocentric.az"><code class="xref py py-obj docutils literal notranslate"><span class="pre">az</span></code></a></p></td>
+<td><p>Topocentric azimuth [deg] (see also Class documentation).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyCoordTopocentric.dist" title="cysgp4.PyCoordTopocentric.dist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dist</span></code></a></p></td>
+<td><p>Topocentric distance [km] (see also Class documentation).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyCoordTopocentric.dist_rate" title="cysgp4.PyCoordTopocentric.dist_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dist_rate</span></code></a></p></td>
+<td><p>Topocentric distance rate [km/s] (see also Class documentation).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyCoordTopocentric.el" title="cysgp4.PyCoordTopocentric.el"><code class="xref py py-obj docutils literal notranslate"><span class="pre">el</span></code></a></p></td>
+<td><p>Topocentric elevation [deg] (see also Class documentation).</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="attribute">
+<dt id="cysgp4.PyCoordTopocentric.az">
+<code class="sig-name descname">az</code><a class="headerlink" href="#cysgp4.PyCoordTopocentric.az" title="Permalink to this definition">¶</a></dt>
+<dd><p>Topocentric azimuth [deg] (see also Class documentation).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyCoordTopocentric.dist">
+<code class="sig-name descname">dist</code><a class="headerlink" href="#cysgp4.PyCoordTopocentric.dist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Topocentric distance [km] (see also Class documentation).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyCoordTopocentric.dist_rate">
+<code class="sig-name descname">dist_rate</code><a class="headerlink" href="#cysgp4.PyCoordTopocentric.dist_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Topocentric distance rate [km/s] (see also Class documentation).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyCoordTopocentric.el">
+<code class="sig-name descname">el</code><a class="headerlink" href="#cysgp4.PyCoordTopocentric.el" title="Permalink to this definition">¶</a></dt>
+<dd><p>Topocentric elevation [deg] (see also Class documentation).</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">PyCoordTopocentric</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/cysgp4.PyCoordTopocentric.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2019, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
+    Last built 22 Nov 2019. <br/>
+  </p>
+</footer>
+  </body>
+</html>

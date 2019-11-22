@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>PyEci &#8212; cysgp4 v0.2.13</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="PyObserver" href="cysgp4.PyObserver.html" />
+    <link rel="prev" title="PyDateTime" href="cysgp4.PyDateTime.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">cysgp4</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="cysgp4.PyObserver.html" title="PyObserver">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="cysgp4.PyDateTime.html" title="PyDateTime">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">cysgp4 v0.2.13</a>
+	 &#187;
+      </li>
+      <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
+      
+      <li>PyEci</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pyeci">
+<h1>PyEci<a class="headerlink" href="#pyeci" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="cysgp4.PyEci">
+<em class="property">class </em><code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">PyEci</code><span class="sig-paren">(</span><em class="sig-param">PyDateTime pydt=None</em>, <em class="sig-param">PyCoordGeodetic geo_loc=None</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyEci" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Thin wrapper around sgp4 (C++) Eci class.</p>
+<p>The Eci class holds an <a class="reference external" href="https://en.wikipedia.org/wiki/Earth-centered_inertial">ECI location</a>
+(latitude, longitude, altitude) for a particular datetime.</p>
+<p>Note, internally, the coordinates (and velocities) are stored in
+Cartesian form (read-only!). One can access these, via the
+<a class="reference internal" href="#cysgp4.PyEci.loc" title="cysgp4.PyEci.loc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loc</span></code></a> and <a class="reference internal" href="#cysgp4.PyEci.vel" title="cysgp4.PyEci.vel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vel</span></code></a> properties. Setting
+new parameters is only possible via a geographic location.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>pydt</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyDateTime.html#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a></span></dt><dd><p>Date and time.</p>
+</dd>
+<dt><strong>geo_loc</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyCoordGeodetic.html#cysgp4.PyCoordGeodetic" title="cysgp4.PyCoordGeodetic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyCoordGeodetic</span></code></a></span></dt><dd><p>Geographic location.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>eci</strong><span class="classifier"><a class="reference internal" href="#cysgp4.PyEci" title="cysgp4.PyEci"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyEci</span></code></a> object</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Constructing and using a <a class="reference internal" href="#cysgp4.PyEci" title="cysgp4.PyEci"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyEci</span></code></a> object is
+straightforward:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="k">import</span> <span class="n">PyEci</span><span class="p">,</span> <span class="n">PyCoordGeodetic</span><span class="p">,</span> <span class="n">PyDateTime</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span> <span class="o">=</span> <span class="n">PyDateTime</span><span class="o">.</span><span class="n">from_mjd</span><span class="p">(</span><span class="mf">55555.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lon_deg</span><span class="p">,</span> <span class="n">lat_deg</span> <span class="o">=</span> <span class="mf">6.88375</span><span class="p">,</span> <span class="mf">50.525</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alt_km</span> <span class="o">=</span> <span class="mf">0.366</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geo</span> <span class="o">=</span> <span class="n">PyCoordGeodetic</span><span class="p">(</span><span class="n">lon_deg</span><span class="p">,</span> <span class="n">lat_deg</span><span class="p">,</span> <span class="n">alt_km</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eci</span> <span class="o">=</span> <span class="n">PyEci</span><span class="p">(</span><span class="n">pydt</span><span class="p">,</span> <span class="n">geo</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eci</span>
+<span class="go">&lt;PyEci: 6.8837d, 50.5250d, 0.3660km 2010-12-25 00:00:00.000000 UTC&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Access is also possible via properties, e.g.:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eci</span><span class="o">.</span><span class="n">loc</span>
+<span class="go">(-725.3304166274728, 3997.924210010933, 4900.402205553537)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eci</span><span class="o">.</span><span class="n">pydt</span> <span class="o">=</span> <span class="n">PyDateTime</span><span class="o">.</span><span class="n">from_mjd</span><span class="p">(</span><span class="mf">55556.</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># or the update method:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eci</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pydt</span><span class="p">,</span> <span class="n">PyCoordGeodetic</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Constructor PyEci(PyDateTime pydt, PyCoordGeodetic geo_loc)</p>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyEci.geo_loc" title="cysgp4.PyEci.geo_loc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geo_loc</span></code></a></p></td>
+<td><p>Geographic location (see also Class documentation).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyEci.loc" title="cysgp4.PyEci.loc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loc</span></code></a></p></td>
+<td><p>Cartesian location (readonly, see also Class documentation).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyEci.pydt" title="cysgp4.PyEci.pydt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydt</span></code></a></p></td>
+<td><p>Datetime (see also Class documentation).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyEci.vel" title="cysgp4.PyEci.vel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vel</span></code></a></p></td>
+<td><p>Cartesian velocity (readonly, see also Class documentation).</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyEci.update" title="cysgp4.PyEci.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(self, PyDateTime pydt=None, …)</p></td>
+<td><p>Update <a class="reference internal" href="#cysgp4.PyEci" title="cysgp4.PyEci"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyEci</span></code></a> object.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="attribute">
+<dt id="cysgp4.PyEci.geo_loc">
+<code class="sig-name descname">geo_loc</code><a class="headerlink" href="#cysgp4.PyEci.geo_loc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Geographic location (see also Class documentation).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyEci.loc">
+<code class="sig-name descname">loc</code><a class="headerlink" href="#cysgp4.PyEci.loc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cartesian location (readonly, see also Class documentation).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyEci.pydt">
+<code class="sig-name descname">pydt</code><a class="headerlink" href="#cysgp4.PyEci.pydt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Datetime (see also Class documentation).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyEci.vel">
+<code class="sig-name descname">vel</code><a class="headerlink" href="#cysgp4.PyEci.vel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cartesian velocity (readonly, see also Class documentation).</p>
+</dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="method">
+<dt id="cysgp4.PyEci.update">
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">PyDateTime pydt=None</em>, <em class="sig-param">PyCoordGeodetic geo_loc=None</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyEci.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update <a class="reference internal" href="#cysgp4.PyEci" title="cysgp4.PyEci"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyEci</span></code></a> object.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>pydt</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyDateTime.html#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a></span></dt><dd><p>Date and time.</p>
+</dd>
+<dt><strong>geo_loc</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyCoordGeodetic.html#cysgp4.PyCoordGeodetic" title="cysgp4.PyCoordGeodetic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyCoordGeodetic</span></code></a></span></dt><dd><p>Geographic location.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">PyEci</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/cysgp4.PyEci.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2019, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
+    Last built 22 Nov 2019. <br/>
+  </p>
+</footer>
+  </body>
+</html>
