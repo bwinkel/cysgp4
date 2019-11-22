@@ -79,21 +79,19 @@ jobs:
     condition: and(succeeded(), eq(variables['do.docs'], true))
 
   - task: TwineAuthenticate@1
-    inputs:
-      pythonUploadServiceConnection: pypi
-    displayName: 'Twine Authenticate'
+    inputs:
+      pythonUploadServiceConnection: pypi
+    displayName: 'Twine Authenticate'
 
-  # - bash: |
-  #     source activate cysgp4-env
-  #     conda install --yes --quiet --name cysgp4-env -c conda-forge twine wheel
-  #     python setup.py sdist
-  #     # python setup.py bdist_wheel
-  #     python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH) dist/*.tar.gz
-  #     # python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH)  dist/*.whl
-  #   displayName: Upload to PyPI
-  #   condition: and(succeeded(), eq(variables['do.dist'], true))
-
-
+  - bash: |
+      source activate cysgp4-env
+      conda install --yes --quiet --name cysgp4-env -c conda-forge twine wheel
+      python setup.py sdist
+      # python setup.py bdist_wheel
+      python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH) dist/*.tar.gz
+      # python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH)  dist/*.whl
+    displayName: Upload to PyPI
+    condition: and(succeeded(), eq(variables['do.dist'], true))
 
 
 
