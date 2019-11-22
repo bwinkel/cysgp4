@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>propagate_many &#8212; cysgp4 v0.2.13.dev1+g4a74d42</title>
+    <title>propagate_many &#8212; cysgp4 v0.2.13.dev2+g4abd4af</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.2.13.dev1+g4a74d42</a>
+	<a href="../index.html">cysgp4 v0.2.13.dev2+g4abd4af</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -78,7 +78,7 @@
 <h1>propagate_many<a class="headerlink" href="#propagate-many" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="cysgp4.propagate_many">
-<code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">propagate_many</code><span class="sig-paren">(</span><em class="sig-param">mjds</em>, <em class="sig-param">tles</em>, <em class="sig-param">observers=None</em>, <em class="sig-param">bool do_eci_pos=True</em>, <em class="sig-param">bool do_eci_vel=True</em>, <em class="sig-param">bool do_geo=True</em>, <em class="sig-param">bool do_topo=True</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.propagate_many" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">propagate_many</code><span class="sig-paren">(</span><em class="sig-param">mjds</em>, <em class="sig-param">tles</em>, <em class="sig-param">observers=None</em>, <em class="sig-param">bool do_eci_pos=True</em>, <em class="sig-param">bool do_eci_vel=True</em>, <em class="sig-param">bool do_geo=True</em>, <em class="sig-param">bool do_topo=True</em>, <em class="sig-param">unicode on_error=u'raise'</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.propagate_many" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate positions of many satellites at a various times at once.</p>
 <p>This is an array interface to the sgp4 calculations, which allows to
 perform calculations for different satellite TLEs, observers and times
@@ -117,6 +117,14 @@ the environment variable <code class="xref py py-obj docutils literal notranslat
 <dt><strong>do_geo</strong><span class="classifier">Boolean, optional (default: True)</span></dt><dd><p>Whether to include geographic/geodetic positions in the result.</p>
 </dd>
 <dt><strong>do_topo</strong><span class="classifier">Boolean, optional (default: True)</span></dt><dd><p>Whether to include topocentric positions in the result.</p>
+</dd>
+<dt><strong>on_error</strong><span class="classifier">str, optional (either ‘raise’ or ‘coerce_to_nan’, default: ‘raise’)</span></dt><dd><p>If the underlying SGP C++ library throws an error (which often
+happens if one works with times that are strongly deviating from
+the TLE epoch), a Python RuntimeError is usually thrown. For batch
+processing, this is not always desirable. If
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">on_error</span> <span class="pre">=</span> <span class="pre">'coerce_to_nan'</span></code> then C++ errors will be suppressed and
+the resulting position vectors will be converted to NaN-values
+instead.</p>
 </dd>
 </dl>
 </dd>

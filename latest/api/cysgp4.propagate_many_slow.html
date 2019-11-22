@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>propagate_many_slow &#8212; cysgp4 v0.2.13.dev1+g4a74d42</title>
+    <title>propagate_many_slow &#8212; cysgp4 v0.2.13.dev2+g4abd4af</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.2.13.dev1+g4a74d42</a>
+	<a href="../index.html">cysgp4 v0.2.13.dev2+g4abd4af</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -78,7 +78,7 @@
 <h1>propagate_many_slow<a class="headerlink" href="#propagate-many-slow" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="cysgp4.propagate_many_slow">
-<code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">propagate_many_slow</code><span class="sig-paren">(</span><em class="sig-param">mjds</em>, <em class="sig-param">tles</em>, <em class="sig-param">observers=None</em>, <em class="sig-param">bool do_eci_pos=True</em>, <em class="sig-param">bool do_eci_vel=True</em>, <em class="sig-param">bool do_geo=True</em>, <em class="sig-param">bool do_topo=True</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.propagate_many_slow" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">propagate_many_slow</code><span class="sig-paren">(</span><em class="sig-param">mjds</em>, <em class="sig-param">tles</em>, <em class="sig-param">observers=None</em>, <em class="sig-param">bool do_eci_pos=True</em>, <em class="sig-param">bool do_eci_vel=True</em>, <em class="sig-param">bool do_geo=True</em>, <em class="sig-param">bool do_topo=True</em>, <em class="sig-param">unicode on_error=u'raise'</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.propagate_many_slow" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a slow (non-parallelized, Python-looping) version of
 <a class="reference internal" href="cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a> that is meant for testing and benchmarking
 only. It has the same interface.</p>
