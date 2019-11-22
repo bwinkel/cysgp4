@@ -49,6 +49,7 @@ public:
     void SetTle(const Tle& tle);
     Eci FindPosition(double tsince) const;
     Eci FindPosition(const DateTime& date) const;
+    Eci FindPositionNaN(const DateTime& date) const;
 
 private:
     struct CommonConstants
@@ -190,7 +191,7 @@ private:
          */
         struct IntegratorValues values_t;
     };
-    
+
     void Initialise();
     Eci FindPositionSDP4(const double tsince) const;
     Eci FindPositionSGP4(double tsince) const;

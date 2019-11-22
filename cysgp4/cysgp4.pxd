@@ -97,10 +97,29 @@ cdef extern from 'Tle.h':
 
 cdef extern from 'SGP4.h':
 
+    # Note: in order to avoid Exceptions in propagate_many, we added another
+    # implementation of FindPosition, which returns NaN-filled results
+    # Have to add the following to SGP4.h:
+
+    #     Eci FindPositionNaN(const DateTime& date) const;
+
+    # and SGP4.cpp:
+
+    #    Eci SGP4::FindPositionNaN(const DateTime& dt) const
+    #    {
+    #        try {
+    #            return FindPosition((dt - elements_.Epoch()).TotalMinutes());
+    #        } catch(...) {
+    #            const Eci nan_eci(DateTime(0), nan(""), nan(""), nan(""));
+    #            return nan_eci;
+    #        }
+    #    }
+
     cdef cppclass SGP4:
         SGP4(const Tle& tle) nogil except +
 
         Eci FindPosition(const DateTime& date) nogil except +
+        Eci FindPositionNaN(const DateTime& date) nogil
 
 
 cdef extern from 'Observer.h':

@@ -58,6 +58,7 @@ import numpy as np
 np.import_array()
 
 
+cdef double NAN = np.nan
 cdef double DEG2RAD = M_PI / 180.
 cdef double RAD2DEG = 180. / M_PI
 cdef double MJD_RESOLUTION = 0.001 / 24. / 3600.
@@ -1066,6 +1067,14 @@ cdef class Satellite(object):
         Granularity of the internal cache [s]. Satellite positions are
         calculated only if the newly requested datetime differs by more than
         this from the previous calculation.
+    on_error : str, optional (either 'raise' or 'coerce_to_nan', default: 'raise')
+        If the underlying SGP C++ library throws an error (which often
+        happens if one works with times that are strongly deviating from
+        the TLE epoch), a Python RuntimeError is usually thrown. For batch
+        processing, this is not always desirable. If
+        `on_error = 'coerce_to_nan'` then C++ errors will be suppressed and
+        the resulting position vectors will be converted to NaN-values
+        instead.
 
     Returns
     -------
@@ -1132,7 +1141,7 @@ cdef class Satellite(object):
 
         # _cmjd holds the mjd for the last calculation time
         double _cmjd, _mjd_cache_resolution
-        python_bool _pos_dirty, _tle_dirty
+        python_bool _pos_dirty, _tle_dirty, on_error_raise
 
     def __init__(
             self,
@@ -1140,10 +1149,14 @@ cdef class Satellite(object):
             PyObserver obs=None,
             PyDateTime pydt=None,
             double mjd_cache_resolution=MJD_RESOLUTION,
+            str on_error='raise',
             ):
         '''
         Constructs a new Satellite object from given TLE
         '''
+
+        assert on_error in ['raise', 'coerce_to_nan']
+        self.on_error_raise = True if on_error == 'raise' else False
 
         if obs is None:
 
@@ -1293,7 +1306,11 @@ cdef class Satellite(object):
 
         # FindPosition doesn't update ECI time, need to do manually :-/
         self._eci = PyEci(pydt=self._pydt)
-        self._eci._cobj = self.thisptr.FindPosition(self._pydt._cobj)
+        if self.on_error_raise:
+            self._eci._cobj = self.thisptr.FindPosition(self._pydt._cobj)
+        else:
+            self._eci._cobj = self.thisptr.FindPositionNaN(self._pydt._cobj)
+
         self._tle_dirty = <python_bool> False
 
         self._topo._cobj = self._obs._cobj.GetLookAngle(
@@ -1309,6 +1326,7 @@ def propagate_many(
         mjds, tles, observers=None,
         bint do_eci_pos=True, bint do_eci_vel=True,
         bint do_geo=True, bint do_topo=True,
+        str on_error='raise',
         ):
     '''
     Calculate positions of many satellites at a various times at once.
@@ -1355,6 +1373,14 @@ def propagate_many(
         Whether to include geographic/geodetic positions in the result.
     do_topo : Boolean, optional (default: True)
         Whether to include topocentric positions in the result.
+    on_error : str, optional (either 'raise' or 'coerce_to_nan', default: 'raise')
+        If the underlying SGP C++ library throws an error (which often
+        happens if one works with times that are strongly deviating from
+        the TLE epoch), a Python RuntimeError is usually thrown. For batch
+        processing, this is not always desirable. If
+        `on_error = 'coerce_to_nan'` then C++ errors will be suppressed and
+        the resulting position vectors will be converted to NaN-values
+        instead.
 
     Returns
     -------
@@ -1436,7 +1462,9 @@ def propagate_many(
         SGP4 *_sgp4_ptr
         Tle *_tle_ptr
         Observer _obs
+        # PyEci py_nan_eci = PyEci(geo_loc=PyCoordGeodetic(NAN, NAN, NAN))
         Eci _eci
+        # Eci _nan_eci = py_nan_eci._cobj
         DateTime _dt
         CoordGeodetic _geo
         CoordTopocentric _topo
@@ -1452,6 +1480,13 @@ def propagate_many(
 
         tle_ptr_t* _tle_ptr_array
         obs_ptr_t* _obs_ptr_array
+
+        bint on_error_raise = True
+
+    assert on_error in ['raise', 'coerce_to_nan']
+
+    if on_error == 'coerce_to_nan':
+        on_error_raise = False
 
     if observers is None:
         observers = PyObserver()
@@ -1533,7 +1568,13 @@ def propagate_many(
             # this could create problems with parallelization if instances
             # where re-used!
             _sgp4_ptr = new SGP4(deref(_tle_ptr))
-            _eci = _sgp4_ptr.FindPosition(_dt)
+            if on_error_raise:
+                _eci = _sgp4_ptr.FindPosition(_dt)
+            else:
+                # "FindPositionE" will return NaNs if an error occured
+                # at C++ level
+                _eci = _sgp4_ptr.FindPositionNaN(_dt)
+
             del _sgp4_ptr
 
             if do_eci_pos:
@@ -1591,12 +1632,15 @@ def propagate_many_slow(
         mjds, tles, observers=None,
         bint do_eci_pos=True, bint do_eci_vel=True,
         bint do_geo=True, bint do_topo=True,
+        str on_error='raise',
         ):
     '''
     This is a slow (non-parallelized, Python-looping) version of
     `~cysgp4.propagate_many` that is meant for testing and benchmarking
     only. It has the same interface.
     '''
+
+    assert on_error in ['raise', 'coerce_to_nan']
 
     pnum = 0
     out_dts = []
@@ -1630,7 +1674,10 @@ def propagate_many_slow(
         size = mjd.shape[0]
         for i in range(size):
 
-            sat = Satellite(tle[i], obs[i], PyDateTime.from_mjd(mjd[i]))
+            sat = Satellite(
+                tle[i], obs[i], PyDateTime.from_mjd(mjd[i]),
+                on_error=on_error
+                )
             eci = sat.eci_pos()
 
             eci_pos_x, eci_pos_y, eci_pos_z = eci.loc

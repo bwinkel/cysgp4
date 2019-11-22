@@ -98,7 +98,7 @@ void SGP4::Initialise()
     if (elements_.Perigee() < 156.0)
     {
         s4 = elements_.Perigee() - 78.0;
-        if (elements_.Perigee() < 98.0) 
+        if (elements_.Perigee() < 98.0)
         {
             s4 = 20.0;
         }
@@ -220,6 +220,16 @@ void SGP4::Initialise()
 Eci SGP4::FindPosition(const DateTime& dt) const
 {
     return FindPosition((dt - elements_.Epoch()).TotalMinutes());
+}
+
+Eci SGP4::FindPositionNaN(const DateTime& dt) const
+{
+    try {
+        return FindPosition((dt - elements_.Epoch()).TotalMinutes());
+    } catch(...) {
+        const Eci nan_eci(DateTime(0), nan(""), nan(""), nan(""));
+        return nan_eci;
+    }
 }
 
 Eci SGP4::FindPosition(double tsince) const
@@ -779,7 +789,7 @@ void SGP4::DeepSpaceInitialise(
 
         const double z11 = -6.0 * a1 * a5
             + eosq * (-24. * x1 * x7 - 6. * x3 * x5);
-        const double z12 = -6.0 * (a1 * a6 + a3 * a5) 
+        const double z12 = -6.0 * (a1 * a6 + a3 * a5)
             + eosq * (-24. * (x2 * x7 + x1 * x8) - 6. * (x3 * x6 + x4 * x5));
         const double z13 = -6.0 * a3 * a6
             + eosq * (-24. * x2 * x8 - 6. * x4 * x6);
@@ -1295,7 +1305,7 @@ void SGP4::DeepSpaceSecular(
          * 1st condition (if tsince is less than one time step from epoch)
          * 2nd condition (if integrator_params_.atime and
          *     tsince are of opposite signs, so zero crossing required)
-         * 3rd condition (if tsince is closer to zero than 
+         * 3rd condition (if tsince is closer to zero than
          *     integrator_params_.atime, only integrate away from zero)
          */
         if (fabs(tsince) < STEP ||
@@ -1353,7 +1363,7 @@ void SGP4::DeepSpaceSecular(
         /*
          * integrator
          */
-        xn = integrator_params_.xni 
+        xn = integrator_params_.xni
             + integrator_params_.values_t.xndot * ft
             + integrator_params_.values_t.xnddt * ft * ft * 0.5;
         const double xl = integrator_params_.xli

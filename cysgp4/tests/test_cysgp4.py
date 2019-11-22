@@ -34,11 +34,26 @@ TLE_GPS = (
     '1 24876U 97035A   19309.58152857 -.00000011  00000-0  00000+0 0  9996',
     '2 24876  55.4542 192.9394 0037899  66.9931 293.4794  2.00564219163301',
     )
-TLE_MMS = (  # this fails if MJD is very old
-    'MMS 1',
-    '1 40482U 15011A   19320.57120432 -.00000010  00000-0  00000+0 0  9996',
-    '2 40482  21.0630 120.0377 8869973  16.2077  55.8249  0.28561246 10609',
+# TLE_MMS = (  # this fails if MJD is very old
+#     'MMS 1',
+#     '1 40482U 15011A   19320.57120432 -.00000010  00000-0  00000+0 0  9996',
+#     '2 40482  21.0630 120.0377 8869973  16.2077  55.8249  0.28561246 10609',
+#     )
+TLE_ECC_ERR = (  # if MJD is far in the future: Error: (e <= -0.001)
+    'POLAR',
+    '1 23802U 96013A   19320.59223231  .00000075  00000-0  00000+0 0  9997',
+    '2 23802  78.7075 252.8203 6540600 290.3797  13.5942  1.29845581113610',
     )
+TLE_ELSQ_ERR = (  # if MJD is far in the future: Error: (elsq >= 1.0)
+    'CXO',
+    '1 25867U 99040B   19322.60140111  .00000856  00000-0  00000-0 0  9990',
+    '2 25867  65.7630 272.2977 7416434 231.1198   0.0919  0.37806068  8260',
+    )
+# TLE_DECAYED_ERR = (  # if MJD is far in the future: Error: Satellite decayed
+#     'SWIFT',
+#  '1 28485U 04047A   19321.65306734  .00000791  00000-0  23585-4 0  9996',
+#  '2 28485  20.5570  74.4329 0010989 245.6346 114.2940 15.04483561821407'
+#     )
 
 
 class TestPyDateTime:
@@ -289,6 +304,43 @@ class TestSatellite:
         Satellite(self.tle, self.effbg_observer, self.pydt)
         Satellite(self.tle, self.effbg_observer, self.pydt, 1 / 86400.)
 
+    def test_error(self):
+
+        pydt_off = PyDateTime.from_mjd(68805.5)
+
+        tle_ecc_err = PyTle(*TLE_ECC_ERR)
+        with pytest.raises(RuntimeError) as excinfo:
+            sat = Satellite(tle_ecc_err, self.effbg_observer, pydt_off)
+            sat.eci_pos()
+
+        assert 'e <= -0.001' in str(excinfo.value)
+
+        tle_elsq_err = PyTle(*TLE_ELSQ_ERR)
+        with pytest.raises(RuntimeError) as excinfo:
+            sat = Satellite(tle_elsq_err, self.effbg_observer, pydt_off)
+            sat.eci_pos()
+
+        assert 'elsq >= 1.0' in str(excinfo.value)
+
+        # tle_decayed_err = PyTle(*TLE_DECAYED_ERR)
+        # with pytest.raises(RuntimeError) as excinfo:
+        #     sat = Satellite(tle_decayed_err, self.effbg_observer, pydt_off)
+        #     sat.eci_pos()
+
+        # assert 'Satellite decayed' in str(excinfo.value)
+
+    def test_error_coerce(self):
+
+        pydt_off = PyDateTime.from_mjd(68805.5)
+
+        tle_ecc_err = PyTle(*TLE_ECC_ERR)
+        sat = Satellite(
+            tle_ecc_err, self.effbg_observer, pydt_off,
+            on_error='coerce_to_nan',
+            )
+        print(sat.eci_pos())
+        assert_allclose(sat.eci_pos().loc, np.array([np.nan] * 3))
+
     def test_eci_position(self):
 
         sat = Satellite(self.tle, self.effbg_observer, self.pydt)
@@ -349,7 +401,7 @@ class TestSatellite:
 
         tle_string = '\n'.join(self.tle_tup)
         location = EarthLocation.from_geodetic(
-            *self.effbg_tup_m, ['WGS72']
+            *self.effbg_tup_m, 'WGS72'
             )
         sat_obs = satellite.SatelliteObserver(location)
         dt = datetime.datetime(*self.dt_tup)
@@ -495,6 +547,53 @@ def test_propagate_many_pos_switches():
         do_eci_pos=False, do_eci_vel=True, do_geo=True, do_topo=True,
         )
     assert ('eci_pos' not in result) and ('eci_vel' in result)
+
+
+def test_propagate_many_raises_error():
+
+    mjd_off = 68805.5
+    obs = PyObserver(6.88375, 50.525, 0.366)
+
+    tle_ecc_err = PyTle(*TLE_ECC_ERR)
+    with pytest.raises(RuntimeError) as excinfo:
+        propagate_many(mjd_off, tle_ecc_err, obs)
+
+    assert 'e <= -0.001' in str(excinfo.value)
+
+    tle_elsq_err = PyTle(*TLE_ELSQ_ERR)
+    with pytest.raises(RuntimeError) as excinfo:
+        propagate_many(mjd_off, tle_elsq_err, obs)
+
+    assert 'elsq >= 1.0' in str(excinfo.value)
+
+    tle_ecc_err = PyTle(*TLE_ECC_ERR)
+    with pytest.raises(RuntimeError) as excinfo:
+        propagate_many_slow(mjd_off, tle_ecc_err, obs)
+
+    assert 'e <= -0.001' in str(excinfo.value)
+
+    tle_elsq_err = PyTle(*TLE_ELSQ_ERR)
+    with pytest.raises(RuntimeError) as excinfo:
+        propagate_many_slow(mjd_off, tle_elsq_err, obs)
+
+    assert 'elsq >= 1.0' in str(excinfo.value)
+
+
+def test_propagate_many_suppress_error():
+
+    mjd_off = 68805.5
+    obs = PyObserver(6.88375, 50.525, 0.366)
+
+    tle_ecc_err = PyTle(*TLE_ECC_ERR)
+    res = propagate_many(mjd_off, tle_ecc_err, obs, on_error='coerce_to_nan')
+
+    assert_allclose(res['eci_pos'], np.array([np.nan] * 3))
+
+    res = propagate_many_slow(
+        mjd_off, tle_ecc_err, obs, on_error='coerce_to_nan'
+        )
+
+    assert_allclose(res['eci_pos'], np.array([np.nan] * 3))
 
 
 def propagate_many_sgp4(
