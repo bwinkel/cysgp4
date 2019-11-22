@@ -28,7 +28,7 @@ jobs:
         numpy.version: '1.13.1'
         do.docs: ${{ true }}
         ${{ if eq(variables['is.tag'], true) }}:
-          docs.target: 'stable'
+          docs.target: '.'
         ${{ if eq(variables['is.tag'], false) }}:
           docs.target: 'latest'
         do.dist: ${{ eq(variables['is.tag'], true) }}
@@ -100,7 +100,7 @@ jobs:
       git remote add github git@github.com:bwinkel/cysgp4.git
       git fetch github gh-pages
       git checkout --track github/gh-pages
-      mkdir -p $DOCS_TARGET
+      # mkdir -p ./$DOCS_TARGET
       rsync -av ../docs/_build/html/ ${DOCS_TARGET}/
       git add -A && git commit -m "Update docs  ***NO_CI***"
       git push github
