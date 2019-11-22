@@ -5,7 +5,7 @@ recursive-include cysgp4 *.pxd
 recursive-include cysgp4 *.py
 recursive-include cysgp4/tests/data/*
 exclude .gitignore .git build
-include COPYING* README.md MANIFEST.in setup.cfg pip-requirements
-include tox.ini pyproject.toml
+include COPYING* *.rst MANIFEST.in setup.cfg pip-requirements
+include tox.ini pyproject.toml retry.sh
 include docs/conf.py docs/make.bat docs/Makefile
 recursive-include docs *.rst
