@@ -274,10 +274,9 @@ class TestSatellite:
         self.effbg_observer = PyObserver(*self.effbg_tup)
 
         self.sat2 = twoline2rv(self.tle_tup[1], self.tle_tup[2], wgs72)
-        dt_tup2 = tuple(
-            list(self.dt_tup[:-2]) + [self.dt_tup[-2] + self.dt_tup[-1] / 1e6]
+        self.pos2, self.vel2 = self.sat2.propagate(
+            *self.dt_tup[:-2], self.dt_tup[-2] + self.dt_tup[-1] / 1e6
             )
-        self.pos2, self.vel2 = self.sat2.propagate(*dt_tup2)
 
     def teardown(self):
 
@@ -349,8 +348,9 @@ class TestSatellite:
         from pycraf import satellite
 
         tle_string = '\n'.join(self.tle_tup)
-        loc_tup = tuple(list(self.effbg_tup_m) + ['WGS72'])
-        location = EarthLocation.from_geodetic(*loc_tup)
+        location = EarthLocation.from_geodetic(
+            *self.effbg_tup_m, ['WGS72']
+            )
         sat_obs = satellite.SatelliteObserver(location)
         dt = datetime.datetime(*self.dt_tup)
         obstime = time.Time(dt)
@@ -541,12 +541,11 @@ def propagate_many_sgp4(
         for i in range(size):
 
             dt_tup = PyDateTime.from_mjd(mjd[i]).get_datetime_tuple()
-            dt_tup2 = tuple(
-                list(dt_tup[:-2]) + [dt_tup[-2] + dt_tup[-1] / 1e6]
-                )
             line1, line2 = tle[i].tle_strings()[1:]
             sat = twoline2rv(line1, line2, wgs72)
-            pos, vel = sat.propagate(*dt_tup2)
+            pos, vel = sat.propagate(
+                *dt_tup[:-2], dt_tup[-2] + dt_tup[-1] / 1e6
+                )
 
             eci_pos_x, eci_pos_y, eci_pos_z = pos
             eci_vel_x, eci_vel_y, eci_vel_z = vel

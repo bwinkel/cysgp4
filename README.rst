@@ -66,7 +66,7 @@ Dependencies
 We kept the dependencies as minimal as possible. The following packages are
 required:
 
-- `Python 2.7`; `Python 3.5` or later
+- `Python 3.5` or later
 - `numpy 1.13` or later
 
 If you want to run the notebooks yourself, you will also need the Jupyter

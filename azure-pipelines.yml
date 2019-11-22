@@ -19,10 +19,6 @@ jobs:
 
   strategy:
     matrix:
-      Python27:
-        python.version: '2.7'
-        numpy.version: '1.13.1'
-        do.dist: ${{ eq(variables['is.tag'], true) }}
       # Python35:
       #   python.version: '3.5'
       #   numpy.version: '1.13.1'
@@ -32,10 +28,10 @@ jobs:
         numpy.version: '1.13.1'
         do.docs: ${{ true }}
         do.dist: ${{ eq(variables['is.tag'], true) }}
-      # Python37:
-      #   python.version: '3.7'
-      #   numpy.version: '1.14.5'
-      #   do.dist: ${{ eq(variables['is.tag'], true) }}
+      Python37:
+        python.version: '3.7'
+        numpy.version: '1.14.5'
+        do.dist: ${{ eq(variables['is.tag'], true) }}
       # Python37:
       #   python.version: '3.8'
       #   numpy.version: '1.14.5'
