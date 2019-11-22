@@ -10,7 +10,8 @@ pys=(/opt/python/*/bin)
 echo "All Pythons: ${pys[@]}"
 
 # Filter out Python 3.4
-pys=(${pys[@]//*34*/})
+# pys=(${pys[@]//*34*/})
+pys=( $( printf '%s\0' "${pys[@]}" | grep -z $py_whl ) )
 
 # Print list of Python's being used
 echo "Using Pythons: ${pys[@]}"
