@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>PyObserver &#8212; cysgp4 v0.2.13.dev1+g4a74d42</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="PyTle" href="cysgp4.PyTle.html" />
+    <link rel="prev" title="PyEci" href="cysgp4.PyEci.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">cysgp4</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="cysgp4.PyTle.html" title="PyTle">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="cysgp4.PyEci.html" title="PyEci">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">cysgp4 v0.2.13.dev1+g4a74d42</a>
+	 &#187;
+      </li>
+      <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
+      
+      <li>PyObserver</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pyobserver">
+<h1>PyObserver<a class="headerlink" href="#pyobserver" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="cysgp4.PyObserver">
+<em class="property">class </em><code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">PyObserver</code><span class="sig-paren">(</span><em class="sig-param">double lon_deg=0</em>, <em class="sig-param">double lat_deg=0</em>, <em class="sig-param">double alt_km=0</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyObserver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Thin wrapper around sgp4 (C++) Observer class.</p>
+<p>The Observer class holds the location (as ECI, see <a class="reference internal" href="cysgp4.PyEci.html#cysgp4.PyEci" title="cysgp4.PyEci"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyEci</span></code></a>) of
+an observer.</p>
+<p>Note: Usually, a datetime is attached to an ECI location in sgp4.
+However, the Observer class has no interface to set the datetime
+and internally it is always set to zero. This is an odd design choice,
+because a geographic location is not fixed in the ECI system if
+time passes.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>lon_deg</strong><span class="classifier">float (default: 0.)</span></dt><dd><p>Longitude of observer (geographic location) [deg].</p>
+</dd>
+<dt><strong>lat_deg</strong><span class="classifier">float (default: 0.)</span></dt><dd><p>Latitude of observer (geographic location) [deg].</p>
+</dd>
+<dt><strong>alt_km</strong><span class="classifier">float (default: 0.)</span></dt><dd><p>Altitude of observer (geographic location) [km].</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>obs</strong><span class="classifier"><a class="reference internal" href="#cysgp4.PyObserver" title="cysgp4.PyObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyObserver</span></code></a> object</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Constructing and using a <a class="reference internal" href="#cysgp4.PyObserver" title="cysgp4.PyObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyObserver</span></code></a> object is
+straightforward:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="k">import</span> <span class="n">PyObserver</span><span class="p">,</span> <span class="n">PyCoordGeodetic</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lon_deg</span><span class="p">,</span> <span class="n">lat_deg</span> <span class="o">=</span> <span class="mf">6.88375</span><span class="p">,</span> <span class="mf">50.525</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alt_km</span> <span class="o">=</span> <span class="mf">0.366</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obs</span> <span class="o">=</span> <span class="n">PyObserver</span><span class="p">(</span><span class="n">lon_deg</span><span class="p">,</span> <span class="n">lat_deg</span><span class="p">,</span> <span class="n">alt_km</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obs</span>
+<span class="go">&lt;PyObserver: 6.8838d, 50.5250d, 0.3660km&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Access is also possible via location property:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obs</span><span class="o">.</span><span class="n">loc</span>
+<span class="go">&lt;PyCoordGeodetic: 6.8838d, 50.5250d, 0.3660km&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obs</span><span class="o">.</span><span class="n">loc</span> <span class="o">=</span> <span class="n">PyCoordGeodetic</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Constructor PyObserver(double lon_deg, double lat_deg, double alt_km)</p>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyObserver.loc" title="cysgp4.PyObserver.loc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loc</span></code></a></p></td>
+<td><p>Geographic location (see also Class documentation).</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="attribute">
+<dt id="cysgp4.PyObserver.loc">
+<code class="sig-name descname">loc</code><a class="headerlink" href="#cysgp4.PyObserver.loc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Geographic location (see also Class documentation).</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">PyObserver</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/cysgp4.PyObserver.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2019, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
+    Last built 22 Nov 2019. <br/>
+  </p>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>test &#8212; cysgp4 v0.2.13.dev1+g4a74d42</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="PyCoordGeodetic" href="cysgp4.PyCoordGeodetic.html" />
+    <link rel="prev" title="set_num_threads" href="cysgp4.set_num_threads.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">cysgp4</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="cysgp4.PyCoordGeodetic.html" title="PyCoordGeodetic">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="cysgp4.set_num_threads.html" title="set_num_threads">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">cysgp4 v0.2.13.dev1+g4a74d42</a>
+	 &#187;
+      </li>
+      <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
+      
+      <li>test</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="test">
+<h1>test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="cysgp4.test">
+<code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">test</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the tests for the package.</p>
+<p>This method builds arguments for and then calls <code class="docutils literal notranslate"><span class="pre">pytest.main</span></code>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>package</strong><span class="classifier">str, optional</span></dt><dd><p>The name of a specific package to test, e.g. ‘io.fits’ or
+‘utils’. Accepts comma separated string to specify multiple
+packages. If nothing is specified all default tests are run.</p>
+</dd>
+<dt><strong>args</strong><span class="classifier">str, optional</span></dt><dd><p>Additional arguments to be passed to <code class="docutils literal notranslate"><span class="pre">pytest.main</span></code> in the <code class="docutils literal notranslate"><span class="pre">args</span></code>
+keyword argument.</p>
+</dd>
+<dt><strong>docs_path</strong><span class="classifier">str, optional</span></dt><dd><p>The path to the documentation .rst files.</p>
+</dd>
+<dt><strong>open_files</strong><span class="classifier">bool, optional</span></dt><dd><p>Fail when any tests leave files open.  Off by default, because
+this adds extra run time to the test suite.  Requires the
+<code class="docutils literal notranslate"><span class="pre">psutil</span></code> package.</p>
+</dd>
+<dt><strong>parallel</strong><span class="classifier">int or ‘auto’, optional</span></dt><dd><p>When provided, run the tests in parallel on the specified
+number of CPUs.  If parallel is <code class="docutils literal notranslate"><span class="pre">'auto'</span></code>, it will use the all
+the cores on the machine.  Requires the <code class="docutils literal notranslate"><span class="pre">pytest-xdist</span></code> plugin.</p>
+</dd>
+<dt><strong>pastebin</strong><span class="classifier">(‘failed’, ‘all’, None), optional</span></dt><dd><p>Convenience option for turning on py.test pastebin output. Set to
+‘failed’ to upload info for failed tests, or ‘all’ to upload info
+for all tests.</p>
+</dd>
+<dt><strong>pdb</strong><span class="classifier">bool, optional</span></dt><dd><p>Turn on PDB post-mortem analysis for failing tests. Same as
+specifying <code class="docutils literal notranslate"><span class="pre">--pdb</span></code> in <code class="docutils literal notranslate"><span class="pre">args</span></code>.</p>
+</dd>
+<dt><strong>pep8</strong><span class="classifier">bool, optional</span></dt><dd><p>Turn on PEP8 checking via the pytest-pep8 plugin and disable normal
+tests. Same as specifying <code class="docutils literal notranslate"><span class="pre">--pep8</span> <span class="pre">-k</span> <span class="pre">pep8</span></code> in <code class="docutils literal notranslate"><span class="pre">args</span></code>.</p>
+</dd>
+<dt><strong>plugins</strong><span class="classifier">list, optional</span></dt><dd><p>Plugins to be passed to <code class="docutils literal notranslate"><span class="pre">pytest.main</span></code> in the <code class="docutils literal notranslate"><span class="pre">plugins</span></code> keyword
+argument.</p>
+</dd>
+<dt><strong>remote_data</strong><span class="classifier">{‘none’, ‘astropy’, ‘any’}, optional</span></dt><dd><p>Controls whether to run tests marked with &#64;pytest.mark.remote_data. This can be
+set to run no tests with remote data (<code class="docutils literal notranslate"><span class="pre">none</span></code>), only ones that use
+data from <a class="reference external" href="http://data.astropy.org">http://data.astropy.org</a> (<code class="docutils literal notranslate"><span class="pre">astropy</span></code>), or all tests that
+use remote data (<code class="docutils literal notranslate"><span class="pre">any</span></code>). The default is <code class="docutils literal notranslate"><span class="pre">none</span></code>.</p>
+</dd>
+<dt><strong>repeat</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>If set, specifies how many times each test should be run. This is
+useful for diagnosing sporadic failures.</p>
+</dd>
+<dt><strong>skip_docs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>When <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, skips running the doctests in the .rst files.</p>
+</dd>
+<dt><strong>test_path</strong><span class="classifier">str, optional</span></dt><dd><p>Specify location to test by path. May be a single file or
+directory. Must be specified absolutely or relative to the
+calling directory.</p>
+</dd>
+<dt><strong>verbose</strong><span class="classifier">bool, optional</span></dt><dd><p>Convenience option to turn on verbose output from py.test. Passing
+True is the same as specifying <code class="docutils literal notranslate"><span class="pre">-v</span></code> in <code class="docutils literal notranslate"><span class="pre">args</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">test</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/cysgp4.test.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2019, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
+    Last built 22 Nov 2019. <br/>
+  </p>
+</footer>
+  </body>
+</html>

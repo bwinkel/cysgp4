@@ -1,0 +1,379 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>PyDateTime &#8212; cysgp4 v0.2.13.dev1+g4a74d42</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="PyEci" href="cysgp4.PyEci.html" />
+    <link rel="prev" title="PyCoordTopocentric" href="cysgp4.PyCoordTopocentric.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">cysgp4</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="cysgp4.PyEci.html" title="PyEci">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="cysgp4.PyCoordTopocentric.html" title="PyCoordTopocentric">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">cysgp4 v0.2.13.dev1+g4a74d42</a>
+	 &#187;
+      </li>
+      <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
+      
+      <li>PyDateTime</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pydatetime">
+<h1>PyDateTime<a class="headerlink" href="#pydatetime" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="cysgp4.PyDateTime">
+<em class="property">class </em><code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">PyDateTime</code><span class="sig-paren">(</span><em class="sig-param">dt=None</em>, <em class="sig-param">init=True</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Thin wrapper around sgp4 (C++) DateTime class.</p>
+<p>Internally, DateTime objects store time on a linear scale, “ticks”,
+which is the number of micro-seconds since 1. January 0001, 00:00.
+For convenience, one can convert to and from Python <a class="reference external" href="https://docs.python.org/3.8/library/datetime.html">datetime</a> objects and
+<a class="reference external" href="https://en.wikipedia.org/wiki/Julian_day#Variants">Modified Julian Date (MJD)</a>, which is often
+used in astronomy.</p>
+<p>For calculating the position of a satellite for a given observer
+(i.e., in the horizontal frame, Azimuth and Elevation), one needs
+the <a class="reference external" href="https://en.wikipedia.org/wiki/Sidereal_time">local mean sidereal time</a>  (derived from Greenwhich
+mean sidereal time), which can be queried using the
+<a class="reference internal" href="#cysgp4.PyDateTime.lmst" title="cysgp4.PyDateTime.lmst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lmst()</span></code></a> and <a class="reference internal" href="#cysgp4.PyDateTime.gmst" title="cysgp4.PyDateTime.gmst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gmst()</span></code></a> methods.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>dt</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> object, or None (default: None)</span></dt><dd><p>Construct the <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance with a given
+Python <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> object, or - if None - use the
+current date and time (as given by <code class="xref py py-obj docutils literal notranslate"><span class="pre">now()</span></code>)</p>
+</dd>
+<dt><strong>init</strong><span class="classifier">Boolean (default: True)</span></dt><dd><p>If set to true, the <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> object will ignore the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">dt</span></code> parameter and set the internal ticks variable to 0.
+This is only useful for computationally heavy tasks.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>pydt</strong><span class="classifier"><a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> object</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>There are several possibilities to create a <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> object:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="k">import</span> <span class="n">PyDateTime</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># from Python&#39;s datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2019</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span> <span class="o">=</span> <span class="n">PyDateTime</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span>
+<span class="go">&lt;PyDateTime: 2019-01-01 12:13:14.000000 UTC&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># from Modified Julian Date</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mjd</span> <span class="o">=</span> <span class="mf">56458.123</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span> <span class="o">=</span> <span class="n">PyDateTime</span><span class="o">.</span><span class="n">from_mjd</span><span class="p">(</span><span class="n">mjd</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span>
+<span class="go">&lt;PyDateTime: 2013-06-15 02:57:07.199999 UTC&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># from &quot;Ticks&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ticks</span> <span class="o">=</span> <span class="mi">58628880000000000</span>  <span class="c1"># aka MJD zero point</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span> <span class="o">=</span> <span class="n">PyDateTime</span><span class="o">.</span><span class="n">from_ticks</span><span class="p">(</span><span class="n">ticks</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span>
+<span class="go">&lt;PyDateTime: 1858-11-17 00:00:00.000000 UTC&gt;</span>
+</pre></div>
+</div>
+<p>Accessing and Modifying the date and time is done via the following
+properties and methods:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pydt</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span>
+<span class="go">1858-11-17 00:00:00</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span><span class="o">.</span><span class="n">datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pydt</span><span class="o">.</span><span class="n">mjd</span><span class="p">)</span>
+<span class="go">55317.00717592592</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span><span class="o">.</span><span class="n">mjd</span> <span class="o">=</span> <span class="mf">55489.01358</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pydt</span><span class="o">.</span><span class="n">ticks</span><span class="p">)</span>
+<span class="go">63423130773311999</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span><span class="o">.</span><span class="n">ticks</span> <span class="o">=</span> <span class="mi">63681941594000000</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">observer_longitude</span> <span class="o">=</span> <span class="mf">6.67</span>  <span class="c1"># degrees</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;GMST: </span><span class="si">{:9.6f}</span><span class="s1"> hours&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pydt</span><span class="o">.</span><span class="n">gmst</span><span class="p">()))</span>
+<span class="go">GMST:  4.959715 hours</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;LMST: </span><span class="si">{:9.6f}</span><span class="s1"> hours&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pydt</span><span class="o">.</span><span class="n">lmst</span><span class="p">(</span><span class="n">observer_longitude</span><span class="p">)))</span>
+<span class="go">LMST:  5.076129 hours</span>
+</pre></div>
+</div>
+<p>One can also set the date and time manually with the
+<a class="reference internal" href="#cysgp4.PyDateTime.set" title="cysgp4.PyDateTime.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a> method.</p>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.datetime" title="cysgp4.PyDateTime.datetime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a></p></td>
+<td><p>datetime (see Class documentation).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.mjd" title="cysgp4.PyDateTime.mjd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mjd</span></code></a></p></td>
+<td><p>MJD (see Class documentation).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.ticks" title="cysgp4.PyDateTime.ticks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ticks</span></code></a></p></td>
+<td><p>Ticks (see Class documentation).</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.from_mjd" title="cysgp4.PyDateTime.from_mjd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_mjd</span></code></a>(type cls, double mjd)</p></td>
+<td><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from MJD.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.from_ticks" title="cysgp4.PyDateTime.from_ticks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_ticks</span></code></a>(type cls, unsigned long long ticks)</p></td>
+<td><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from “ticks”.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.get_datetime_tuple" title="cysgp4.PyDateTime.get_datetime_tuple"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_datetime_tuple</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.gmst" title="cysgp4.PyDateTime.gmst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gmst</span></code></a>(self)</p></td>
+<td><p>Greenwhich mean sidereal time (GMST) of current date/time.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.lmst" title="cysgp4.PyDateTime.lmst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lmst</span></code></a>(self, obslon_deg)</p></td>
+<td><p>Local mean sidereal time (LMST) of current date/time.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.set" title="cysgp4.PyDateTime.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(self, int year, int month, int day, …)</p></td>
+<td><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from given date and time.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="attribute">
+<dt id="cysgp4.PyDateTime.datetime">
+<code class="sig-name descname">datetime</code><a class="headerlink" href="#cysgp4.PyDateTime.datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>datetime (see Class documentation).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyDateTime.mjd">
+<code class="sig-name descname">mjd</code><a class="headerlink" href="#cysgp4.PyDateTime.mjd" title="Permalink to this definition">¶</a></dt>
+<dd><p>MJD (see Class documentation).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyDateTime.ticks">
+<code class="sig-name descname">ticks</code><a class="headerlink" href="#cysgp4.PyDateTime.ticks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ticks (see Class documentation).</p>
+</dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="method">
+<dt id="cysgp4.PyDateTime.from_mjd">
+<code class="sig-name descname">from_mjd</code><span class="sig-paren">(</span><em class="sig-param">type cls</em>, <em class="sig-param">double mjd</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.from_mjd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from MJD.</p>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Julian_day#Variants">Modified Julian Date (MJD)</a>, is a
+timescale, which is often used in astronomy.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mjd</strong><span class="classifier">double</span></dt><dd><p>Modified Julian Date.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>pydt</strong><span class="classifier"><a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> object</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>“from_mjd” is a classmethod:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mjd</span> <span class="o">=</span> <span class="mf">56458.123</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span> <span class="o">=</span> <span class="n">PyDateTime</span><span class="o">.</span><span class="n">from_mjd</span><span class="p">(</span><span class="n">mjd</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span>
+<span class="go">&lt;PyDateTime: 2013-06-15 02:57:07.199999 UTC&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cysgp4.PyDateTime.from_ticks">
+<code class="sig-name descname">from_ticks</code><span class="sig-paren">(</span><em class="sig-param">type cls</em>, <em class="sig-param">unsigned long long ticks</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.from_ticks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from “ticks”.</p>
+<p>Internally, DateTime objects store time on a linear scale, “ticks”,
+which is the number of micro-seconds since 1. January 0001, 00:00.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ticks</strong><span class="classifier">unsigned long long</span></dt><dd><p>Number of micro-seconds since 1. January 0001, 00:00.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>pydt</strong><span class="classifier"><a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> object</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>“from_ticks” is a classmethod:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ticks</span> <span class="o">=</span> <span class="mi">58628880000000000</span>  <span class="c1"># aka MJD zero point</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span> <span class="o">=</span> <span class="n">PyDateTime</span><span class="o">.</span><span class="n">from_ticks</span><span class="p">(</span><span class="n">ticks</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span>
+<span class="go">&lt;PyDateTime: 1858-11-17 00:00:00.000000 UTC&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cysgp4.PyDateTime.get_datetime_tuple">
+<code class="sig-name descname">get_datetime_tuple</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.get_datetime_tuple" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cysgp4.PyDateTime.gmst">
+<code class="sig-name descname">gmst</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.gmst" title="Permalink to this definition">¶</a></dt>
+<dd><p>Greenwhich mean sidereal time (GMST) of current date/time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gmst</strong><span class="classifier">float</span></dt><dd><p>Greenwhich mean sidereal time (GMST) in (fractional) hours.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="cysgp4.PyDateTime.lmst">
+<code class="sig-name descname">lmst</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">obslon_deg</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.lmst" title="Permalink to this definition">¶</a></dt>
+<dd><p>Local mean sidereal time (LMST) of current date/time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>obslon_deg</strong><span class="classifier">float</span></dt><dd><p>Geographic longitude of the observer.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>lmst</strong><span class="classifier">float</span></dt><dd><p>Local mean sidereal time (LMST) in (fractional) hours.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="cysgp4.PyDateTime.set">
+<code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">int year</em>, <em class="sig-param">int month</em>, <em class="sig-param">int day</em>, <em class="sig-param">int hour</em>, <em class="sig-param">int minute</em>, <em class="sig-param">int second</em>, <em class="sig-param">int microsecond</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from given date and time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>year</strong><span class="classifier">int</span></dt><dd><p>Year of desired date.</p>
+</dd>
+<dt><strong>month</strong><span class="classifier">int</span></dt><dd><p>Month of desired date.</p>
+</dd>
+<dt><strong>day</strong><span class="classifier">int</span></dt><dd><p>Day of desired date.</p>
+</dd>
+<dt><strong>hour</strong><span class="classifier">int</span></dt><dd><p>Hours of desired time.</p>
+</dd>
+<dt><strong>minute</strong><span class="classifier">int</span></dt><dd><p>Minutes of desired time.</p>
+</dd>
+<dt><strong>second</strong><span class="classifier">int</span></dt><dd><p>Seconds of desired time.</p>
+</dd>
+<dt><strong>microsecond</strong><span class="classifier">int</span></dt><dd><p>Microseconds of desired time.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">PyDateTime</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/cysgp4.PyDateTime.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2019, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
+    Last built 22 Nov 2019. <br/>
+  </p>
+</footer>
+  </body>
+</html>

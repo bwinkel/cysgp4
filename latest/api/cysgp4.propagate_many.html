@@ -1,0 +1,226 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>propagate_many &#8212; cysgp4 v0.2.13.dev1+g4a74d42</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="propagate_many_slow" href="cysgp4.propagate_many_slow.html" />
+    <link rel="prev" title="Cysgp4 user manual" href="../user_manual.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">cysgp4</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="cysgp4.propagate_many_slow.html" title="propagate_many_slow">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="../user_manual.html" title="Cysgp4 user manual">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">cysgp4 v0.2.13.dev1+g4a74d42</a>
+	 &#187;
+      </li>
+      <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
+      
+      <li>propagate_many</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="propagate-many">
+<h1>propagate_many<a class="headerlink" href="#propagate-many" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="cysgp4.propagate_many">
+<code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">propagate_many</code><span class="sig-paren">(</span><em class="sig-param">mjds</em>, <em class="sig-param">tles</em>, <em class="sig-param">observers=None</em>, <em class="sig-param">bool do_eci_pos=True</em>, <em class="sig-param">bool do_eci_vel=True</em>, <em class="sig-param">bool do_geo=True</em>, <em class="sig-param">bool do_topo=True</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.propagate_many" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate positions of many satellites at a various times at once.</p>
+<p>This is an array interface to the sgp4 calculations, which allows to
+perform calculations for different satellite TLEs, observers and times
+in a parallelized manner. <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/index.html#module-numpy" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy</span></code></a> broadcasting rules apply.</p>
+<p>With the Boolean parameters, <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_eci_pos</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_eci_vel</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_geo</span></code>, and
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">do_topo</span></code> the user can decide, which position frames are returned
+in the output dictionary.</p>
+<p>Satellite are defined via TLEs (see <a class="reference internal" href="cysgp4.PyTle.html#cysgp4.PyTle" title="cysgp4.PyTle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTle</span></code></a>). The
+<a class="reference internal" href="#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a> function works with a single (scalar) PyTle
+object or a list/array of them. The same is true for the <code class="xref py py-obj docutils literal notranslate"><span class="pre">mjds</span></code> and
+optional <code class="xref py py-obj docutils literal notranslate"><span class="pre">observers</span></code> parameters, which must be a scalar (a double and
+<a class="reference internal" href="cysgp4.PyObserver.html#cysgp4.PyObserver" title="cysgp4.PyObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyObserver</span></code></a> instance, respectively) or a list/array of them.</p>
+<p>As in most use cases, a large number of positions is probably queried,
+the returned values do not use the <a class="reference internal" href="cysgp4.PyEci.html#cysgp4.PyEci" title="cysgp4.PyEci"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyEci</span></code></a> or
+<a class="reference internal" href="cysgp4.PyCoordTopocentric.html#cysgp4.PyCoordTopocentric" title="cysgp4.PyCoordTopocentric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyCoordTopocentric</span></code></a> classes, but pack everything in arrays.
+This is not only faster, but makes it easier to further process the
+results.</p>
+<p>For parallelization, <a class="reference external" href="https://www.openmp.org/">OpenMP</a> is utilized.
+To change the number of CPU cores that are used, one can either set
+the environment variable <code class="xref py py-obj docutils literal notranslate"><span class="pre">OMP_NUM_THREADS</span></code> or use
+<a class="reference internal" href="cysgp4.set_num_threads.html#cysgp4.set_num_threads" title="cysgp4.set_num_threads"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_num_threads</span></code></a>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>mjds</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a>, or scalar of float</span></dt><dd><p>Modified Julian Date.</p>
+</dd>
+<dt><strong>tles</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a>, or scalar of <a class="reference internal" href="cysgp4.PyTle.html#cysgp4.PyTle" title="cysgp4.PyTle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTle</span></code></a></span></dt><dd><p>TLE instance of the satellite of interest.</p>
+</dd>
+<dt><strong>observers</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a>, or scalar of <a class="reference internal" href="cysgp4.PyObserver.html#cysgp4.PyObserver" title="cysgp4.PyObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyObserver</span></code></a> or None (default: None)</span></dt><dd><p>Observer instance. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then the observer location is set to
+(0 deg, 0 deg, 0 km).</p>
+</dd>
+<dt><strong>do_eci_pos</strong><span class="classifier">Boolean, optional (default: True)</span></dt><dd><p>Whether to include ECI cartesian positions in the result.</p>
+</dd>
+<dt><strong>do_eci_vel</strong><span class="classifier">Boolean, optional (default: True)</span></dt><dd><p>Whether to include ECI cartesian velocity in the result.</p>
+</dd>
+<dt><strong>do_geo</strong><span class="classifier">Boolean, optional (default: True)</span></dt><dd><p>Whether to include geographic/geodetic positions in the result.</p>
+</dd>
+<dt><strong>do_topo</strong><span class="classifier">Boolean, optional (default: True)</span></dt><dd><p>Whether to include topocentric positions in the result.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>result</strong><span class="classifier">dict</span></dt><dd><p>Resulting positions for each requested frame:</p>
+<ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">eci_pos</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float
+Satellites ECI cartesian positions. Last dimension has length 3,
+one for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code>. First dimensions are
+determined by the (broadcasted) shape of the inputs <code class="xref py py-obj docutils literal notranslate"><span class="pre">mjd</span></code>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">tles</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">observers</span></code>.</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">eci_vel</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float
+Satellites ECI cartesian velicities. Last dimension has length 3,
+one for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">v_x</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">v_y</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">v_z</span></code>. First dimensions are
+determined by the (broadcasted) shape of the inputs <code class="xref py py-obj docutils literal notranslate"><span class="pre">mjd</span></code>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">tles</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">observers</span></code>.</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">geo</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float
+Satellites Geodetic positions. Last dimension has length 3, one
+for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">lon</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">lat</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">alt</span></code>. First dimensions are
+determined by the (broadcasted) shape of the inputs <code class="xref py py-obj docutils literal notranslate"><span class="pre">mjd</span></code>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">tles</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">observers</span></code>.</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">topo</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float
+Satellites Topocentric positions. Last dimension has length 4,
+one for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">az</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">el</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">dist</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">dist_rate</span></code>. First
+dimensions are determined by the (broadcasted) shape of the
+inputs <code class="xref py py-obj docutils literal notranslate"><span class="pre">mjd</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">tles</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">observers</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>The following demonstrates how to use the <a class="reference internal" href="#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a>
+function:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">requests</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="k">import</span> <span class="n">PyTle</span><span class="p">,</span> <span class="n">PyObserver</span><span class="p">,</span> <span class="n">propagate_many</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://celestrak.com/NORAD/elements/science.txt&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ctrak_science</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">all_lines</span> <span class="o">=</span> <span class="n">ctrak_science</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tle_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="nb">tuple</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">all_lines</span><span class="p">[</span><span class="n">idx</span><span class="p">::</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+<span class="gp">... </span>    <span class="n">PyTle</span><span class="p">(</span><span class="o">*</span><span class="n">tle</span><span class="p">)</span> <span class="k">for</span> <span class="n">tle</span> <span class="ow">in</span> <span class="n">tle_list</span>
+<span class="gp">... </span>    <span class="p">])[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:</span><span class="mi">20</span><span class="p">]</span>  <span class="c1"># use first 20 TLEs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">observers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+<span class="gp">... </span>    <span class="n">PyObserver</span><span class="p">(</span><span class="mf">6.88375</span><span class="p">,</span> <span class="mf">50.525</span><span class="p">,</span> <span class="mf">0.366</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">PyObserver</span><span class="p">(</span><span class="mf">16.88375</span><span class="p">,</span> <span class="mf">50.525</span><span class="p">,</span> <span class="mf">0.366</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="p">])[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mjds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="mf">58805.5</span><span class="p">,</span> <span class="mf">58806.5</span><span class="p">,</span> <span class="mi">1000</span>  <span class="c1"># 1000 time steps</span>
+<span class="gp">... </span>    <span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">propagate_many</span><span class="p">(</span><span class="n">mjds</span><span class="p">,</span> <span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="go">dict_keys([&#39;eci_pos&#39;, &#39;eci_vel&#39;, &#39;geo&#39;, &#39;topo&#39;])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># shapes are as follows</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(</span><span class="n">mjds</span><span class="p">,</span> <span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="go">(1000, 2, 20)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;eci_pos&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;topo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="go">(1000, 2, 20, 3) (1000, 2, 20, 4)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">propagate_many</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">mjds</span><span class="p">,</span> <span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">do_eci_pos</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_eci_vel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_geo</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_topo</span><span class="o">=</span><span class="kc">True</span>
+<span class="gp">... </span>    <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="go">dict_keys([&#39;topo&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">propagate_many</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/cysgp4.propagate_many.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2019, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
+    Last built 22 Nov 2019. <br/>
+  </p>
+</footer>
+  </body>
+</html>
