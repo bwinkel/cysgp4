@@ -106,10 +106,6 @@ jobs:
     displayName: Publish docs
     condition: and(succeeded(), eq(variables['do.docs'], true))
 
-  - bash: rm ~/.ssh/id_rsa || true
-    displayName: 'Make sure key is removed'
-    condition: succeededOrFailed()
-
   - task: TwineAuthenticate@1
     inputs:
       pythonUploadServiceConnection: pypi
@@ -130,6 +126,10 @@ jobs:
       python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH) dist/*.tar.gz
     displayName: Upload tarball
     condition: and(succeeded(), eq(variables['do.tarball'], true))
+
+  - bash: rm ~/.ssh/id_rsa || true
+    displayName: 'Cleanup docs deploy key'
+    condition: and(always(), eq(variables['do.docs'], true))
 
 
 
