@@ -18,13 +18,9 @@ cysgp4
 Project Status
 ==============
 
-.. image:: https://travis-ci.org/bwinkel/cysgp4.svg?branch=master
-    :target: https://travis-ci.org/bwinkel/cysgp4
-    :alt: cysgp4's Travis CI Status
-
-.. image:: https://ci.appveyor.com/api/projects/status/1ydk0hjf04t90aw5?svg=true
-    :target: https://ci.appveyor.com/project/bwinkel/cysgp4
-    :alt: cysgp4's AppVeyor CI Status
+.. image:: https://dev.azure.com/bwinkel78/Benjamin-Winkel-Projects/_apis/build/status/bwinkel.cysgp4?branchName=master
+    :target: https://dev.azure.com/bwinkel78/Benjamin-Winkel-Projects/_build
+    :alt: cysgp4's Azure Pipelines Status
 
 .. image:: https://coveralls.io/repos/github/bwinkel/cysgp4/badge.svg?branch=master
     :target: https://coveralls.io/github/bwinkel/cysgp4?branch=master

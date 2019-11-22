@@ -9,6 +9,7 @@ trigger:
 variables:
   # twine.username: __token__
   is.tag: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
+  do.dist: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
   # is.tag: true
 
 jobs:
@@ -19,10 +20,9 @@ jobs:
 
   strategy:
     matrix:
-      # Python35:
-      #   python.version: '3.5'
-      #   numpy.version: '1.13.1'
-      #   do.dist: ${{ eq(variables['is.tag'], true) }}
+      Python35:
+        python.version: '3.5'
+        numpy.version: '1.13.1'
       Python36:
         python.version: '3.6'
         numpy.version: '1.13.1'
@@ -31,15 +31,14 @@ jobs:
           docs.target: '.'
         ${{ if eq(variables['is.tag'], false) }}:
           docs.target: 'latest'
-        do.dist: ${{ eq(variables['is.tag'], true) }}
+        # do.dist: ${{ eq(variables['is.tag'], true) }}
+        do.tarball: ${{ eq(variables['is.tag'], true) }}
       Python37:
         python.version: '3.7'
         numpy.version: '1.14.5'
-        do.dist: ${{ eq(variables['is.tag'], true) }}
-      # Python37:
-      #   python.version: '3.8'
-      #   numpy.version: '1.14.5'
-      #   do.dist: ${{ eq(variables['is.tag'], true) }}
+      Python38:
+        python.version: '3.8'
+        numpy.version: '1.14.5'
 
   steps:
 
@@ -103,7 +102,7 @@ jobs:
       # mkdir -p ./$DOCS_TARGET
       rsync -av ../docs/_build/html/ ${DOCS_TARGET}/
       git add -A && git commit -m "Update docs  ***NO_CI***"
-      git push github
+      bash ../retry.sh git push github
     displayName: Publish docs
     condition: and(succeeded(), eq(variables['do.docs'], true))
 
@@ -119,12 +118,18 @@ jobs:
   - bash: |
       source activate cysgp4-env
       # conda install --yes --quiet --name cysgp4-env -c conda-forge twine wheel
-      python setup.py sdist
-      # python setup.py bdist_wheel
-      python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH) dist/*.tar.gz
-      # python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH)  dist/*.whl
-    displayName: Upload to PyPI
+      python setup.py bdist_wheel
+      python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH)  dist/*.whl
+    displayName: Upload wheels
     condition: and(succeeded(), eq(variables['do.dist'], true))
+
+  - bash: |
+      source activate cysgp4-env
+      # conda install --yes --quiet --name cysgp4-env -c conda-forge twine wheel
+      python setup.py sdist
+      python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH) dist/*.tar.gz
+    displayName: Upload tarball
+    condition: and(succeeded(), eq(variables['do.tarball'], true))
 
 
 
