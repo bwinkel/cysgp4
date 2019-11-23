@@ -136,32 +136,32 @@ public:
      * @param[in] microseconds whether to set the microsecond component
      * @returns a DateTime object set to the current date and time
      */
-    static DateTime Now(bool microseconds = false)
-    {
-        DateTime dt;
-        struct timespec ts;
+    // static DateTime Now(bool microseconds = false)
+    // {
+    //     DateTime dt;
+    //     struct timespec ts;
 
-        if (clock_gettime(CLOCK_REALTIME, &ts) == 0)
-        {
-            if (microseconds)
-            {
-                dt = DateTime(UnixEpoch
-                    + ts.tv_sec * TicksPerSecond
-                    + ts.tv_nsec / 1000LL * TicksPerMicrosecond);
-            }
-            else
-            {
-                dt = DateTime(UnixEpoch
-                    + ts.tv_sec * TicksPerSecond);
-            }
-        }
-        else
-        {
-            throw 1;
-        }
+    //     if (clock_gettime(CLOCK_REALTIME, &ts) == 0)
+    //     {
+    //         if (microseconds)
+    //         {
+    //             dt = DateTime(UnixEpoch
+    //                 + ts.tv_sec * TicksPerSecond
+    //                 + ts.tv_nsec / 1000LL * TicksPerMicrosecond);
+    //         }
+    //         else
+    //         {
+    //             dt = DateTime(UnixEpoch
+    //                 + ts.tv_sec * TicksPerSecond);
+    //         }
+    //     }
+    //     else
+    //     {
+    //         throw 1;
+    //     }
 
-        return dt;
-    }
+    //     return dt;
+    // }
 
     /**
      * Find whether a year is a leap year
@@ -209,13 +209,13 @@ public:
                 valid = false;
             }
         }
-        else 
+        else
         {
             valid = false;
         }
         return valid;
     }
-    
+
     /**
      * Check whether the year/month/day is valid
      * @param[in] year the year to check
@@ -252,7 +252,7 @@ public:
         {
             throw 1;
         }
-        
+
         const int* daysInMonthPtr;
 
         if (IsLeapYear(year))
@@ -404,7 +404,9 @@ public:
         }
 
         int maxday = DaysInMonth(year, month);
-        day = std::min(day, maxday);
+        // day = std::min(day, maxday);
+        if (maxday < day)
+            day = maxday;
 
         return DateTime(year, month, day).Add(TimeOfDay());
     }
@@ -462,7 +464,7 @@ public:
     void FromTicks(int& year, int& month, int& day) const
     {
         int totalDays = static_cast<int>(m_encoded / TicksPerDay);
-        
+
         /*
          * number of 400 year cycles
          */
@@ -502,7 +504,7 @@ public:
          * find year
          */
         year = (num400 * 400) + (num100 * 100) + (num4 * 4) + num1 + 1;
-        
+
         /*
          * convert day of year to month/day
          */

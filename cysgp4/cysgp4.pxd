@@ -164,6 +164,14 @@ cdef extern from 'Vector.h':
 
 cdef extern from 'DateTime.h':
 
+    # Note: for Win_X86 compatibility, one needs to remove the
+    #     static DateTime Now(bool microseconds = false)
+    # method from DateTime; furthermore the line
+    #     day = std::min(day, maxday);
+    # should be replaced with
+    #     if (maxday < day)
+    #         day = maxday;
+
     cdef cppclass DateTime:
 
         DateTime() nogil except +
