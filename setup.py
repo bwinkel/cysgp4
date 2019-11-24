@@ -4,6 +4,7 @@
 from setuptools import setup
 from setuptools.extension import Extension
 from Cython.Distutils import build_ext
+import os
 import numpy
 import platform
 import glob
@@ -27,6 +28,9 @@ LICENSE = metadata.get('license', 'unknown')
 URL = metadata.get('url', 'https://github.com/bwinkel/cysgp4')
 __minimum_python_version__ = metadata.get("minimum_python_version", "3.5")
 
+if os.path.exists('README.rst'):
+    with open('README.rst') as f:
+        LONG_DESCRIPTION = f.read()
 
 EX_COMP_ARGS = []
 if 'mac' in platform.system().lower():
