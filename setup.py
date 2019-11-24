@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.extension import Extension
 from Cython.Distutils import build_ext
 import os
@@ -115,18 +115,17 @@ setup(
     license=LICENSE,
     install_requires=[
         'setuptools',
-        'cython',
         'numpy>=1.13.1',
         ],
     tests_require=['pytest', 'numpy>=1.13.1', 'sgp4'],
-    packages=['cysgp4'],
+    packages=find_packages(),
+    package_data={
+        PACKAGENAME: ['tests/data/science.txt']
+        },
     cmdclass={'build_ext': build_ext},
     ext_modules=[
         SGP_EXT,
         ],
-    # package_data={
-    #     'tests': ['tests/data/science.txt']
-    #     },
     zip_safe=False,
     # url='https://github.com/bwinkel/cyaatm/',
     # download_url='https://github.com/bwinkel/cyaatm/tarball/0.1.0',

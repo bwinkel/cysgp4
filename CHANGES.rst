@@ -1,6 +1,10 @@
 0.2.19 (unreleased)
 =======================
 
+Bugfixes
+~~~~~~~~~~
+- Include tests in (installed) package, such that test runner can find them.
+
 0.2.18 (2019-11-24)
 =======================
 
