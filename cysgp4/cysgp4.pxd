@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # ####################################################################
@@ -186,6 +185,7 @@ cdef extern from 'DateTime.h':
         DateTime AddTicks(long long ticks) nogil const
         long long Ticks() nogil const
 
+        int DayOfYear(int year, int month, int day) const
         int Year() nogil const
         int Month() nogil const
         int Day() nogil const
@@ -282,3 +282,11 @@ cdef extern from *:
     '''
     T* array_new[T](int)
     void array_delete[T](T* x)
+
+
+cdef long long ticks_from_mjd(double mjd) nogil
+cdef double mjd_from_ticks(long long ticks) nogil
+cdef DateTime datetime_from_mjd(double mjd) nogil
+cdef (double, double, double) ecef_from_geo(
+    double lon_rad, double lat_rad, double alt_km
+    ) nogil
