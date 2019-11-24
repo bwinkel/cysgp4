@@ -96,6 +96,8 @@ SGP_EXT = Extension(
 for e in [SGP_EXT]:
     e.cython_directives = {'language_level': "3"}  # all are Python-3
 
+# NOTE: for github pages, put an empty .nojekyll into the root dir of
+# the web directory (gh-pages branch root)
 
 setup(
     name=PACKAGENAME,
