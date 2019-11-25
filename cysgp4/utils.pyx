@@ -56,12 +56,38 @@ np.import_array()
 
 
 __all__ = [
-    'tle_checksum', 'tle_linestrings_from_text', 'tles_from_text',
+    'tle_checksum', 'tle_tuples_from_text', 'tles_from_text',
     'satellite_mean_motion', 'tle_linestrings_from_orbital_parameters',
     ]
 
 
 cpdef int tle_checksum(str line):
+    '''
+    Compute checksum of a `TLE line string
+    <https://en.wikipedia.org/wiki/Two-line_element_set>`_.
+
+    Parameters
+    ----------
+    line : str
+        TLE line string.
+
+    Returns
+    -------
+    chksum : int
+        Checksum (1-digit).
+
+    Examples
+    --------
+    Assume you want to check if a TLE line string is correct::
+
+        >>> import cysgp4
+
+        >>> tle_line = '1 25544U 98067A   13165.59097222  .00004759  00000-0  88814-4 0    47'
+        >>> chksum = cysgp4.tle_checksum(tle_line)
+        >>> tle_line[-1] == str(chksum)
+        True
+
+    '''
 
     cdef:
 
@@ -87,7 +113,44 @@ cpdef int tle_checksum(str line):
     return acc % 10
 
 
-def tle_linestrings_from_text(str tle_text):
+def tle_tuples_from_text(str tle_text):
+    '''
+    Split a text containing `TLE strings
+    <https://en.wikipedia.org/wiki/Two-line_element_set>`_ (including Name
+    or ID, i.e., three lines per entry) into list of TLE tuples.
+
+    Parameters
+    ----------
+    tle_text : str
+        Text containing TLE line strings.
+
+    Returns
+    -------
+    tle_list : list of (str, str, str)
+        List of TLE tuples, each consisting of the line strings.
+
+    Examples
+    --------
+    An example text file with TLE strings is included in `~cysgp4`
+    and can be parsed like this::
+
+        >>> import cysgp4
+
+        >>> tle_text = cysgp4.get_example_tles()
+        >>> tle_tuples = cysgp4.tle_tuples_from_text(tle_text)
+        >>> tle_tuples
+        [('AKEBONO (EXOS-D)        ',
+          '1 19822U 89016A   19321.49921565  .00016421  94291-6  28704-3 0  9992',
+          '2 19822  75.0304 327.7460 1766579 276.4058  63.9734 12.00957719 13956'),
+         ('HST                     ',
+          '1 20580U 90037B   19321.38711875  .00000471  00000-0  17700-4 0  9991',
+          '2 20580  28.4699 288.8102 0002495 321.7771 171.5855 15.09299865423838'),
+        ...
+         ('ZHANGZHENG-1 (CSES)     ',
+          '1 43194U 18015C   19322.55091545  .00001006  00000-0  48427-4 0  9993',
+          '2 43194  97.4135  85.6925 0016973 127.3937   1.4087 15.20935646 99453')]
+
+    '''
 
     all_lines = tle_text.split('\r\n')
     tle_list = list(zip(*tuple(all_lines[idx::3] for idx in range(3))))
@@ -96,10 +159,40 @@ def tle_linestrings_from_text(str tle_text):
 
 
 def tles_from_text(str tle_text):
+    '''
+    Parse a text containing `TLE strings
+    <https://en.wikipedia.org/wiki/Two-line_element_set>`_ (including Name
+    or ID, i.e., three lines per entry) into list of `~cysgp4.PyTle` objects.
+
+    Parameters
+    ----------
+    tle_text : str
+        Text containing TLE line strings.
+
+    Returns
+    -------
+    tle_list : list of `~cysgp4.PyTle` objects
+        List of `~cysgp4.PyTle` objects.
+
+    Examples
+    --------
+    An example text file with TLE strings is included in `~cysgp4`
+    and can be parsed like this::
+
+        >>> import cysgp4
+
+        >>> tle_text = cysgp4.get_example_tles()
+        >>> tle_tuples = cysgp4.tles_from_text(tle_text)
+        [<PyTle: AKEBONO (EXOS-D)        >,
+         <PyTle: HST                     >,
+        ...
+         <PyTle: ZHANGZHENG-1 (CSES)     >]
+
+    '''
 
     return [
         PyTle(*tle)
-        for tle in tle_linestrings_from_text(tle_text)
+        for tle in tle_tuples_from_text(tle_text)
         ]
 
 
@@ -110,6 +203,34 @@ cpdef double satellite_mean_motion(
     Mean motion of satellite at altitude in Earth's gravitational field.
 
     See https://en.wikipedia.org/wiki/Mean_motion#Formulae
+
+    Note the parameters are such that they fit to the WGS72 definition.
+
+    Parameters
+    ----------
+    alt_km : float
+        Text containing TLE line strings.
+    mu_km3_s2 : float, optional (default: 398600.8)
+        Nominal Earth mass parameter [km^3 / s^2].
+    r_earth_km : float, optional (default: 6378.135)
+        Earth's radius [km].
+
+    Returns
+    -------
+    mean_motion : double
+        Mean motion of satellite in revolutions per day [1 / day].
+
+    Examples
+    --------
+    An example text file with TLE strings is included in `~cysgp4`
+    and can be parsed like this::
+
+        >>> import cysgp4
+
+        >>> mean_motion = cysgp4.satellite_mean_motion(500.)
+        >>> mean_motion
+        15.219378350934464
+
     '''
 
     cdef:
@@ -133,12 +254,77 @@ cpdef tuple tle_linestrings_from_orbital_parameters(
     '''
     Generate TLE strings from orbital parameters.
 
-    Note: epoch has a very strange format: first two digits are the year, next three
-    digits are the day from beginning of year, then fraction of a day is given, e.g.
-    20180.25 would be 2020, day 180, 6 hours (UT?)
-    '''
+    See `TLE line strings
+    <https://en.wikipedia.org/wiki/Two-line_element_set>`_ for a description
+    of the two-line element format.
 
-    # Note: RAAN = right ascention (or longitude) of ascending node
+    Note: The epoch (date/time) used in TLEs has a very strange format: first
+    two digits are the year, next three digits are the day from beginning of
+    year, then fraction of a day is given, e.g. 20180.25 would be 2020, day
+    180, 6 hours (UTC).
+
+        Parameters
+    ----------
+    sat_name : str
+        The satellite name.
+    sat_nr : str
+        The satellite number.
+    mjd_epoch : float
+        The epoch of the orbital parameters as MJD [day].
+        The function will convert this to the TLE epoch format.
+    inclination_deg : float
+        Inclination of the orbit [deg].
+    raan_deg : float
+        Right ascension of the ascending node of the orbit [deg].
+    mean_anomaly_deg : float
+        Mean anomaly of the node [deg].
+    mean_motion_per_day : float
+        Mean motion of the satellite [1 / day].
+
+    Returns
+    -------
+    mean_motion : double
+        Mean motion of satellite in revolutions per day [1 / day].
+    tle_lines : (str, str, str)
+        TLE tuple of the satellite, consisting of the line strings.
+
+    Examples
+    --------
+    A simple use case would be like::
+
+        >>> from datetime import datetime
+        >>> import cysgp4
+
+        >>> # Define satellite orbital parameters
+        >>> sat_name, sat_nr = 'MYSAT', 1
+        >>> alt_km = 3000.  # satellite altitude
+        >>> mean_motion = cysgp4.satellite_mean_motion(alt_km)
+        >>> inclination = 10.  # deg
+        >>> raan = 35.  # deg
+        >>> mean_anomaly = 112.  # deg
+
+        >>> # assume, the parameters are valid for the following time
+        >>> dt = datetime(2019, 11, 2, 2, 5, 14)
+        >>> pydt = cysgp4.PyDateTime(dt)
+        >>> pydt
+        <PyDateTime: 2019-11-02 02:05:14.000000 UTC>
+        >>> mjd_epoch = pydt.mjd
+
+        >>> tle_tuple = cysgp4.tle_linestrings_from_orbital_parameters(
+        ...     sat_name,
+        ...     sat_nr,
+        ...     mjd_epoch,
+        ...     inclination,
+        ...     raan,
+        ...     mean_anomaly,
+        ...     mean_motion,
+        ...     )
+        >>> tle_tuple
+        ('MYSAT',
+         '1 00001U 20001A   19306.08696759  .00000000  00000-0  50000-4 0    05',
+         '2 00001  10.0000  35.0000 0001000   0.0000 112.0000  9.55934723    04')
+
+    '''
 
     cdef:
 
@@ -151,7 +337,6 @@ cpdef tuple tle_linestrings_from_orbital_parameters(
             dt.Minute() / 1440. +
             dt.Second() / 86400. +
             dt.Microsecond() * 1.e-6
-            # mjd_epoch - <unsigned int> mjd_epoch
             )
 
         str tmp1 = (
