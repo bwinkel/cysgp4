@@ -109,6 +109,48 @@ class TestPyDateTime:
         assert str(t1) == '2013-06-15 02:57:07.199999 UTC'
         assert_allclose(mjd, t1.mjd)
 
+    def test_tle_epoch(self):
+
+        # Note: this is an oddity with the TLE time format; if day is
+        # zero, it is really the last day of the previous year...
+        t = PyDateTime.from_tle_epoch(19000.)
+        assert str(t) == '2018-12-31 00:00:00.000000 UTC'
+
+        dt = datetime.datetime(2018, 12, 31, 0, 0, 0)
+        t = PyDateTime(dt)
+        print(t)
+        assert_allclose(t.tle_epoch, 18365.)  # sic!
+
+        tle_epoch = 19001.0
+        t = PyDateTime.from_tle_epoch(tle_epoch)
+        assert str(t) == '2019-01-01 00:00:00.000000 UTC'
+
+        dt = datetime.datetime(2019, 1, 1, 0, 0, 0)
+        t = PyDateTime(dt)
+        print(t)
+        assert_allclose(t.tle_epoch, tle_epoch)
+
+        mjd = 58533.1
+        tle_epoch = 19050.1
+        dt = datetime.datetime(2019, 2, 19, 2, 24, 0)
+
+        t = PyDateTime(dt)
+        print(t)
+        assert str(t) == '2019-02-19 02:24:00.000000 UTC'
+        assert_allclose(t.tle_epoch, tle_epoch)
+
+        t = PyDateTime.from_mjd(mjd)
+        print(t)
+        assert str(t) == '2019-02-19 02:23:59.999999 UTC'
+
+        assert_allclose(t.tle_epoch, tle_epoch)
+
+        t = PyDateTime.from_tle_epoch(tle_epoch)
+        print(t)
+        assert str(t) == '2019-02-19 02:24:00.000000 UTC'
+
+        assert_allclose(t.mjd, mjd)
+
 
 class TestPyTle:
 

@@ -175,6 +175,7 @@ cdef extern from 'DateTime.h':
 
         DateTime() nogil except +
         DateTime(unsigned long long ticks) nogil except +
+        DateTime(int year, double doy) nogil except +
         void Initialise(
             int year, int month, int day,
             int hour, int minute, int second, int microsecond

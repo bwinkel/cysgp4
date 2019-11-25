@@ -470,8 +470,7 @@ cdef class PyDateTime(object):
                 dt.DayOfYear(year, dt.Month(), dt.Day()) +
                 dt.Hour() / 24. +
                 dt.Minute() / 1440. +
-                dt.Second() / 86400. +
-                dt.Microsecond() * 1.e-6
+                (dt.Second() + dt.Microsecond() * 1.e-6) / 86400.
                 )
 
         if year < 1957 or year > 2056:
@@ -484,18 +483,18 @@ cdef class PyDateTime(object):
         cdef:
 
             int year = (<int> _tle_epoch) // 1000
-            int iday = (<int> _tle_epoch) % 1000
-            double fday = _tle_epoch - <int> _tle_epoch
+            int idoy = (<int> _tle_epoch) % 1000
+            double fdoy = _tle_epoch - <int> _tle_epoch
+            double doy = idoy + fdoy
+
+            DateTime dt
 
         year += 1900
         if year < 1957:
             year += 100
 
-        dt = (
-            datetime.datetime(year, 1, 1) +
-            datetime.timedelta(iday + fday - 1)
-            )
-        self.datetime = dt
+        dt = DateTime(year, doy)
+        self._cobj = dt
 
     tle_epoch = property(
         _get_tle_epoch, _set_tle_epoch, None,
