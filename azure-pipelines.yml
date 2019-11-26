@@ -13,6 +13,7 @@ variables:
   package_name: cysgp4
   is.tag: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
   do.dist: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
+  is.pullrequest: ${{ startsWith(variables['Build.Reason'], 'PullRequest') }}
   # is.tag: ${{ true }}
   # do.dist: ${{ true }}
   # why is the following not working?
@@ -123,6 +124,7 @@ jobs:
       echo "conda.activate" $(conda.activate)
       echo "is.tag" $(is.tag)
       echo "do.docs" $(do.docs)
+      echo "is.pullrequest" $(is.pullrequest)
       echo "docs.target" $(docs.target)
       echo "do.dist" $(do.dist)
       echo "python.version" $(python.version)
@@ -170,6 +172,7 @@ jobs:
     inputs:
       secureFile: ghpages_deploy_key
     displayName: 'Get the deploy key'
+    condition: and(succeeded(), eq(variables['do.docs'], true), not(eq(variables['is.pullrequest'], true)))
 
   - bash: |
       mkdir ~/.ssh && mv $DOWNLOADSECUREFILE_SECUREFILEPATH ~/.ssh/id_rsa
@@ -187,7 +190,7 @@ jobs:
       git add -A && git commit -m "Update docs  ***NO_CI***"
       bash ../retry.sh git push github
     displayName: Publish docs
-    condition: and(succeeded(), eq(variables['do.docs'], true))
+    condition: and(succeeded(), eq(variables['do.docs'], true), not(eq(variables['is.pullrequest'], true)))
 
   - task: TwineAuthenticate@1
     inputs:
