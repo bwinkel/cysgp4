@@ -646,6 +646,25 @@ cdef class PyTle(object):
             self.thisptr.Line2().decode('UTF-8'),
             )
 
+    @property
+    def epoch(self):
+        '''
+        Epoch of the satellites TLE.
+
+        Note that TLEs get outdated quickly in which case, the orbit
+        computations can have large errorbars.
+
+        Returns
+        ----------
+        epoch : `~cysgp4.PyDateTime`
+            Epoch of the satellites TLE.
+        '''
+
+        cdef PyDateTime pydt = PyDateTime(init=False)
+        pydt._cobj = self.thisptr.Epoch()
+
+        return pydt
+
 
 cdef class PyCoordGeodetic(object):
     '''

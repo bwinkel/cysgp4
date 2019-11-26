@@ -225,6 +225,12 @@ class TestPyTle:
 
         assert 'Invalid length for line one' in str(excinfo.value)
 
+    def test_epoch(self):
+
+        tle = PyTle(*self.tle_tup)
+
+        assert_allclose(tle.epoch.mjd, 56457.590972)
+
 
 class TestPyCoordGeodetic:
 

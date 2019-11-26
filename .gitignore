@@ -2,7 +2,9 @@ cysgp4.egg-info
 build
 dist
 cextern
-cysgp4/cysgp4.cpp
+cysgp4/*.cpp
+cysgp4/*.html
+notebooks/.ipynb_checkpoints
 .eggs
 .tox
 .cache
