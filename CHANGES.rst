@@ -1,6 +1,12 @@
 0.2.19 (unreleased)
 =======================
 
+Bugfixes
+~~~~~~~~~~
+- Include tests in (installed) package, such that test runner can find them.
+- Fix github pages rendering, where css/js wasn't found in static directories
+  with a leading underscore (an empty .nojekyll is necessary!)
+
 0.2.18 (2019-11-24)
 =======================
 

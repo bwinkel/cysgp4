@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.extension import Extension
 from Cython.Distutils import build_ext
 import os
@@ -12,6 +12,10 @@ try:
     from configparser import ConfigParser
 except ImportError:
     from ConfigParser import ConfigParser
+
+# Produce annotated html files
+import Cython.Compiler.Options
+Cython.Compiler.Options.annotate = True
 
 
 # Get some values from the setup.cfg
@@ -93,9 +97,20 @@ SGP_EXT = Extension(
     **get_compile_args()
     )
 
-for e in [SGP_EXT]:
+UTILS_EXT = Extension(
+    'cysgp4.utils',
+    ['cysgp4/utils.pyx'] + CPPSOURCES,
+    **get_compile_args()
+    )
+
+for e in [SGP_EXT, UTILS_EXT]:
     e.cython_directives = {'language_level': "3"}  # all are Python-3
 
+
+print('Cython.Compiler.Options.annotate', Cython.Compiler.Options.annotate)
+
+# NOTE: for github pages, put an empty .nojekyll into the root dir of
+# the web directory (gh-pages branch root)
 
 setup(
     name=PACKAGENAME,
@@ -115,18 +130,17 @@ setup(
     license=LICENSE,
     install_requires=[
         'setuptools',
-        'cython',
         'numpy>=1.13.1',
         ],
     tests_require=['pytest', 'numpy>=1.13.1', 'sgp4'],
-    packages=['cysgp4'],
+    packages=find_packages(),
+    package_data={
+        PACKAGENAME: ['tests/data/science.txt']
+        },
     cmdclass={'build_ext': build_ext},
     ext_modules=[
-        SGP_EXT,
+        UTILS_EXT, SGP_EXT,
         ],
-    # package_data={
-    #     'tests': ['tests/data/science.txt']
-    #     },
     zip_safe=False,
     # url='https://github.com/bwinkel/cyaatm/',
     # download_url='https://github.com/bwinkel/cyaatm/tarball/0.1.0',

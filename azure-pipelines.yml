@@ -12,9 +12,10 @@ pr:
 variables:
   package_name: cysgp4
   is.tag: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
-  do.dist: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
+  publish.wheels: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
+  is.pullrequest: ${{ startsWith(variables['Build.Reason'], 'PullRequest') }}
   # is.tag: ${{ true }}
-  # do.dist: ${{ true }}
+  # publish.wheels: ${{ true }}
   # why is the following not working?
   is.linux: ${{ startsWith(variables['Agent.OS'], 'Linux') }}
   is.macos: ${{ startsWith(variables['Agent.OS'], 'Darwin') }}
@@ -46,12 +47,17 @@ jobs:
         python.version: '3.6'
         py_whl: 36
         numpy.version: '1.13.1'
-        do.docs: ${{ true }}
+        # docs should only be published by one thread, as they are version-
+        # independent; and only if not on a PR
+        publish.docs: ${{ not(eq(variables['is.pullrequest'], true)) }}
         ${{ if eq(variables['is.tag'], true) }}:
           docs.target: '.'
         ${{ if eq(variables['is.tag'], false) }}:
           docs.target: 'latest'
-        do.tarball: ${{ eq(variables['is.tag'], true) }}
+        # tarball should only be published by one thread, as it is version-
+        # independent
+        build.tarball: ${{ true }}
+        publish.tarball: ${{ eq(variables['is.tag'], true) }}
       linux37:
         imageName: 'ubuntu-16.04'
         python.version: '3.7'
@@ -122,9 +128,10 @@ jobs:
       echo "is.win" $(is.win) "/" ${{ variables['is.win'] }}
       echo "conda.activate" $(conda.activate)
       echo "is.tag" $(is.tag)
-      echo "do.docs" $(do.docs)
+      echo "publish.docs" $(publish.docs)
+      echo "is.pullrequest" $(is.pullrequest)
       echo "docs.target" $(docs.target)
-      echo "do.dist" $(do.dist)
+      echo "publish.wheels" $(publish.wheels)
       echo "python.version" $(python.version)
       echo "py_whl" $(py_whl)
       echo "numpy.version" $(numpy.version)
@@ -134,9 +141,13 @@ jobs:
   - script: conda create --yes --quiet --name cysgp4-env -c conda-forge
     displayName: Create Anaconda environment
 
+  # note: with project.toml it should not be necessary to have cython
+  # installed already, but on PRs building wheels and the tarball still fails
+  # for some reason!? therefore, we add it here (should also be faster than
+  # pip installation)
   - script: |
       $(conda.activate) cysgp4-env
-      conda install --yes --quiet -c conda-forge python=$(python.version) numpy==$(numpy.version) setuptools_scm twine pytest sgp4 wheel
+      conda install --yes --quiet -c conda-forge python=$(python.version) cython numpy==$(numpy.version) setuptools_scm twine pytest pytest-astropy pytest-doctestplus sgp4 wheel
     displayName: Install Anaconda packages
 
   # need to fix cctools and ld64 to slightly older version, otherwise an
@@ -156,7 +167,7 @@ jobs:
   - script: |
       $(conda.activate) cysgp4-env
       pip install pytest-azurepipelines
-      pytest cysgp4
+      pytest --doctest-rst docs cysgp4
     displayName: Testing
 
   - script: |
@@ -164,12 +175,13 @@ jobs:
       conda install --yes --quiet --name cysgp4-env -c conda-forge astropy sphinx-astropy
       sphinx-build docs docs/_build/html -W -b html
     displayName: Make docs
-    condition: and(succeeded(), eq(variables['do.docs'], true))
+    condition: succeeded()
 
   - task: DownloadSecureFile@1
     inputs:
       secureFile: ghpages_deploy_key
     displayName: 'Get the deploy key'
+    condition: and(succeeded(), eq(variables['publish.docs'], true))
 
   - bash: |
       mkdir ~/.ssh && mv $DOWNLOADSECUREFILE_SECUREFILEPATH ~/.ssh/id_rsa
@@ -187,7 +199,7 @@ jobs:
       git add -A && git commit -m "Update docs  ***NO_CI***"
       bash ../retry.sh git push github
     displayName: Publish docs
-    condition: and(succeeded(), eq(variables['do.docs'], true))
+    condition: and(succeeded(), eq(variables['publish.docs'], true))
 
   - task: TwineAuthenticate@1
     inputs:
@@ -201,13 +213,13 @@ jobs:
       cp wheelhouse/$(package_name)*.whl dist/.
       ls dist
     displayName: Build wheels, Linux
-    condition: and(succeeded(), eq(variables['do.dist'], true), startsWith(variables['Agent.OS'], 'Linux'))
+    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'))
 
   - script: |
       $(conda.activate) cysgp4-env
       python setup.py bdist_wheel
     displayName: Build wheels, MacOS/Windows
-    condition: and(succeeded(), eq(variables['do.dist'], true), not(startsWith(variables['Agent.OS'], 'Linux')))
+    condition: and(succeeded(), not(startsWith(variables['Agent.OS'], 'Linux')))
 
   # twine upload with python 3.5 doesn't work?
   # (pkg_resources.DistributionNotFound: The 'readme-renderer>=21.0' distribution was not found)
@@ -220,21 +232,26 @@ jobs:
       pip install twine
       python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH) dist/*.whl
     displayName: Upload wheels, Linux/MacOS
-    condition: and(succeeded(), eq(variables['do.dist'], true), not(startsWith(variables['Agent.OS'], 'Windows')))
+    condition: and(succeeded(), eq(variables['publish.wheels'], true), not(startsWith(variables['Agent.OS'], 'Windows')))
 
   - script: |
       pip install twine
       python -m twine upload -r "pypi" --config-file %PYPIRC_PATH% dist/*.whl
     displayName: Upload wheels, Windows
-    condition: and(succeeded(), eq(variables['do.dist'], true), startsWith(variables['Agent.OS'], 'Windows'))
+    condition: and(succeeded(), eq(variables['publish.wheels'], true), startsWith(variables['Agent.OS'], 'Windows'))
 
   - script: |
       $(conda.activate) cysgp4-env
       python setup.py sdist
+    displayName: Build tarball
+    condition: and(succeeded(), eq(variables['build.tarball'], true))
+
+  - script: |
+      $(conda.activate) cysgp4-env
       python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH) dist/*.tar.gz
     displayName: Upload tarball
-    condition: and(succeeded(), eq(variables['do.tarball'], true))
+    condition: and(succeeded(), eq(variables['publish.tarball'], true))
 
   - script: rm ~/.ssh/id_rsa || true
     displayName: 'Cleanup docs deploy key'
-    condition: and(always(), eq(variables['do.docs'], true))
+    condition: and(always(), eq(variables['publish.docs'], true))

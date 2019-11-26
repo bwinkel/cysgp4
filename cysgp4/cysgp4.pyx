@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 # cython: language_level=3
 # cython: cdivision=True, boundscheck=False, wraparound=False
@@ -52,7 +51,7 @@ from libcpp cimport bool as cpp_bool
 from libc.math cimport M_PI, floor, fabs, fmod, sqrt, sin, cos
 from .cysgp4 cimport *
 
-from datetime import datetime
+import datetime
 import numpy as np
 
 np.import_array()
@@ -119,6 +118,16 @@ cdef inline double mjd_from_ticks(long long ticks) nogil:
 
     ticks -= MJD0_TICKS
     return ticks / 8.64e10
+
+
+cdef inline DateTime datetime_from_mjd(double mjd) nogil:
+
+    cdef:
+
+        unsigned long long ticks = ticks_from_mjd(mjd)
+        DateTime dt = DateTime(ticks)
+
+    return dt
 
 
 cdef inline (double, double, double) ecef_from_geo(
@@ -309,6 +318,44 @@ cdef class PyDateTime(object):
 
         return dt
 
+    @classmethod
+    def from_tle_epoch(cls, double tle_epoch):
+        '''
+        Creates a new `~cysgp4.PyDateTime` instance from TLE epoch format.
+
+        Note: TLE epochs have a very strange format: first two digits are the
+        year, next three digits are the day from beginning of year, then
+        the fraction of a day is given, e.g. 20180.25 would be 2020, day 180,
+        6 hours (probably UT as no timezone is mentioned). See also
+        `Wikipedia <https://en.wikipedia.org/wiki/Two-line_element_set>`_
+        or `Celestrak <https://celestrak.com/columns/v04n03/>`_.
+
+        Corresponding year must be between 1957 and 2056.
+
+        Parameters
+        ----------
+        tle_epoch : double
+            Datetime in TLE epoch format.
+
+        Returns
+        -------
+        pydt : `~cysgp4.PyDateTime` object
+
+        Examples
+        --------
+        "from_tle_epoch" is a classmethod::
+
+            >>> tle_epoch = 19050.1
+            >>> pydt = PyDateTime.from_tle_epoch(tle_epoch)
+            >>> pydt
+            <PyDateTime: 2019-02-19 02:24:00.000000 UTC>
+        '''
+
+        dt = cls(dt=None, init=False)
+        dt.tle_epoch = tle_epoch
+
+        return dt
+
     def get_datetime_tuple(self):
 
         return (
@@ -323,7 +370,7 @@ cdef class PyDateTime(object):
 
     def _get_datetime(self):
 
-        return datetime(*self.get_datetime_tuple())
+        return datetime.datetime(*self.get_datetime_tuple())
 
     def _set_datetime(self, dt):
         '''
@@ -331,9 +378,9 @@ cdef class PyDateTime(object):
         '''
 
         if dt is None:
-            dt = datetime.now()
+            dt = datetime.datetime.now()
 
-        assert isinstance(dt, datetime)
+        assert isinstance(dt, datetime.datetime)
 
         self._cobj.Initialise(
             <int> dt.year, <int> dt.month, <int> dt.day,
@@ -411,6 +458,47 @@ cdef class PyDateTime(object):
 
     mjd = property(
         _get_mjd, _set_mjd, None, doc='MJD (see Class documentation).'
+        )
+
+    def _get_tle_epoch(self):
+
+        cdef:
+            DateTime dt = self._cobj
+            int year = dt.Year()
+            double _tle_epoch = (
+                (year % 100) * 1000. +
+                dt.DayOfYear(year, dt.Month(), dt.Day()) +
+                dt.Hour() / 24. +
+                dt.Minute() / 1440. +
+                (dt.Second() + dt.Microsecond() * 1.e-6) / 86400.
+                )
+
+        if year < 1957 or year > 2056:
+            raise ValueError('Year must be between 1957 and 2056')
+
+        return _tle_epoch
+
+    def _set_tle_epoch(self, double _tle_epoch):
+
+        cdef:
+
+            int year = (<int> _tle_epoch) // 1000
+            int idoy = (<int> _tle_epoch) % 1000
+            double fdoy = _tle_epoch - <int> _tle_epoch
+            double doy = idoy + fdoy
+
+            DateTime dt
+
+        year += 1900
+        if year < 1957:
+            year += 100
+
+        dt = DateTime(year, doy)
+        self._cobj = dt
+
+    tle_epoch = property(
+        _get_tle_epoch, _set_tle_epoch, None,
+        doc='Datetime in TLE epoch format. See also `~cysgp4.from_tle_epoch`.'
         )
 
     def __str__(self):
@@ -557,6 +645,135 @@ cdef class PyTle(object):
             self.thisptr.Line1().decode('UTF-8'),
             self.thisptr.Line2().decode('UTF-8'),
             )
+
+    @property
+    def epoch(self):
+        '''
+        Epoch of the satellites TLE.
+
+        Note that TLEs get outdated quickly in which case, the orbit
+        computations can have large errorbars.
+
+        Returns
+        ----------
+        epoch : `~cysgp4.PyDateTime`
+            Epoch of the satellites TLE.
+        '''
+
+        cdef PyDateTime pydt = PyDateTime(init=False)
+        pydt._cobj = self.thisptr.Epoch()
+
+        return pydt
+
+    @property
+    def int_designator(self):
+        '''
+        Satellite's international designator.
+
+        First two digits is the (last two digits of the) launch year.
+        Next three digits are the launch number (in that year).
+        Last digit is the piece of the launch.
+        (see `TLEs on Wikipedia
+        <https://en.wikipedia.org/wiki/Two-line_element_set>`_)
+        '''
+
+        return self.thisptr.IntDesignator()
+
+    @property
+    def catalog_number(self):
+        '''
+        Satellite's (NORAD) catalog number.
+        '''
+
+        return self.thisptr.NoradNumber()
+
+    @property
+    def inclination(self):
+        '''
+        Satellite's inclination [deg].
+        '''
+
+        cdef bint in_degrees = True
+
+        return self.thisptr.Inclination(in_degrees)
+
+    @property
+    def raan(self):
+        '''
+        Satellite's right ascension of the ascending node (RAAN) [deg].
+        '''
+
+        cdef bint in_degrees = True
+
+        return self.thisptr.RightAscendingNode(in_degrees)
+
+    @property
+    def eccentricity(self):
+        '''
+        Satellite orbit's eccentricity [dimless].
+        '''
+
+        return self.thisptr.Eccentricity()
+
+    @property
+    def arg_perigee(self):
+        '''
+        Satellite's argument of perigee [deg].
+        '''
+
+        cdef bint in_degrees = True
+
+        return self.thisptr.ArgumentPerigee(in_degrees)
+
+    @property
+    def mean_anomaly(self):
+        '''
+        Satellite's mean anomaly [deg].
+        '''
+
+        cdef bint in_degrees = True
+
+        return self.thisptr.MeanAnomaly(in_degrees)
+
+    @property
+    def mean_motion(self):
+        '''
+        Satellite's mean motion [1 / day].
+        '''
+
+        return self.thisptr.MeanMotion()
+
+    @property
+    def rev_number(self):
+        '''
+        Satellite's revolution number at epoch (revolutions).
+        '''
+
+        return self.thisptr.OrbitNumber()
+
+    @property
+    def mean_motion_dt2(self):
+        '''
+        Satellite's first time derivative of the mean motion divided by two.
+        '''
+
+        return self.thisptr.MeanMotionDt2()
+
+    @property
+    def mean_motion_dt6(self):
+        '''
+        Satellite's second time derivative of mean motion divided by six.
+        '''
+
+        return self.thisptr.MeanMotionDdt6()
+
+    @property
+    def bstar(self):
+        '''
+        Satellite's BSTAR drag term.
+        '''
+
+        return self.thisptr.BStar()
 
 
 cdef class PyCoordGeodetic(object):

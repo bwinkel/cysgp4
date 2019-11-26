@@ -48,20 +48,21 @@ different satellite TLEs, observers and times in a parallelized manner.
 `~numpy` broadcasting `rules
 <https://docs.scipy.org/doc/numpy/user/basics.broadcasting.html>`_ apply::
 
-        >>> import requests
         >>> import numpy as np
-        >>> from cysgp4 import PyTle, PyObserver, propagate_many
+        >>> from cysgp4 import PyTle, PyObserver
+        >>> from cysgp4 import get_example_tles, propagate_many
 
         >>> # Download many TLEs from a website
-        >>> url = 'http://celestrak.com/NORAD/elements/science.txt'
-        >>> ctrak_science = requests.get(url)
-        >>> all_lines = ctrak_science.text.split('\\r\\n')
+        >>> # import requests
+        >>> # url = 'http://celestrak.com/NORAD/elements/science.txt'
+        >>> # ctrak_science = requests.get(url).text
+
+        >>> # or use built-in example TLE text file
+        >>> ctrak_science = get_example_tles()
 
         >>> # Need to convert them to a list of tuples (each tuple consisting
         >>> # of the three TLE strings)
-        >>> tle_list = list(zip(*tuple(
-        ...     all_lines[idx::3] for idx in range(3)
-        ...     )))
+        >>> tle_list = cysgp4.tle_tuples_from_text(ctrak_science)
         >>> # Create an array of PyTle and PyObserver objects, and MJDs
         >>> tles = np.array([
         ...     PyTle(*tle) for tle in tle_list
@@ -76,8 +77,8 @@ different satellite TLEs, observers and times in a parallelized manner.
 
         >>> # The result is a dictionary
         >>> result = propagate_many(mjds, tles, observers)
-        >>> print(result.keys())
-        dict_keys(['eci_pos', 'eci_vel', 'geo', 'topo'])
+        >>> print(sorted(result.keys()))
+        ['eci_pos', 'eci_vel', 'geo', 'topo']
 
         >>> # Returned array shapes are as follows; last array dimension
         >>> # contains the coordinate pairs.
