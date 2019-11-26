@@ -12,10 +12,10 @@ pr:
 variables:
   package_name: cysgp4
   is.tag: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
-  do.dist: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
+  publish.wheels: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
   is.pullrequest: ${{ startsWith(variables['Build.Reason'], 'PullRequest') }}
   # is.tag: ${{ true }}
-  # do.dist: ${{ true }}
+  # publish.wheels: ${{ true }}
   # why is the following not working?
   is.linux: ${{ startsWith(variables['Agent.OS'], 'Linux') }}
   is.macos: ${{ startsWith(variables['Agent.OS'], 'Darwin') }}
@@ -47,12 +47,17 @@ jobs:
         python.version: '3.6'
         py_whl: 36
         numpy.version: '1.13.1'
-        publish.docs: ${{ eq(variables['is.pullrequest'], false) }}
+        # docs should only be published by one thread, as they are version-
+        # independent; and only if not on a PR
+        publish.docs: ${{ not(eq(variables['is.pullrequest'], true)) }}
         ${{ if eq(variables['is.tag'], true) }}:
           docs.target: '.'
         ${{ if eq(variables['is.tag'], false) }}:
           docs.target: 'latest'
-        do.tarball: ${{ eq(variables['is.tag'], true) }}
+        # tarball should only be published by one thread, as it is version-
+        # independent
+        build.tarball: ${{ true }}
+        publish.tarball: ${{ eq(variables['is.tag'], true) }}
       linux37:
         imageName: 'ubuntu-16.04'
         python.version: '3.7'
@@ -126,7 +131,7 @@ jobs:
       echo "publish.docs" $(publish.docs)
       echo "is.pullrequest" $(is.pullrequest)
       echo "docs.target" $(docs.target)
-      echo "do.dist" $(do.dist)
+      echo "publish.wheels" $(publish.wheels)
       echo "python.version" $(python.version)
       echo "py_whl" $(py_whl)
       echo "numpy.version" $(numpy.version)
@@ -204,13 +209,13 @@ jobs:
       cp wheelhouse/$(package_name)*.whl dist/.
       ls dist
     displayName: Build wheels, Linux
-    condition: and(succeeded(), eq(variables['do.dist'], true), startsWith(variables['Agent.OS'], 'Linux'))
+    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'))
 
   - script: |
       $(conda.activate) cysgp4-env
       python setup.py bdist_wheel
     displayName: Build wheels, MacOS/Windows
-    condition: and(succeeded(), eq(variables['do.dist'], true), not(startsWith(variables['Agent.OS'], 'Linux')))
+    condition: and(succeeded(), not(startsWith(variables['Agent.OS'], 'Linux')))
 
   # twine upload with python 3.5 doesn't work?
   # (pkg_resources.DistributionNotFound: The 'readme-renderer>=21.0' distribution was not found)
@@ -223,20 +228,25 @@ jobs:
       pip install twine
       python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH) dist/*.whl
     displayName: Upload wheels, Linux/MacOS
-    condition: and(succeeded(), eq(variables['do.dist'], true), not(startsWith(variables['Agent.OS'], 'Windows')))
+    condition: and(succeeded(), eq(variables['publish.wheels'], true), not(startsWith(variables['Agent.OS'], 'Windows')))
 
   - script: |
       pip install twine
       python -m twine upload -r "pypi" --config-file %PYPIRC_PATH% dist/*.whl
     displayName: Upload wheels, Windows
-    condition: and(succeeded(), eq(variables['do.dist'], true), startsWith(variables['Agent.OS'], 'Windows'))
+    condition: and(succeeded(), eq(variables['publish.wheels'], true), startsWith(variables['Agent.OS'], 'Windows'))
 
   - script: |
       $(conda.activate) cysgp4-env
       python setup.py sdist
+    displayName: Build tarball
+    condition: and(succeeded(), eq(variables['build.tarball'], true))
+
+  - script: |
+      $(conda.activate) cysgp4-env
       python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH) dist/*.tar.gz
     displayName: Upload tarball
-    condition: and(succeeded(), eq(variables['do.tarball'], true))
+    condition: and(succeeded(), eq(variables['publish.tarball'], true))
 
   - script: rm ~/.ssh/id_rsa || true
     displayName: 'Cleanup docs deploy key'
