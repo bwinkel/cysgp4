@@ -47,7 +47,7 @@ jobs:
         python.version: '3.6'
         py_whl: 36
         numpy.version: '1.13.1'
-        do.docs: ${{ true }}
+        publish.docs: ${{ eq(variables['is.pullrequest'], false) }}
         ${{ if eq(variables['is.tag'], true) }}:
           docs.target: '.'
         ${{ if eq(variables['is.tag'], false) }}:
@@ -123,7 +123,7 @@ jobs:
       echo "is.win" $(is.win) "/" ${{ variables['is.win'] }}
       echo "conda.activate" $(conda.activate)
       echo "is.tag" $(is.tag)
-      echo "do.docs" $(do.docs)
+      echo "publish.docs" $(publish.docs)
       echo "is.pullrequest" $(is.pullrequest)
       echo "docs.target" $(docs.target)
       echo "do.dist" $(do.dist)
@@ -166,13 +166,13 @@ jobs:
       conda install --yes --quiet --name cysgp4-env -c conda-forge astropy sphinx-astropy
       sphinx-build docs docs/_build/html -W -b html
     displayName: Make docs
-    condition: and(succeeded(), eq(variables['do.docs'], true))
+    condition: succeeded()
 
   - task: DownloadSecureFile@1
     inputs:
       secureFile: ghpages_deploy_key
     displayName: 'Get the deploy key'
-    condition: and(succeeded(), eq(variables['do.docs'], true), not(eq(variables['is.pullrequest'], true)))
+    condition: and(succeeded(), eq(variables['publish.docs'], true))
 
   - bash: |
       mkdir ~/.ssh && mv $DOWNLOADSECUREFILE_SECUREFILEPATH ~/.ssh/id_rsa
@@ -190,7 +190,7 @@ jobs:
       git add -A && git commit -m "Update docs  ***NO_CI***"
       bash ../retry.sh git push github
     displayName: Publish docs
-    condition: and(succeeded(), eq(variables['do.docs'], true), not(eq(variables['is.pullrequest'], true)))
+    condition: and(succeeded(), eq(variables['publish.docs'], true))
 
   - task: TwineAuthenticate@1
     inputs:
@@ -240,4 +240,4 @@ jobs:
 
   - script: rm ~/.ssh/id_rsa || true
     displayName: 'Cleanup docs deploy key'
-    condition: and(always(), eq(variables['do.docs'], true))
+    condition: and(always(), eq(variables['publish.docs'], true))
