@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>PyDateTime &#8212; cysgp4 v0.2.15</title>
+    <title>PyDateTime &#8212; cysgp4 v0.2.19.dev8+g9d25e70</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.2.15</a>
+	<a href="../index.html">cysgp4 v0.2.19.dev8+g9d25e70</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -173,6 +173,9 @@ properties and methods:</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.ticks" title="cysgp4.PyDateTime.ticks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ticks</span></code></a></p></td>
 <td><p>Ticks (see Class documentation).</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.tle_epoch" title="cysgp4.PyDateTime.tle_epoch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_epoch</span></code></a></p></td>
+<td><p>Datetime in TLE epoch format.</p></td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Methods Summary</p>
@@ -188,16 +191,19 @@ properties and methods:</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.from_ticks" title="cysgp4.PyDateTime.from_ticks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_ticks</span></code></a>(type cls, unsigned long long ticks)</p></td>
 <td><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from “ticks”.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.get_datetime_tuple" title="cysgp4.PyDateTime.get_datetime_tuple"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_datetime_tuple</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.from_tle_epoch" title="cysgp4.PyDateTime.from_tle_epoch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_tle_epoch</span></code></a>(type cls, double tle_epoch)</p></td>
+<td><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from TLE epoch format.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.get_datetime_tuple" title="cysgp4.PyDateTime.get_datetime_tuple"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_datetime_tuple</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.gmst" title="cysgp4.PyDateTime.gmst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gmst</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.gmst" title="cysgp4.PyDateTime.gmst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gmst</span></code></a>(self)</p></td>
 <td><p>Greenwhich mean sidereal time (GMST) of current date/time.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.lmst" title="cysgp4.PyDateTime.lmst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lmst</span></code></a>(self, obslon_deg)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.lmst" title="cysgp4.PyDateTime.lmst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lmst</span></code></a>(self, obslon_deg)</p></td>
 <td><p>Local mean sidereal time (LMST) of current date/time.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.set" title="cysgp4.PyDateTime.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(self, int year, int month, int day, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.set" title="cysgp4.PyDateTime.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(self, int year, int month, int day, …)</p></td>
 <td><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from given date and time.</p></td>
 </tr>
 </tbody>
@@ -219,6 +225,12 @@ properties and methods:</p>
 <dt id="cysgp4.PyDateTime.ticks">
 <code class="sig-name descname">ticks</code><a class="headerlink" href="#cysgp4.PyDateTime.ticks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ticks (see Class documentation).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyDateTime.tle_epoch">
+<code class="sig-name descname">tle_epoch</code><a class="headerlink" href="#cysgp4.PyDateTime.tle_epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Datetime in TLE epoch format. See also <code class="xref py py-obj docutils literal notranslate"><span class="pre">from_tle_epoch</span></code>.</p>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
@@ -276,6 +288,40 @@ which is the number of micro-seconds since 1. January 0001, 00:00.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span> <span class="o">=</span> <span class="n">PyDateTime</span><span class="o">.</span><span class="n">from_ticks</span><span class="p">(</span><span class="n">ticks</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span>
 <span class="go">&lt;PyDateTime: 1858-11-17 00:00:00.000000 UTC&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cysgp4.PyDateTime.from_tle_epoch">
+<code class="sig-name descname">from_tle_epoch</code><span class="sig-paren">(</span><em class="sig-param">type cls</em>, <em class="sig-param">double tle_epoch</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.from_tle_epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from TLE epoch format.</p>
+<p>Note: TLE epochs have a very strange format: first two digits are the
+year, next three digits are the day from beginning of year, then
+the fraction of a day is given, e.g. 20180.25 would be 2020, day 180,
+6 hours (probably UT as no timezone is mentioned). See also
+<a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">Wikipedia</a>
+or <a class="reference external" href="https://celestrak.com/columns/v04n03/">Celestrak</a>.</p>
+<p>Corresponding year must be between 1957 and 2056.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tle_epoch</strong><span class="classifier">double</span></dt><dd><p>Datetime in TLE epoch format.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>pydt</strong><span class="classifier"><a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> object</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>“from_tle_epoch” is a classmethod:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tle_epoch</span> <span class="o">=</span> <span class="mf">19050.1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span> <span class="o">=</span> <span class="n">PyDateTime</span><span class="o">.</span><span class="n">from_tle_epoch</span><span class="p">(</span><span class="n">tle_epoch</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span>
+<span class="go">&lt;PyDateTime: 2019-02-19 02:24:00.000000 UTC&gt;</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -372,7 +418,7 @@ which is the number of micro-seconds since 1. January 0001, 00:00.</p>
   <p>
     &copy; Copyright 2019, Benjamin Winkel.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
-    Last built 22 Nov 2019. <br/>
+    Last built 26 Nov 2019. <br/>
   </p>
 </footer>
   </body>

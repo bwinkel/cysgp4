@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>cysgp4 &#8212; cysgp4 v0.2.19.dev8+g9d25e70</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">cysgp4</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li>
+	<a href="../index.html">cysgp4 v0.2.19.dev8+g9d25e70</a>
+	 &#187;
+      </li>
+      <li><a href="index.html" accesskey="U">Module code</a> &#187;</li>
+      
+       
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cysgp4</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">.cysgp4</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.version</span> <span class="k">import</span> <span class="n">__version__</span>
+<span class="kn">from</span> <span class="nn">.init_testrunner</span> <span class="k">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="get_example_tles"><a class="viewcode-back" href="../api/cysgp4.get_example_tles.html#cysgp4.get_example_tles">[docs]</a><span class="k">def</span> <span class="nf">get_example_tles</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Return a text with example TLE entries for testing purposes.</span>
+
+<span class="sd">    The example is the content of the file &quot;science.txt&quot;, which was downloaded</span>
+<span class="sd">    from `Celestrak &lt;https://celestrak.com/&gt;`_ on Nov 25 2019.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tle_text : str</span>
+<span class="sd">        Text containing TLE line strings.</span>
+
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Use like this::</span>
+
+<span class="sd">        &gt;&gt;&gt; import cysgp4</span>
+
+<span class="sd">        &gt;&gt;&gt; tle_text = cysgp4.get_example_tles()</span>
+<span class="sd">        &gt;&gt;&gt; print(tle_text)</span>
+<span class="sd">        AKEBONO (EXOS-D)</span>
+<span class="sd">        1 19822U 89016A   19321.49921565  .00016421  94291-6  28704-3 0  9992</span>
+<span class="sd">        2 19822  75.0304 327.7460 1766579 276.4058  63.9734 12.00957719 13956</span>
+<span class="sd">        HST</span>
+<span class="sd">        1 20580U 90037B   19321.38711875  .00000471  00000-0  17700-4 0  9991</span>
+<span class="sd">        2 20580  28.4699 288.8102 0002495 321.7771 171.5855 15.092998654238</span>
+<span class="sd">        ...</span>
+<span class="sd">        ZHANGZHENG-1 (CSES)</span>
+<span class="sd">        1 43194U 18015C   19322.55091545  .00001006  00000-0  48427-4 0  9993</span>
+<span class="sd">        2 43194  97.4135  85.6925 0016973 127.3937   1.4087 15.20935646 99453</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="k">import</span> <span class="n">resource_stream</span>
+
+    <span class="k">with</span> <span class="n">resource_stream</span><span class="p">(</span><span class="s1">&#39;cysgp4&#39;</span><span class="p">,</span> <span class="s1">&#39;tests/data/science.txt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right"> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2019, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
+    Last built 26 Nov 2019. <br/>
+  </p>
+</footer>
+  </body>
+</html>

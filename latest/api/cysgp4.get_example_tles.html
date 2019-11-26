@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>get_example_tles &#8212; cysgp4 v0.2.19.dev8+g9d25e70</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="propagate_many" href="cysgp4.propagate_many.html" />
+    <link rel="prev" title="Cysgp4 user manual" href="../user_manual.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">cysgp4</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="cysgp4.propagate_many.html" title="propagate_many">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="../user_manual.html" title="Cysgp4 user manual">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">cysgp4 v0.2.19.dev8+g9d25e70</a>
+	 &#187;
+      </li>
+      <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
+      
+      <li>get_example_tles</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="get-example-tles">
+<h1>get_example_tles<a class="headerlink" href="#get-example-tles" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="cysgp4.get_example_tles">
+<code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">get_example_tles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cysgp4.html#get_example_tles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cysgp4.get_example_tles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a text with example TLE entries for testing purposes.</p>
+<p>The example is the content of the file “science.txt”, which was downloaded
+from <a class="reference external" href="https://celestrak.com/">Celestrak</a> on Nov 25 2019.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tle_text</strong><span class="classifier">str</span></dt><dd><p>Text containing TLE line strings.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Use like this:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cysgp4</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tle_text</span> <span class="o">=</span> <span class="n">cysgp4</span><span class="o">.</span><span class="n">get_example_tles</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">tle_text</span><span class="p">)</span>
+<span class="go">AKEBONO (EXOS-D)</span>
+<span class="go">1 19822U 89016A   19321.49921565  .00016421  94291-6  28704-3 0  9992</span>
+<span class="go">2 19822  75.0304 327.7460 1766579 276.4058  63.9734 12.00957719 13956</span>
+<span class="go">HST</span>
+<span class="go">1 20580U 90037B   19321.38711875  .00000471  00000-0  17700-4 0  9991</span>
+<span class="go">2 20580  28.4699 288.8102 0002495 321.7771 171.5855 15.092998654238</span>
+<span class="gp">...</span>
+<span class="go">ZHANGZHENG-1 (CSES)</span>
+<span class="go">1 43194U 18015C   19322.55091545  .00001006  00000-0  48427-4 0  9993</span>
+<span class="go">2 43194  97.4135  85.6925 0016973 127.3937   1.4087 15.20935646 99453</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">get_example_tles</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/cysgp4.get_example_tles.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2019, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
+    Last built 26 Nov 2019. <br/>
+  </p>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>tle_tuples_from_text &#8212; cysgp4 v0.2.19.dev8+g9d25e70</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="tles_from_text" href="cysgp4.tles_from_text.html" />
+    <link rel="prev" title="tle_linestrings_from_orbital_parameters" href="cysgp4.tle_linestrings_from_orbital_parameters.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">cysgp4</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="cysgp4.tles_from_text.html" title="tles_from_text">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="cysgp4.tle_linestrings_from_orbital_parameters.html" title="tle_linestrings_from_orbital_parameters">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">cysgp4 v0.2.19.dev8+g9d25e70</a>
+	 &#187;
+      </li>
+      <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
+      
+      <li>tle_tuples_from_text</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tle-tuples-from-text">
+<h1>tle_tuples_from_text<a class="headerlink" href="#tle-tuples-from-text" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="cysgp4.tle_tuples_from_text">
+<code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">tle_tuples_from_text</code><span class="sig-paren">(</span><em class="sig-param">unicode tle_text</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.tle_tuples_from_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split a text containing <a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">TLE strings</a> (including Name
+or ID, i.e., three lines per entry) into list of TLE tuples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tle_text</strong><span class="classifier">str</span></dt><dd><p>Text containing TLE line strings.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>tle_list</strong><span class="classifier">list of (str, str, str)</span></dt><dd><p>List of TLE tuples, each consisting of the line strings.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>An example text file with TLE strings is included in <code class="xref py py-obj docutils literal notranslate"><span class="pre">cysgp4</span></code>
+and can be parsed like this:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cysgp4</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tle_text</span> <span class="o">=</span> <span class="n">cysgp4</span><span class="o">.</span><span class="n">get_example_tles</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tle_tuples</span> <span class="o">=</span> <span class="n">cysgp4</span><span class="o">.</span><span class="n">tle_tuples_from_text</span><span class="p">(</span><span class="n">tle_text</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tle_tuples</span>
+<span class="go">[(&#39;AKEBONO (EXOS-D)        &#39;,</span>
+<span class="go">  &#39;1 19822U 89016A   19321.49921565  .00016421  94291-6  28704-3 0  9992&#39;,</span>
+<span class="go">  &#39;2 19822  75.0304 327.7460 1766579 276.4058  63.9734 12.00957719 13956&#39;),</span>
+<span class="go"> (&#39;HST                     &#39;,</span>
+<span class="go">  &#39;1 20580U 90037B   19321.38711875  .00000471  00000-0  17700-4 0  9991&#39;,</span>
+<span class="go">  &#39;2 20580  28.4699 288.8102 0002495 321.7771 171.5855 15.09299865423838&#39;),</span>
+<span class="gp">...</span>
+<span class="go"> (&#39;ZHANGZHENG-1 (CSES)     &#39;,</span>
+<span class="go">  &#39;1 43194U 18015C   19322.55091545  .00001006  00000-0  48427-4 0  9993&#39;,</span>
+<span class="go">  &#39;2 43194  97.4135  85.6925 0016973 127.3937   1.4087 15.20935646 99453&#39;)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">tle_tuples_from_text</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/cysgp4.tle_tuples_from_text.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2019, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
+    Last built 26 Nov 2019. <br/>
+  </p>
+</footer>
+  </body>
+</html>
