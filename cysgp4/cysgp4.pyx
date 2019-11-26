@@ -665,6 +665,116 @@ cdef class PyTle(object):
 
         return pydt
 
+    @property
+    def int_designator(self):
+        '''
+        Satellite's international designator.
+
+        First two digits is the (last two digits of the) launch year.
+        Next three digits are the launch number (in that year).
+        Last digit is the piece of the launch.
+        (see `TLEs on Wikipedia
+        <https://en.wikipedia.org/wiki/Two-line_element_set>`_)
+        '''
+
+        return self.thisptr.IntDesignator()
+
+    @property
+    def catalog_number(self):
+        '''
+        Satellite's (NORAD) catalog number.
+        '''
+
+        return self.thisptr.NoradNumber()
+
+    @property
+    def inclination(self):
+        '''
+        Satellite's inclination [deg].
+        '''
+
+        cdef bint in_degrees = True
+
+        return self.thisptr.Inclination(in_degrees)
+
+    @property
+    def raan(self):
+        '''
+        Satellite's right ascension of the ascending node (RAAN) [deg].
+        '''
+
+        cdef bint in_degrees = True
+
+        return self.thisptr.RightAscendingNode(in_degrees)
+
+    @property
+    def eccentricity(self):
+        '''
+        Satellite orbit's eccentricity [dimless].
+        '''
+
+        return self.thisptr.Eccentricity()
+
+    @property
+    def arg_perigee(self):
+        '''
+        Satellite's argument of perigee [deg].
+        '''
+
+        cdef bint in_degrees = True
+
+        return self.thisptr.ArgumentPerigee(in_degrees)
+
+    @property
+    def mean_anomaly(self):
+        '''
+        Satellite's mean anomaly [deg].
+        '''
+
+        cdef bint in_degrees = True
+
+        return self.thisptr.MeanAnomaly(in_degrees)
+
+    @property
+    def mean_motion(self):
+        '''
+        Satellite's mean motion [1 / day].
+        '''
+
+        return self.thisptr.MeanMotion()
+
+    @property
+    def rev_number(self):
+        '''
+        Satellite's revolution number at epoch (revolutions).
+        '''
+
+        return self.thisptr.OrbitNumber()
+
+    @property
+    def mean_motion_dt2(self):
+        '''
+        Satellite's first time derivative of the mean motion divided by two.
+        '''
+
+        return self.thisptr.MeanMotionDt2()
+
+    @property
+    def mean_motion_dt6(self):
+        '''
+        Satellite's second time derivative of mean motion divided by six.
+        '''
+
+        return self.thisptr.MeanMotionDdt6()
+
+    @property
+    def bstar(self):
+        '''
+        Satellite's BSTAR drag term.
+        '''
+
+        return self.thisptr.BStar()
+
 
 cdef class PyCoordGeodetic(object):
     '''
