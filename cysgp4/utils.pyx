@@ -256,7 +256,9 @@ cpdef tuple tle_linestrings_from_orbital_parameters(
 
     See `TLE line strings
     <https://en.wikipedia.org/wiki/Two-line_element_set>`_ for a description
-    of the two-line element format.
+    of the two-line element format. The parameters are the `Orbital/Keplarian
+    elements <https://en.wikipedia.org/wiki/Orbital_elements>`_ and Wikipedia
+    has a really good description what each of them means.
 
     Note: The epoch (date/time) used in TLEs has a very strange format: first
     two digits are the year, next three digits are the day from beginning of
