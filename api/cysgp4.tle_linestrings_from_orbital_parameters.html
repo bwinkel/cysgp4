@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>tle_linestrings_from_orbital_parameters &#8212; cysgp4 v0.2.19</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="tle_tuples_from_text" href="cysgp4.tle_tuples_from_text.html" />
+    <link rel="prev" title="tle_checksum" href="cysgp4.tle_checksum.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">cysgp4</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="cysgp4.tle_tuples_from_text.html" title="tle_tuples_from_text">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="cysgp4.tle_checksum.html" title="tle_checksum">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">cysgp4 v0.2.19</a>
+	 &#187;
+      </li>
+      <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
+      
+      <li>tle_linestrings_from_orbital_parameters</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tle-linestrings-from-orbital-parameters">
+<h1>tle_linestrings_from_orbital_parameters<a class="headerlink" href="#tle-linestrings-from-orbital-parameters" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="cysgp4.tle_linestrings_from_orbital_parameters">
+<code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">tle_linestrings_from_orbital_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.tle_linestrings_from_orbital_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate TLE strings from orbital parameters.</p>
+<p>See <a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">TLE line strings</a> for a description
+of the two-line element format.</p>
+<p>Note: The epoch (date/time) used in TLEs has a very strange format: first
+two digits are the year, next three digits are the day from beginning of
+year, then fraction of a day is given, e.g. 20180.25 would be 2020, day
+180, 6 hours (UTC).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sat_name</strong><span class="classifier">str</span></dt><dd><p>The satellite name.</p>
+</dd>
+<dt><strong>sat_nr</strong><span class="classifier">str</span></dt><dd><p>The satellite number.</p>
+</dd>
+<dt><strong>mjd_epoch</strong><span class="classifier">float</span></dt><dd><p>The epoch of the orbital parameters as MJD [day].
+The function will convert this to the TLE epoch format.</p>
+</dd>
+<dt><strong>inclination_deg</strong><span class="classifier">float</span></dt><dd><p>Inclination of the orbit [deg].</p>
+</dd>
+<dt><strong>raan_deg</strong><span class="classifier">float</span></dt><dd><p>Right ascension of the ascending node of the orbit [deg].</p>
+</dd>
+<dt><strong>mean_anomaly_deg</strong><span class="classifier">float</span></dt><dd><p>Mean anomaly of the node [deg].</p>
+</dd>
+<dt><strong>mean_motion_per_day</strong><span class="classifier">float</span></dt><dd><p>Mean motion of the satellite [1 / day].</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>mean_motion</strong><span class="classifier">double</span></dt><dd><p>Mean motion of satellite in revolutions per day [1 / day].</p>
+</dd>
+<dt><strong>tle_lines</strong><span class="classifier">(str, str, str)</span></dt><dd><p>TLE tuple of the satellite, consisting of the line strings.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>A simple use case would be like:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cysgp4</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define satellite orbital parameters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sat_name</span><span class="p">,</span> <span class="n">sat_nr</span> <span class="o">=</span> <span class="s1">&#39;MYSAT&#39;</span><span class="p">,</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alt_km</span> <span class="o">=</span> <span class="mf">3000.</span>  <span class="c1"># satellite altitude</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mean_motion</span> <span class="o">=</span> <span class="n">cysgp4</span><span class="o">.</span><span class="n">satellite_mean_motion</span><span class="p">(</span><span class="n">alt_km</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inclination</span> <span class="o">=</span> <span class="mf">10.</span>  <span class="c1"># deg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">raan</span> <span class="o">=</span> <span class="mf">35.</span>  <span class="c1"># deg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mean_anomaly</span> <span class="o">=</span> <span class="mf">112.</span>  <span class="c1"># deg</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># assume, the parameters are valid for the following time</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2019</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span> <span class="o">=</span> <span class="n">cysgp4</span><span class="o">.</span><span class="n">PyDateTime</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pydt</span>
+<span class="go">&lt;PyDateTime: 2019-11-02 02:05:14.000000 UTC&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mjd_epoch</span> <span class="o">=</span> <span class="n">pydt</span><span class="o">.</span><span class="n">mjd</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tle_tuple</span> <span class="o">=</span> <span class="n">cysgp4</span><span class="o">.</span><span class="n">tle_linestrings_from_orbital_parameters</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">sat_name</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">sat_nr</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">mjd_epoch</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">inclination</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">raan</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">mean_anomaly</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">mean_motion</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tle_tuple</span>
+<span class="go">(&#39;MYSAT&#39;,</span>
+<span class="go"> &#39;1 00001U 20001A   19306.08696759  .00000000  00000-0  50000-4 0    05&#39;,</span>
+<span class="go"> &#39;2 00001  10.0000  35.0000 0001000   0.0000 112.0000  9.55934723    04&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">tle_linestrings_from_orbital_parameters</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/cysgp4.tle_linestrings_from_orbital_parameters.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2019, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
+    Last built 27 Nov 2019. <br/>
+  </p>
+</footer>
+  </body>
+</html>

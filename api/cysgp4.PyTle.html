@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>PyTle &#8212; cysgp4 v0.2.18</title>
+    <title>PyTle &#8212; cysgp4 v0.2.19</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.2.18</a>
+	<a href="../index.html">cysgp4 v0.2.19</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -112,7 +112,7 @@ orbital parameters for use by other sgp4 routines.</p>
 <p>TLEs can be obtained from many sources, such as
 <a class="reference external" href="https://celestrak.com/">https://celestrak.com/</a>:</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">requests</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="k">import</span> <span class="n">PyTle</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="kn">import</span> <span class="n">PyTle</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://celestrak.com/NORAD/elements/science.txt&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ctrak_science</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -146,6 +146,54 @@ orbital parameters for use by other sgp4 routines.</p>
 <span class="go">Mean Motion:           15.09299865</span>
 </pre></div>
 </div>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyTle.arg_perigee" title="cysgp4.PyTle.arg_perigee"><code class="xref py py-obj docutils literal notranslate"><span class="pre">arg_perigee</span></code></a></p></td>
+<td><p>Satellite’s argument of perigee [deg].</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyTle.bstar" title="cysgp4.PyTle.bstar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bstar</span></code></a></p></td>
+<td><p>Satellite’s BSTAR drag term.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyTle.catalog_number" title="cysgp4.PyTle.catalog_number"><code class="xref py py-obj docutils literal notranslate"><span class="pre">catalog_number</span></code></a></p></td>
+<td><p>Satellite’s (NORAD) catalog number.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyTle.eccentricity" title="cysgp4.PyTle.eccentricity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eccentricity</span></code></a></p></td>
+<td><p>Satellite orbit’s eccentricity [dimless].</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyTle.epoch" title="cysgp4.PyTle.epoch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">epoch</span></code></a></p></td>
+<td><p>Epoch of the satellites TLE.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyTle.inclination" title="cysgp4.PyTle.inclination"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inclination</span></code></a></p></td>
+<td><p>Satellite’s inclination [deg].</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyTle.int_designator" title="cysgp4.PyTle.int_designator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int_designator</span></code></a></p></td>
+<td><p>Satellite’s international designator.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyTle.mean_anomaly" title="cysgp4.PyTle.mean_anomaly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_anomaly</span></code></a></p></td>
+<td><p>Satellite’s mean anomaly [deg].</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyTle.mean_motion" title="cysgp4.PyTle.mean_motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_motion</span></code></a></p></td>
+<td><p>Satellite’s mean motion [1 / day].</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyTle.mean_motion_dt2" title="cysgp4.PyTle.mean_motion_dt2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_motion_dt2</span></code></a></p></td>
+<td><p>Satellite’s first time derivative of the mean motion divided by two.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyTle.mean_motion_dt6" title="cysgp4.PyTle.mean_motion_dt6"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_motion_dt6</span></code></a></p></td>
+<td><p>Satellite’s second time derivative of mean motion divided by six.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyTle.raan" title="cysgp4.PyTle.raan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">raan</span></code></a></p></td>
+<td><p>Satellite’s right ascension of the ascending node (RAAN) [deg].</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyTle.rev_number" title="cysgp4.PyTle.rev_number"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rev_number</span></code></a></p></td>
+<td><p>Satellite’s revolution number at epoch (revolutions).</p></td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Methods Summary</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -158,6 +206,99 @@ orbital parameters for use by other sgp4 routines.</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="attribute">
+<dt id="cysgp4.PyTle.arg_perigee">
+<code class="sig-name descname">arg_perigee</code><a class="headerlink" href="#cysgp4.PyTle.arg_perigee" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satellite’s argument of perigee [deg].</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyTle.bstar">
+<code class="sig-name descname">bstar</code><a class="headerlink" href="#cysgp4.PyTle.bstar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satellite’s BSTAR drag term.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyTle.catalog_number">
+<code class="sig-name descname">catalog_number</code><a class="headerlink" href="#cysgp4.PyTle.catalog_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satellite’s (NORAD) catalog number.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyTle.eccentricity">
+<code class="sig-name descname">eccentricity</code><a class="headerlink" href="#cysgp4.PyTle.eccentricity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satellite orbit’s eccentricity [dimless].</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyTle.epoch">
+<code class="sig-name descname">epoch</code><a class="headerlink" href="#cysgp4.PyTle.epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Epoch of the satellites TLE.</p>
+<p>Note that TLEs get outdated quickly in which case, the orbit
+computations can have large errorbars.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>epoch</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyDateTime.html#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a></span></dt><dd><p>Epoch of the satellites TLE.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyTle.inclination">
+<code class="sig-name descname">inclination</code><a class="headerlink" href="#cysgp4.PyTle.inclination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satellite’s inclination [deg].</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyTle.int_designator">
+<code class="sig-name descname">int_designator</code><a class="headerlink" href="#cysgp4.PyTle.int_designator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satellite’s international designator.</p>
+<p>First two digits is the (last two digits of the) launch year.
+Next three digits are the launch number (in that year).
+Last digit is the piece of the launch.
+(see <a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">TLEs on Wikipedia</a>)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyTle.mean_anomaly">
+<code class="sig-name descname">mean_anomaly</code><a class="headerlink" href="#cysgp4.PyTle.mean_anomaly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satellite’s mean anomaly [deg].</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyTle.mean_motion">
+<code class="sig-name descname">mean_motion</code><a class="headerlink" href="#cysgp4.PyTle.mean_motion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satellite’s mean motion [1 / day].</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyTle.mean_motion_dt2">
+<code class="sig-name descname">mean_motion_dt2</code><a class="headerlink" href="#cysgp4.PyTle.mean_motion_dt2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satellite’s first time derivative of the mean motion divided by two.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyTle.mean_motion_dt6">
+<code class="sig-name descname">mean_motion_dt6</code><a class="headerlink" href="#cysgp4.PyTle.mean_motion_dt6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satellite’s second time derivative of mean motion divided by six.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyTle.raan">
+<code class="sig-name descname">raan</code><a class="headerlink" href="#cysgp4.PyTle.raan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satellite’s right ascension of the ascending node (RAAN) [deg].</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cysgp4.PyTle.rev_number">
+<code class="sig-name descname">rev_number</code><a class="headerlink" href="#cysgp4.PyTle.rev_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satellite’s revolution number at epoch (revolutions).</p>
+</dd></dl>
+
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="cysgp4.PyTle.tle_strings">
@@ -191,7 +332,7 @@ orbital parameters for use by other sgp4 routines.</p>
   <p>
     &copy; Copyright 2019, Benjamin Winkel.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
-    Last built 24 Nov 2019. <br/>
+    Last built 27 Nov 2019. <br/>
   </p>
 </footer>
   </body>

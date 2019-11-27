@@ -13,6 +13,7 @@ PyDateTime
       ~PyDateTime.datetime
       ~PyDateTime.mjd
       ~PyDateTime.ticks
+      ~PyDateTime.tle_epoch
 
    .. rubric:: Methods Summary
 
@@ -20,6 +21,7 @@ PyDateTime
 
       ~PyDateTime.from_mjd
       ~PyDateTime.from_ticks
+      ~PyDateTime.from_tle_epoch
       ~PyDateTime.get_datetime_tuple
       ~PyDateTime.gmst
       ~PyDateTime.lmst
@@ -30,11 +32,13 @@ PyDateTime
    .. autoattribute:: datetime
    .. autoattribute:: mjd
    .. autoattribute:: ticks
+   .. autoattribute:: tle_epoch
 
    .. rubric:: Methods Documentation
 
    .. automethod:: from_mjd
    .. automethod:: from_ticks
+   .. automethod:: from_tle_epoch
    .. automethod:: get_datetime_tuple
    .. automethod:: gmst
    .. automethod:: lmst

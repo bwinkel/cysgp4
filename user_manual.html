@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Cysgp4 user manual &#8212; cysgp4 v0.2.18</title>
+    <title>Cysgp4 user manual &#8212; cysgp4 v0.2.19</title>
     <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -19,7 +19,7 @@
     <link rel="shortcut icon" href="_static/astropy_logo.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="propagate_many" href="api/cysgp4.propagate_many.html" />
+    <link rel="next" title="get_example_tles" href="api/cysgp4.get_example_tles.html" />
     <link rel="prev" title="Cysgp4 quick tour" href="quick_tour.html" />
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
 
@@ -48,7 +48,7 @@
     <h3>Navigation</h3>
     <ul>
       <li class="right">
-	<a href="api/cysgp4.propagate_many.html" title="propagate_many">
+	<a href="api/cysgp4.get_example_tles.html" title="get_example_tles">
 	  next &raquo;
 	</a>
       </li>
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="index.html">cysgp4 v0.2.18</a>
+	<a href="index.html">cysgp4 v0.2.19</a>
 	 &#187;
       </li>
       
@@ -107,17 +107,36 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a>(mjds, tles[, observers])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.get_example_tles.html#cysgp4.get_example_tles" title="cysgp4.get_example_tles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_example_tles</span></code></a>()</p></td>
+<td><p>Return a text with example TLE entries for testing purposes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a>(mjds, tles[, observers])</p></td>
 <td><p>Calculate positions of many satellites at a various times at once.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.propagate_many_slow.html#cysgp4.propagate_many_slow" title="cysgp4.propagate_many_slow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many_slow</span></code></a>(mjds, tles[, observers])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.propagate_many_slow.html#cysgp4.propagate_many_slow" title="cysgp4.propagate_many_slow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many_slow</span></code></a>(mjds, tles[, observers])</p></td>
 <td><p>This is a slow (non-parallelized, Python-looping) version of <a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a> that is meant for testing and benchmarking only.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.satellite_mean_motion.html#cysgp4.satellite_mean_motion" title="cysgp4.satellite_mean_motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">satellite_mean_motion</span></code></a>()</p></td>
+<td><p>Mean motion of satellite at altitude in Earth’s gravitational field.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.set_num_threads.html#cysgp4.set_num_threads" title="cysgp4.set_num_threads"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_num_threads</span></code></a>(int nthreads)</p></td>
 <td><p>Change maximum number of threads to use.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.test.html#cysgp4.test" title="cysgp4.test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test</span></code></a>(\*\*kwargs)</p></td>
 <td><p>Run the tests for the package.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.tle_checksum.html#cysgp4.tle_checksum" title="cysgp4.tle_checksum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_checksum</span></code></a>()</p></td>
+<td><p>Compute checksum of a <a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">TLE line string</a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.tle_linestrings_from_orbital_parameters.html#cysgp4.tle_linestrings_from_orbital_parameters" title="cysgp4.tle_linestrings_from_orbital_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_linestrings_from_orbital_parameters</span></code></a>()</p></td>
+<td><p>Generate TLE strings from orbital parameters.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.tle_tuples_from_text.html#cysgp4.tle_tuples_from_text" title="cysgp4.tle_tuples_from_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_tuples_from_text</span></code></a>(unicode tle_text)</p></td>
+<td><p>Split a text containing <a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">TLE strings</a> (including Name or ID, i.e., three lines per entry) into list of TLE tuples.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.tles_from_text.html#cysgp4.tles_from_text" title="cysgp4.tles_from_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tles_from_text</span></code></a>(unicode tle_text)</p></td>
+<td><p><p>Parse a text containing <a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">TLE strings</a> (including Name or ID, i.e., three lines per entry) into list of <a class="reference internal" href="api/cysgp4.PyTle.html#cysgp4.PyTle" title="cysgp4.PyTle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTle</span></code></a> objects.</p>
+</p></td>
 </tr>
 </tbody>
 </table>
@@ -195,7 +214,7 @@
   <p>
     &copy; Copyright 2019, Benjamin Winkel.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
-    Last built 24 Nov 2019. <br/>
+    Last built 27 Nov 2019. <br/>
   </p>
 </footer>
   </body>

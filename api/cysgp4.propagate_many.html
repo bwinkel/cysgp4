@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>propagate_many &#8212; cysgp4 v0.2.18</title>
+    <title>propagate_many &#8212; cysgp4 v0.2.19</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="propagate_many_slow" href="cysgp4.propagate_many_slow.html" />
-    <link rel="prev" title="Cysgp4 user manual" href="../user_manual.html" />
+    <link rel="prev" title="get_example_tles" href="cysgp4.get_example_tles.html" />
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
 
   </head><body>
@@ -53,13 +53,13 @@
 	</a>
       </li>
       <li class="right">
-	<a href="../user_manual.html" title="Cysgp4 user manual">
+	<a href="cysgp4.get_example_tles.html" title="get_example_tles">
 	  &laquo; previous
 	</a>
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.2.18</a>
+	<a href="../index.html">cysgp4 v0.2.19</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -162,7 +162,7 @@ inputs <code class="xref py py-obj docutils literal notranslate"><span class="pr
 function:</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">requests</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="k">import</span> <span class="n">PyTle</span><span class="p">,</span> <span class="n">PyObserver</span><span class="p">,</span> <span class="n">propagate_many</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="kn">import</span> <span class="n">PyTle</span><span class="p">,</span> <span class="n">PyObserver</span><span class="p">,</span> <span class="n">propagate_many</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://celestrak.com/NORAD/elements/science.txt&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ctrak_science</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -227,7 +227,7 @@ function:</p>
   <p>
     &copy; Copyright 2019, Benjamin Winkel.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
-    Last built 24 Nov 2019. <br/>
+    Last built 27 Nov 2019. <br/>
   </p>
 </footer>
   </body>
