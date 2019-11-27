@@ -196,7 +196,8 @@ jobs:
       git checkout --track github/gh-pages
       # mkdir -p ./$DOCS_TARGET
       rsync -av ../docs/_build/html/ ${DOCS_TARGET}/
-      git add -A && git commit -m "Update docs  ***NO_CI***"
+      docs_version=$(python -c "import cysgp4; print(cysgp4.__version__)")
+      git add -A && git commit -m "Update docs for $docs_version ***NO_CI***"
       bash ../retry.sh git push github
     displayName: Publish docs
     condition: and(succeeded(), eq(variables['publish.docs'], true))
