@@ -1,5 +1,14 @@
-0.2.19 (unreleased)
+0.2.20 (unreleased)
 =======================
+
+0.2.19 (2019-11-27)
+=======================
+
+New Features
+------------
+- Add two example tutorial notebooks.
+- Introduce several helper/utitlity functions, e.g. to create your own TLEs
+  from orbital parameters.
 
 Bugfixes
 ~~~~~~~~~~
