@@ -1633,20 +1633,14 @@ def propagate_many(
     The following demonstrates how to use the `~cysgp4.propagate_many`
     function::
 
-        >>> import requests
         >>> import numpy as np
         >>> from cysgp4 import PyTle, PyObserver, propagate_many
+        >>> from cysgp4 import get_example_tles, tles_from_text
 
-        >>> url = 'http://celestrak.com/NORAD/elements/science.txt'
-        >>> ctrak_science = requests.get(url)
-        >>> all_lines = ctrak_science.text.split('\\r\\n')
-
-        >>> tle_list = list(zip(*tuple(
-        ...     all_lines[idx::3] for idx in range(3)
-        ...     )))
-        >>> tles = np.array([
-        ...     PyTle(*tle) for tle in tle_list
-        ...     ])[np.newaxis, np.newaxis, :20]  # use first 20 TLEs
+        >>> tle_text = cysgp4.get_example_tles()
+        >>> tles = np.array(
+        ...     tles_from_text(tle_text)
+        ...     )[np.newaxis, np.newaxis, :20]  # use first 20 TLEs
         >>> observers = np.array([
         ...     PyObserver(6.88375, 50.525, 0.366),
         ...     PyObserver(16.88375, 50.525, 0.366),
@@ -1656,8 +1650,8 @@ def propagate_many(
         ...     )[:, np.newaxis, np.newaxis]
 
         >>> result = propagate_many(mjds, tles, observers)
-        >>> print(result.keys())
-        dict_keys(['eci_pos', 'eci_vel', 'geo', 'topo'])
+        >>> print(sorted(result.keys()))
+        ['eci_pos', 'eci_vel', 'geo', 'topo']
 
         >>> # shapes are as follows
         >>> print(np.broadcast(mjds, tles, observers).shape)
@@ -1669,8 +1663,8 @@ def propagate_many(
         ...     mjds, tles, observers,
         ...     do_eci_pos=False, do_eci_vel=False, do_geo=False, do_topo=True
         ...     )
-        >>> print(result.keys())
-        dict_keys(['topo'])
+        >>> print(sorted(result.keys()))
+        ['topo']
 
     '''
 
