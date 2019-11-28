@@ -72,7 +72,7 @@ ctypedef Observer* obs_ptr_t
 __all__ = [
     'PyDateTime', 'PyTle', 'PyObserver',
     'PyCoordGeodetic', 'PyCoordTopocentric', 'PyEci',
-    'Satellite', 'propagate_many', 'propagate_many_slow', 'set_num_threads',
+    'Satellite', 'propagate_many', 'set_num_threads',
     ]
 
 
@@ -1816,111 +1816,6 @@ def propagate_many(
 
         array_delete(_tle_ptr_array)
         array_delete(_obs_ptr_array)
-
-    result = {}
-
-    n = 3
-    if do_eci_pos:
-        result['eci_pos'] = it.operands[n]
-        n += 1
-
-    if do_eci_vel:
-        result['eci_vel'] = it.operands[n]
-        n += 1
-
-    if do_geo:
-        result['geo'] = it.operands[n]
-        n += 1
-
-    if do_topo:
-        result['topo'] = it.operands[n]
-        n += 1
-
-    return result
-
-
-def propagate_many_slow(
-        mjds, tles, observers=None,
-        bint do_eci_pos=True, bint do_eci_vel=True,
-        bint do_geo=True, bint do_topo=True,
-        str on_error='raise',
-        ):
-    '''
-    This is a slow (non-parallelized, Python-looping) version of
-    `~cysgp4.propagate_many` that is meant for testing and benchmarking
-    only. It has the same interface.
-    '''
-
-    assert on_error in ['raise', 'coerce_to_nan']
-
-    pnum = 0
-    out_dts = []
-    if do_eci_pos:
-        out_dts.append(np.dtype(('float64', 3)))
-        pnum += 1
-    if do_eci_vel:
-        out_dts.append(np.dtype(('float64', 3)))
-        pnum += 1
-    if do_geo:
-        out_dts.append(np.dtype(('float64', 3)))
-        pnum += 1
-    if do_topo:
-        out_dts.append(np.dtype(('float64', 4)))
-        pnum += 1
-
-    it = np.nditer(
-        [tles, observers, mjds] + [None] * pnum,
-        flags=['external_loop', 'buffered', 'delay_bufalloc', 'refs_ok'],
-        op_flags=[['readonly']] * 3 + [['readwrite', 'allocate']] * pnum,
-        op_dtypes=['object', 'object', 'float64'] + out_dts
-        )
-
-    it.reset()
-    for itup in it:
-
-        tle = itup[0]
-        obs = itup[1]
-        mjd = itup[2]
-
-        size = mjd.shape[0]
-        for i in range(size):
-
-            sat = Satellite(
-                tle[i], obs[i], PyDateTime.from_mjd(mjd[i]),
-                on_error=on_error
-                )
-            eci = sat.eci_pos()
-
-            eci_pos_x, eci_pos_y, eci_pos_z = eci.loc
-            eci_vel_x, eci_vel_y, eci_vel_z = eci.vel
-
-            n = 3
-            if do_eci_pos:
-                itup[n][i][0] = eci_pos_x
-                itup[n][i][1] = eci_pos_y
-                itup[n][i][2] = eci_pos_z
-                n += 1
-
-            if do_eci_vel:
-                itup[n][i][0] = eci_vel_x
-                itup[n][i][1] = eci_vel_y
-                itup[n][i][2] = eci_vel_z
-                n += 1
-
-            if do_geo:
-                geo_pos = sat.geo_pos()
-                itup[n][i][0] = geo_pos.lon
-                itup[n][i][1] = geo_pos.lat
-                itup[n][i][2] = geo_pos.alt
-                n += 1
-
-            if do_topo:
-                topo_pos = sat.topo_pos()
-                itup[n][i][0] = topo_pos.az
-                itup[n][i][1] = topo_pos.el
-                itup[n][i][2] = topo_pos.dist
-                itup[n][i][3] = topo_pos.dist_rate
-                n += 1
 
     result = {}
 
