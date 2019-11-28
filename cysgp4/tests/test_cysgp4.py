@@ -7,12 +7,15 @@ import os
 import pytest
 import datetime
 import numpy as np
-from sgp4.earth_gravity import wgs72
-from sgp4.io import twoline2rv
 from numpy.testing import assert_equal, assert_allclose
 from cysgp4 import *
 
 
+# skip over sgp4 related tests, if not package present:
+skip_sgp4 = pytest.mark.skipif(
+    importlib.util.find_spec('sgp4') is None,
+    reason='"pycraf" package not installed'
+    )
 # skip over pycraf related tests, if not package present:
 skip_pycraf = pytest.mark.skipif(
     importlib.util.find_spec('pycraf') is None,
@@ -331,11 +334,6 @@ class TestSatellite:
         self.effbg_tup_m = (6.88375, 50.525, 366.)
         self.effbg_observer = PyObserver(*self.effbg_tup)
 
-        self.sat2 = twoline2rv(self.tle_tup[1], self.tle_tup[2], wgs72)
-        self.pos2, self.vel2 = self.sat2.propagate(
-            *self.dt_tup[:-2], self.dt_tup[-2] + self.dt_tup[-1] / 1e6
-            )
-
     def teardown(self):
 
         pass
@@ -392,9 +390,7 @@ class TestSatellite:
         eci_pos = sat.eci_pos()
 
         print(eci_pos.loc)
-        print(self.pos2)
         print(eci_pos.vel)
-        print(self.vel2)
 
         assert_allclose(
             eci_pos.loc, (-4728.184444, 730.892025, 4802.515276)
@@ -402,8 +398,6 @@ class TestSatellite:
         assert_allclose(
             eci_pos.vel, (1.530454442, -7.065375488, 2.574384704)
             )
-        assert_allclose(eci_pos.loc, self.pos2, atol=1e-2)
-        assert_allclose(eci_pos.vel, self.vel2, atol=1e-5)
 
     def test_geo_position(self):
 
@@ -434,6 +428,28 @@ class TestSatellite:
             (topo_pos.az, topo_pos.el, topo_pos.dist),
             (334.789646, -37.384929, 8406.367773)
             )
+
+    @skip_sgp4
+    def test_eci_position_vs_sgp4(self):
+
+        from sgp4.earth_gravity import wgs72
+        from sgp4.io import twoline2rv
+
+        sat2 = twoline2rv(self.tle_tup[1], self.tle_tup[2], wgs72)
+        pos2, vel2 = sat2.propagate(
+            *self.dt_tup[:-2], self.dt_tup[-2] + self.dt_tup[-1] / 1e6
+            )
+
+        sat = Satellite(self.tle, self.effbg_observer, self.pydt)
+        eci_pos = sat.eci_pos()
+
+        print(eci_pos.loc)
+        print(pos2)
+        print(eci_pos.vel)
+        print(vel2)
+
+        assert_allclose(eci_pos.loc, pos2, atol=1e-2)
+        assert_allclose(eci_pos.vel, vel2, atol=1e-5)
 
     @skip_pycraf
     def test_topo_position_vs_pycraf(self):

@@ -1,4 +1,7 @@
-0.2.21 (unreleased)
+0.3.1 (unreleased)
+=======================
+
+0.3.0 (2019-11-28)
 =======================
 Add a benchmark section to the User Manual.
 

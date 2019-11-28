@@ -3,8 +3,6 @@
 
 from pkg_resources import resource_stream
 import numpy as np
-from sgp4.earth_gravity import wgs72
-from sgp4.io import twoline2rv
 from .cysgp4 import PyDateTime, Satellite, PyObserver
 
 
@@ -175,6 +173,17 @@ def propagate_many_sgp4(
 
     Note: `sgp4 <https://pypi.org/project/sgp4/>`_ Package by Brandon Rhodes
     '''
+
+    try:
+        from sgp4.earth_gravity import wgs72
+        from sgp4.io import twoline2rv
+    except ImportError as e:
+        import warnings
+        warnings.warn('''
+            Package sgp4 needed to use this function. Can install with
+            "pip install sgp4" or "conda install -c conda-forge sgp4".
+            ''')
+        raise e
 
     if observers is None:
         observers = PyObserver()
