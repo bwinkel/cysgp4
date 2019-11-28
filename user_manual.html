@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Cysgp4 user manual &#8212; cysgp4 v0.2.20</title>
+    <title>Cysgp4 user manual &#8212; cysgp4 v0.3.0</title>
     <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="index.html">cysgp4 v0.2.20</a>
+	<a href="index.html">cysgp4 v0.3.0</a>
 	 &#187;
       </li>
       
@@ -99,7 +99,7 @@ TLEs and observing times and make use of multi-core platforms (via <a class="ref
 contains some higher-level functions, which make it possible to bulk-process
 satellite orbits with few lines of code.</p>
 <div class="section" id="option-1-c-sgp4-library-wrapper">
-<h3>Option 1: C++ SGP4 library wrapper<a class="headerlink" href="#option-1-c-sgp4-library-wrapper" title="Permalink to this headline">¶</a></h3>
+<span id="wrapped-approach-label"></span><h3>Option 1: C++ SGP4 library wrapper<a class="headerlink" href="#option-1-c-sgp4-library-wrapper" title="Permalink to this headline">¶</a></h3>
 <p>The package provides the following Classes.</p>
 <div class="section" id="pydatetime">
 <h4>PyDateTime<a class="headerlink" href="#pydatetime" title="Permalink to this headline">¶</a></h4>
@@ -327,8 +327,7 @@ between the satellite and the observer. However,
 and distance rate parameters, but contains no information on the
 observer. It is only useful in conjuction with a <a class="reference internal" href="api/cysgp4.PyObserver.html#cysgp4.PyObserver" title="cysgp4.PyObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyObserver</span></code></a> (
 which holds a reference to a geographic location) and a datetime; see
-also the description in <a class="reference internal" href="api/cysgp4.Satellite.html#cysgp4.Satellite" title="cysgp4.Satellite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Satellite</span></code></a> TODO: REF to “Satellite
-interface”.</p>
+also the discussion of <a class="reference internal" href="api/cysgp4.Satellite.html#cysgp4.Satellite" title="cysgp4.Satellite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Satellite</span></code></a> here: <a class="reference internal" href="#satellite-label"><span class="std std-ref">Satellite interface</span></a>.</p>
 </div>
 <p>Constructing and using a <a class="reference internal" href="api/cysgp4.PyCoordTopocentric.html#cysgp4.PyCoordTopocentric" title="cysgp4.PyCoordTopocentric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyCoordTopocentric</span></code></a> object is
 straightforward:</p>
@@ -378,7 +377,7 @@ and internally it is always set to zero.</p>
 satellite orbit calculation.</p>
 </div>
 <div class="section" id="satellite-interface">
-<h4>Satellite interface<a class="headerlink" href="#satellite-interface" title="Permalink to this headline">¶</a></h4>
+<span id="satellite-label"></span><h4>Satellite interface<a class="headerlink" href="#satellite-interface" title="Permalink to this headline">¶</a></h4>
 <p>With the <a class="reference internal" href="api/cysgp4.Satellite.html#cysgp4.Satellite" title="cysgp4.Satellite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Satellite</span></code></a> class, one can calculate positions of a
 satellite at given times. Here, the satellite is defined via an TLE (see
 <a class="reference internal" href="api/cysgp4.PyTle.html#cysgp4.PyTle" title="cysgp4.PyTle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTle</span></code></a>). Furthermore, to be able to calculate apparent positions of
@@ -512,7 +511,84 @@ axis). The broadcasted input arrays form the first axes of the output:</p>
 </div>
 <div class="section" id="benchmarks">
 <h2>Benchmarks<a class="headerlink" href="#benchmarks" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<p>Because we make use of <a class="reference external" href="https://www.cython.org">Cython</a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">cysgp4</span></code> turns out to be really fast. In
+the following, a few benchmarks are run. First, it should be mentioned that
+<a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a> will utilize all CPU cores that are available on
+your system. It is possible to change that by calling:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_cores</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cysgp4</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">num_cores</span><span class="p">)</span>  <span class="c1"># set desired number of cores</span>
+</pre></div>
+</div>
+<p>With the Python <a class="reference external" href="https://docs.python.org/3/library/timeit.html#module-timeit" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timeit</span></code></a> package, it is possible to do some speed testing.
+We can also try out, how well the parallelization is working:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cysgp4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">timeit</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">prepare_arrays</span><span class="p">():</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="n">tle_text</span> <span class="o">=</span> <span class="n">cysgp4</span><span class="o">.</span><span class="n">get_example_tles</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">tles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cysgp4</span><span class="o">.</span><span class="n">tles_from_text</span><span class="p">(</span><span class="n">tle_text</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="n">observers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+<span class="gp">... </span>        <span class="n">cysgp4</span><span class="o">.</span><span class="n">PyObserver</span><span class="p">(</span><span class="mf">6.88375</span><span class="p">,</span> <span class="mf">50.525</span><span class="p">,</span> <span class="mf">0.366</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="n">cysgp4</span><span class="o">.</span><span class="n">PyObserver</span><span class="p">(</span><span class="mf">16.88375</span><span class="p">,</span> <span class="mf">50.525</span><span class="p">,</span> <span class="mf">0.366</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="p">])</span>
+<span class="gp">... </span>    <span class="n">mjds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">58805.5</span><span class="p">,</span> <span class="mf">58806.5</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>  <span class="c1"># 1000 time steps</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="p">(</span>
+<span class="gp">... </span>        <span class="n">mjds</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="n">tles</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:],</span>
+<span class="gp">... </span>        <span class="n">observers</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mjds</span><span class="p">,</span> <span class="n">tles</span><span class="p">,</span> <span class="n">observers</span> <span class="o">=</span> <span class="n">prepare_arrays</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">num_cores</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">]:</span>  
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="n">cysgp4</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">num_cores</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">run_times</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="s1">&#39;cysgp4.propagate_many(mjds, tles, observers)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># do 3 repeats, 10 runs each</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:2d}</span><span class="s1"> cores: </span><span class="si">{:.2f}</span><span class="s1"> seconds (best of three)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<span class="gp">... </span>          <span class="n">num_cores</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">run_times</span><span class="p">)))</span>
+<span class="go"> 1 cores: 7.16 seconds (best of three)</span>
+<span class="go"> 2 cores: 3.63 seconds (best of three)</span>
+<span class="go"> 4 cores: 1.86 seconds (best of three)</span>
+<span class="go"> 8 cores: 0.99 seconds (best of three)</span>
+<span class="go">16 cores: 0.58 seconds (best of three)</span>
+</pre></div>
+</div>
+<p>How does this relate to using Python for-loops with the wrapped classes (see
+<a class="reference internal" href="#wrapped-approach-label"><span class="std std-ref">Option 1: C++ SGP4 library wrapper</span></a>)? There is a function,
+<a class="reference internal" href="api/cysgp4.propagate_many_slow.html#cysgp4.propagate_many_slow" title="cysgp4.propagate_many_slow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many_slow</span></code></a> that does exactly that and is merely included
+in the package for benchmarking. You can see its <a class="reference external" href="_modules/cysgp4/helpers.html#propagate_many_slow">source code here</a>. We can compare this to the faster
+routine like this:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">run_times</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span>  
+<span class="gp">... </span>    <span class="s1">&#39;cysgp4.propagate_many_slow(mjds, tles, observers)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># do 3 repeats, 10 runs each</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;slow version: </span><span class="si">{:.2f}</span><span class="s1"> seconds (best of three)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<span class="gp">... </span>      <span class="nb">min</span><span class="p">(</span><span class="n">run_times</span><span class="p">)))</span>  
+<span class="go">slow version: 74.94 seconds (best of three)</span>
+</pre></div>
+</div>
+<p>Last but not least, we are interested in a comparison with the well-known
+<a class="reference external" href="https://pypi.org/project/sgp4/">sgp4</a> Python package (by Brandon Rhodes). Again, for the sole purpose of
+benchmarking, a function was added, which uses <a class="reference external" href="https://pypi.org/project/sgp4/">sgp4</a> but has the same
+interface as <a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a>. The source code of
+<a class="reference internal" href="api/cysgp4.propagate_many_sgp4.html#cysgp4.propagate_many_sgp4" title="cysgp4.propagate_many_sgp4"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many_sgp4</span></code></a> is available in the <a class="reference external" href="_modules/cysgp4/helpers.html#propagate_many_sgp4">manual</a>, as well. Here are the results:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">run_times</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span>  
+<span class="gp">... </span>    <span class="s1">&#39;cysgp4.propagate_many_sgp4(mjds, tles, observers)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># do 3 repeats, 10 runs each</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sgp4 version: </span><span class="si">{:.2f}</span><span class="s1"> seconds (best of three)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<span class="gp">... </span>      <span class="nb">min</span><span class="p">(</span><span class="n">run_times</span><span class="p">)))</span>  
+<span class="go">sgp4 version: 236.46 seconds (best of three)</span>
+</pre></div>
+</div>
+<p>As you can see, there is some significant speed-up to be gained.</p>
 </div>
 <div class="section" id="see-also">
 <h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
@@ -542,28 +618,31 @@ axis). The broadcasted input arrays form the first axes of the output:</p>
 <tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a>(mjds, tles[, observers])</p></td>
 <td><p>Calculate positions of many satellites at a various times at once.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.propagate_many_slow.html#cysgp4.propagate_many_slow" title="cysgp4.propagate_many_slow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many_slow</span></code></a>(mjds, tles[, observers])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.propagate_many_sgp4.html#cysgp4.propagate_many_sgp4" title="cysgp4.propagate_many_sgp4"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many_sgp4</span></code></a>(mjds, tles[, observers, …])</p></td>
+<td><p>This is an <a class="reference external" href="https://pypi.org/project/sgp4/">sgp4</a>-based variant (non-parallelized, Python-looping) of <a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a> that is meant for testing and benchmarking only.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.propagate_many_slow.html#cysgp4.propagate_many_slow" title="cysgp4.propagate_many_slow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many_slow</span></code></a>(mjds, tles[, observers, …])</p></td>
 <td><p>This is a slow (non-parallelized, Python-looping) version of <a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a> that is meant for testing and benchmarking only.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.satellite_mean_motion.html#cysgp4.satellite_mean_motion" title="cysgp4.satellite_mean_motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">satellite_mean_motion</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.satellite_mean_motion.html#cysgp4.satellite_mean_motion" title="cysgp4.satellite_mean_motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">satellite_mean_motion</span></code></a>()</p></td>
 <td><p>Mean motion of satellite at altitude in Earth’s gravitational field.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.set_num_threads.html#cysgp4.set_num_threads" title="cysgp4.set_num_threads"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_num_threads</span></code></a>(int nthreads)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.set_num_threads.html#cysgp4.set_num_threads" title="cysgp4.set_num_threads"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_num_threads</span></code></a>(int nthreads)</p></td>
 <td><p>Change maximum number of threads to use.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.test.html#cysgp4.test" title="cysgp4.test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test</span></code></a>(\*\*kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.test.html#cysgp4.test" title="cysgp4.test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test</span></code></a>(\*\*kwargs)</p></td>
 <td><p>Run the tests for the package.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.tle_checksum.html#cysgp4.tle_checksum" title="cysgp4.tle_checksum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_checksum</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.tle_checksum.html#cysgp4.tle_checksum" title="cysgp4.tle_checksum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_checksum</span></code></a>()</p></td>
 <td><p>Compute checksum of a <a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">TLE line string</a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.tle_linestrings_from_orbital_parameters.html#cysgp4.tle_linestrings_from_orbital_parameters" title="cysgp4.tle_linestrings_from_orbital_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_linestrings_from_orbital_parameters</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.tle_linestrings_from_orbital_parameters.html#cysgp4.tle_linestrings_from_orbital_parameters" title="cysgp4.tle_linestrings_from_orbital_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_linestrings_from_orbital_parameters</span></code></a>()</p></td>
 <td><p>Generate TLE strings from orbital parameters.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.tle_tuples_from_text.html#cysgp4.tle_tuples_from_text" title="cysgp4.tle_tuples_from_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_tuples_from_text</span></code></a>(unicode tle_text)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.tle_tuples_from_text.html#cysgp4.tle_tuples_from_text" title="cysgp4.tle_tuples_from_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_tuples_from_text</span></code></a>(unicode tle_text)</p></td>
 <td><p>Split a text containing <a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">TLE strings</a> (including Name or ID, i.e., three lines per entry) into list of TLE tuples.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.tles_from_text.html#cysgp4.tles_from_text" title="cysgp4.tles_from_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tles_from_text</span></code></a>(unicode tle_text)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.tles_from_text.html#cysgp4.tles_from_text" title="cysgp4.tles_from_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tles_from_text</span></code></a>(unicode tle_text)</p></td>
 <td><p><p>Parse a text containing <a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">TLE strings</a> (including Name or ID, i.e., three lines per entry) into list of <a class="reference internal" href="api/cysgp4.PyTle.html#cysgp4.PyTle" title="cysgp4.PyTle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTle</span></code></a> objects.</p>
 </p></td>
 </tr>
@@ -650,13 +729,14 @@ axis). The broadcasted input arrays form the first axes of the output:</p>
     </div>
 <footer class="footer">
   <p class="pull-right">
+    <a href="https://github.com/bwinkel/cysgp4/tree/v0.3.0/docs/user_manual.rst">Edit This Page on Github</a> &nbsp;
     <a href="_sources/user_manual.rst.txt"
        rel="nofollow">Page Source</a> &nbsp;
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2019, Benjamin Winkel.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
-    Last built 27 Nov 2019. <br/>
+    Last built 28 Nov 2019. <br/>
   </p>
 </footer>
   </body>

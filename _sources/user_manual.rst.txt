@@ -37,6 +37,9 @@ The Python package `~cysgp4` provides a relatively thin wrapper around the
 contains some higher-level functions, which make it possible to bulk-process
 satellite orbits with few lines of code.
 
+
+.. _wrapped-approach-label:
+
 Option 1: C++ SGP4 library wrapper
 ----------------------------------
 
@@ -271,8 +274,7 @@ rate).
     and distance rate parameters, but contains no information on the
     observer. It is only useful in conjuction with a `~cysgp4.PyObserver` (
     which holds a reference to a geographic location) and a datetime; see
-    also the description in `~cysgp4.Satellite` TODO: REF to "Satellite
-    interface".
+    also the discussion of `~cysgp4.Satellite` here: :ref:`satellite-label`.
 
 Constructing and using a `~cysgp4.PyCoordTopocentric` object is
 straightforward::
@@ -321,6 +323,8 @@ Using `~cysgp4.PyObserver` is similar to working with
 
 We will see in the next section, how the observer interplays with the
 satellite orbit calculation.
+
+.. _satellite-label:
 
 Satellite interface
 ^^^^^^^^^^^^^^^^^^^
@@ -460,7 +464,87 @@ axis). The broadcasted input arrays form the first axes of the output::
 Benchmarks
 ==========
 
-TODO
+Because we make use of `Cython`_, `~cysgp4` turns out to be really fast. In
+the following, a few benchmarks are run. First, it should be mentioned that
+`~cysgp4.propagate_many` will utilize all CPU cores that are available on
+your system. It is possible to change that by calling::
+
+    >>> num_cores = 1
+    >>> cysgp4.set_num_threads(num_cores)  # set desired number of cores
+
+With the Python `~timeit` package, it is possible to do some speed testing.
+We can also try out, how well the parallelization is working::
+
+    >>> import numpy as np
+    >>> import cysgp4
+    >>> import timeit
+
+    >>> def prepare_arrays():
+    ...
+    ...     tle_text = cysgp4.get_example_tles()
+    ...     tles = np.array(cysgp4.tles_from_text(tle_text))
+    ...     observers = np.array([
+    ...         cysgp4.PyObserver(6.88375, 50.525, 0.366),
+    ...         cysgp4.PyObserver(16.88375, 50.525, 0.366),
+    ...         ])
+    ...     mjds = np.linspace(58805.5, 58806.5, 1000)  # 1000 time steps
+    ...
+    ...     return (
+    ...         mjds[:, np.newaxis, np.newaxis],
+    ...         tles[np.newaxis, np.newaxis, :],
+    ...         observers[np.newaxis, :, np.newaxis],
+    ...         )
+
+    >>> mjds, tles, observers = prepare_arrays()
+
+    >>> for num_cores in [1, 2, 4, 8, 16]:  # doctest: +SKIP
+    ...
+    ...     cysgp4.set_num_threads(num_cores)
+    ...     run_times = timeit.Timer(
+    ...         'cysgp4.propagate_many(mjds, tles, observers)',
+    ...         globals=globals()
+    ...         ).repeat(3, number=10)  # do 3 repeats, 10 runs each
+    ...
+    ...     print('{:2d} cores: {:.2f} seconds (best of three)'.format(
+    ...           num_cores, min(run_times)))
+     1 cores: 7.16 seconds (best of three)
+     2 cores: 3.63 seconds (best of three)
+     4 cores: 1.86 seconds (best of three)
+     8 cores: 0.99 seconds (best of three)
+    16 cores: 0.58 seconds (best of three)
+
+How does this relate to using Python for-loops with the wrapped classes (see
+:ref:`wrapped-approach-label`)? There is a function,
+`~cysgp4.propagate_many_slow` that does exactly that and is merely included
+in the package for benchmarking. You can see its `source code here <_modules/
+cysgp4/helpers.html#propagate_many_slow>`_. We can compare this to the faster
+routine like this::
+
+    >>> run_times = timeit.Timer(  # doctest: +SKIP
+    ...     'cysgp4.propagate_many_slow(mjds, tles, observers)',
+    ...     globals=globals()
+    ...     ).repeat(3, number=10)  # do 3 repeats, 10 runs each
+    >>> print('slow version: {:.2f} seconds (best of three)'.format(
+    ...       min(run_times)))  # doctest: +SKIP
+    slow version: 74.94 seconds (best of three)
+
+Last but not least, we are interested in a comparison with the well-known
+`sgp4`_ Python package (by Brandon Rhodes). Again, for the sole purpose of
+benchmarking, a function was added, which uses `sgp4`_ but has the same
+interface as `~cysgp4.propagate_many`. The source code of
+`~cysgp4.propagate_many_sgp4` is available in the `manual <_modules/
+cysgp4/helpers.html#propagate_many_sgp4>`_, as well. Here are the results::
+
+    >>> run_times = timeit.Timer(  # doctest: +SKIP
+    ...     'cysgp4.propagate_many_sgp4(mjds, tles, observers)',
+    ...     globals=globals()
+    ...     ).repeat(3, number=10)  # do 3 repeats, 10 runs each
+    >>> print('sgp4 version: {:.2f} seconds (best of three)'.format(
+    ...       min(run_times)))  # doctest: +SKIP
+    sgp4 version: 236.46 seconds (best of three)
+
+As you can see, there is some significant speed-up to be gained.
+
 
 See Also
 ========
