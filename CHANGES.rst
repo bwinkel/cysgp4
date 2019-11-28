@@ -1,5 +1,13 @@
 0.2.21 (unreleased)
 =======================
+Add a benchmark section to the User Manual.
+
+Bugfixes
+~~~~~~~~~~
+- The pytest benchmarks were not working properly (so we had them skipped),
+  because it was not clear how to check if the pytest-benchmark plugin was
+  installed in the first place. This is now clear: can add a config routine
+  to `conftest.py`.
 
 0.2.20 (2019-11-27)
 =======================

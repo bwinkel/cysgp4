@@ -167,7 +167,7 @@ jobs:
   - script: |
       $(conda.activate) cysgp4-env
       pip install pytest-azurepipelines
-      pytest --doctest-rst docs cysgp4
+      pytest -rsx --doctest-rst docs cysgp4
     displayName: Testing
 
   - script: |
