@@ -156,18 +156,17 @@ man_pages = [('index', project.lower(), project + u' Documentation',
 
 # -- Options for the edit_on_github extension ---------------------------------
 
-# if eval(setup_cfg.get('edit_on_github')):
-#     extensions += ['sphinx_astropy.ext.edit_on_github']
+if eval(setup_cfg.get('edit_on_github')):
+    extensions += ['sphinx_astropy.ext.edit_on_github']
 
-#     versionmod = __import__(setup_cfg['package_name'] + '.version')
-#     edit_on_github_project = setup_cfg['github_project']
-#     if versionmod.version.release:
-#         edit_on_github_branch = "v" + versionmod.version.version
-#     else:
-#         edit_on_github_branch = "master"
+    edit_on_github_project = setup_cfg['github_project']
+    if '.dev' in package.__version__:
+        edit_on_github_branch = "master"
+    else:
+        edit_on_github_branch = "v" + package.__version__
 
-#     edit_on_github_source_root = ""
-#     edit_on_github_doc_root = "docs"
+    edit_on_github_source_root = ""
+    edit_on_github_doc_root = "docs"
 
 # -- Resolving isssue number to links in changelog -----------------------------
 # github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_project'])
