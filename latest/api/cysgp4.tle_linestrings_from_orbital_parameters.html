@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>tle_linestrings_from_orbital_parameters &#8212; cysgp4 v0.2.20.dev1+ga5ac652</title>
+    <title>tle_linestrings_from_orbital_parameters &#8212; cysgp4 v0.2.21.dev2+gfc8f953</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.2.20.dev1+ga5ac652</a>
+	<a href="../index.html">cysgp4 v0.2.21.dev2+gfc8f953</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -81,7 +81,9 @@
 <code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">tle_linestrings_from_orbital_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.tle_linestrings_from_orbital_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate TLE strings from orbital parameters.</p>
 <p>See <a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">TLE line strings</a> for a description
-of the two-line element format.</p>
+of the two-line element format. The parameters are the <a class="reference external" href="https://en.wikipedia.org/wiki/Orbital_elements">Orbital/Keplarian
+elements</a> and Wikipedia
+has a really good description what each of them means.</p>
 <p>Note: The epoch (date/time) used in TLEs has a very strange format: first
 two digits are the year, next three digits are the day from beginning of
 year, then fraction of a day is given, e.g. 20180.25 would be 2020, day
@@ -171,13 +173,14 @@ The function will convert this to the TLE epoch format.</p>
     </div>
 <footer class="footer">
   <p class="pull-right">
+    <a href="https://github.com/bwinkel/cysgp4/tree/master/docs/api/cysgp4.tle_linestrings_from_orbital_parameters.rst">Edit This Page on Github</a> &nbsp;
     <a href="../_sources/api/cysgp4.tle_linestrings_from_orbital_parameters.rst.txt"
        rel="nofollow">Page Source</a> &nbsp;
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2019, Benjamin Winkel.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
-    Last built 27 Nov 2019. <br/>
+    Last built 28 Nov 2019. <br/>
   </p>
 </footer>
   </body>

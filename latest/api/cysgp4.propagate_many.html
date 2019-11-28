@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>propagate_many &#8212; cysgp4 v0.2.20.dev1+ga5ac652</title>
+    <title>propagate_many &#8212; cysgp4 v0.2.21.dev2+gfc8f953</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -19,7 +19,7 @@
     <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="propagate_many_slow" href="cysgp4.propagate_many_slow.html" />
+    <link rel="next" title="propagate_many_sgp4" href="cysgp4.propagate_many_sgp4.html" />
     <link rel="prev" title="get_example_tles" href="cysgp4.get_example_tles.html" />
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
 
@@ -48,7 +48,7 @@
     <h3>Navigation</h3>
     <ul>
       <li class="right">
-	<a href="cysgp4.propagate_many_slow.html" title="propagate_many_slow">
+	<a href="cysgp4.propagate_many_sgp4.html" title="propagate_many_sgp4">
 	  next &raquo;
 	</a>
       </li>
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.2.20.dev1+ga5ac652</a>
+	<a href="../index.html">cysgp4 v0.2.21.dev2+gfc8f953</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -160,20 +160,14 @@ inputs <code class="xref py py-obj docutils literal notranslate"><span class="pr
 <p class="rubric">Examples</p>
 <p>The following demonstrates how to use the <a class="reference internal" href="#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a>
 function:</p>
-<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">requests</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="kn">import</span> <span class="n">PyTle</span><span class="p">,</span> <span class="n">PyObserver</span><span class="p">,</span> <span class="n">propagate_many</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="kn">import</span> <span class="n">get_example_tles</span><span class="p">,</span> <span class="n">tles_from_text</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://celestrak.com/NORAD/elements/science.txt&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ctrak_science</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">all_lines</span> <span class="o">=</span> <span class="n">ctrak_science</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tle_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="nb">tuple</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">all_lines</span><span class="p">[</span><span class="n">idx</span><span class="p">::</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">... </span>    <span class="p">)))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-<span class="gp">... </span>    <span class="n">PyTle</span><span class="p">(</span><span class="o">*</span><span class="n">tle</span><span class="p">)</span> <span class="k">for</span> <span class="n">tle</span> <span class="ow">in</span> <span class="n">tle_list</span>
-<span class="gp">... </span>    <span class="p">])[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:</span><span class="mi">20</span><span class="p">]</span>  <span class="c1"># use first 20 TLEs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tle_text</span> <span class="o">=</span> <span class="n">cysgp4</span><span class="o">.</span><span class="n">get_example_tles</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">tles_from_text</span><span class="p">(</span><span class="n">tle_text</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="p">)[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:</span><span class="mi">20</span><span class="p">]</span>  <span class="c1"># use first 20 TLEs</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">observers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
 <span class="gp">... </span>    <span class="n">PyObserver</span><span class="p">(</span><span class="mf">6.88375</span><span class="p">,</span> <span class="mf">50.525</span><span class="p">,</span> <span class="mf">0.366</span><span class="p">),</span>
 <span class="gp">... </span>    <span class="n">PyObserver</span><span class="p">(</span><span class="mf">16.88375</span><span class="p">,</span> <span class="mf">50.525</span><span class="p">,</span> <span class="mf">0.366</span><span class="p">),</span>
@@ -183,8 +177,8 @@ function:</p>
 <span class="gp">... </span>    <span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">propagate_many</span><span class="p">(</span><span class="n">mjds</span><span class="p">,</span> <span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<span class="go">dict_keys([&#39;eci_pos&#39;, &#39;eci_vel&#39;, &#39;geo&#39;, &#39;topo&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+<span class="go">[&#39;eci_pos&#39;, &#39;eci_vel&#39;, &#39;geo&#39;, &#39;topo&#39;]</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># shapes are as follows</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(</span><span class="n">mjds</span><span class="p">,</span> <span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -196,8 +190,8 @@ function:</p>
 <span class="gp">... </span>    <span class="n">mjds</span><span class="p">,</span> <span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">do_eci_pos</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_eci_vel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_geo</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_topo</span><span class="o">=</span><span class="kc">True</span>
 <span class="gp">... </span>    <span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<span class="go">dict_keys([&#39;topo&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+<span class="go">[&#39;topo&#39;]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -221,13 +215,14 @@ function:</p>
     </div>
 <footer class="footer">
   <p class="pull-right">
+    <a href="https://github.com/bwinkel/cysgp4/tree/master/docs/api/cysgp4.propagate_many.rst">Edit This Page on Github</a> &nbsp;
     <a href="../_sources/api/cysgp4.propagate_many.rst.txt"
        rel="nofollow">Page Source</a> &nbsp;
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2019, Benjamin Winkel.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
-    Last built 27 Nov 2019. <br/>
+    Last built 28 Nov 2019. <br/>
   </p>
 </footer>
   </body>
