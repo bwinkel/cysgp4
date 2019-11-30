@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>cysgp4.init_testrunner &#8212; cysgp4 v0.2.21.dev3+ga001736</title>
+    <title>cysgp4.init_testrunner &#8212; cysgp4 v0.3.1.dev1+ge591296</title>
     <link rel="stylesheet" href="../../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -46,7 +46,7 @@
     <h3>Navigation</h3>
     <ul>
       <li>
-	<a href="../../index.html">cysgp4 v0.2.21.dev3+ga001736</a>
+	<a href="../../index.html">cysgp4 v0.3.1.dev1+ge591296</a>
 	 &#187;
       </li>
       <li><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
@@ -66,18 +66,24 @@
 <span class="c1"># -*- coding: utf-8 -*-</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="k">try</span><span class="p">:</span>
 
     <span class="c1"># Create the test function for self test</span>
     <span class="kn">from</span> <span class="nn">astropy.tests.runner</span> <span class="kn">import</span> <span class="n">TestRunner</span>
     <span class="n">test</span> <span class="o">=</span> <span class="n">TestRunner</span><span class="o">.</span><span class="n">make_test_runner_in</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
-    <span class="n">test</span><span class="o">.</span><span class="n">__test__</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">__all__</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span>
 
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="k">pass</span>
+
+<div class="viewcode-block" id="test"><a class="viewcode-back" href="../../api/cysgp4.test.html#cysgp4.test">[docs]</a>    <span class="k">def</span> <span class="nf">test</span><span class="p">():</span>
+
+        <span class="kn">import</span> <span class="nn">warnings</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s1">&#39;Package &quot;astropy&quot; is needed for using the &quot;test()&quot; function&#39;</span>
+            <span class="p">)</span></div>
+
+<span class="n">test</span><span class="o">.</span><span class="n">__test__</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span>
 </pre></div>
 
           </div>
@@ -97,7 +103,7 @@
   <p>
     &copy; Copyright 2019, Benjamin Winkel.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
-    Last built 28 Nov 2019. <br/>
+    Last built 30 Nov 2019. <br/>
   </p>
 </footer>
   </body>

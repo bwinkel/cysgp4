@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>cysgp4.helpers &#8212; cysgp4 v0.2.21.dev3+ga001736</title>
+    <title>cysgp4.helpers &#8212; cysgp4 v0.3.1.dev1+ge591296</title>
     <link rel="stylesheet" href="../../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -46,7 +46,7 @@
     <h3>Navigation</h3>
     <ul>
       <li>
-	<a href="../../index.html">cysgp4 v0.2.21.dev3+ga001736</a>
+	<a href="../../index.html">cysgp4 v0.3.1.dev1+ge591296</a>
 	 &#187;
       </li>
       <li><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
@@ -67,8 +67,6 @@
 
 <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_stream</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">sgp4.earth_gravity</span> <span class="kn">import</span> <span class="n">wgs72</span>
-<span class="kn">from</span> <span class="nn">sgp4.io</span> <span class="kn">import</span> <span class="n">twoline2rv</span>
 <span class="kn">from</span> <span class="nn">.cysgp4</span> <span class="kn">import</span> <span class="n">PyDateTime</span><span class="p">,</span> <span class="n">Satellite</span><span class="p">,</span> <span class="n">PyObserver</span>
 
 
@@ -240,6 +238,17 @@
 <span class="sd">    Note: `sgp4 &lt;https://pypi.org/project/sgp4/&gt;`_ Package by Brandon Rhodes</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">sgp4.earth_gravity</span> <span class="kn">import</span> <span class="n">wgs72</span>
+        <span class="kn">from</span> <span class="nn">sgp4.io</span> <span class="kn">import</span> <span class="n">twoline2rv</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">warnings</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">            Package sgp4 needed to use this function. Can install with</span>
+<span class="s1">            &quot;pip install sgp4&quot; or &quot;conda install -c conda-forge sgp4&quot;.</span>
+<span class="s1">            &#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">e</span>
+
     <span class="k">if</span> <span class="n">observers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">observers</span> <span class="o">=</span> <span class="n">PyObserver</span><span class="p">()</span>
 
@@ -350,7 +359,7 @@
   <p>
     &copy; Copyright 2019, Benjamin Winkel.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
-    Last built 28 Nov 2019. <br/>
+    Last built 30 Nov 2019. <br/>
   </p>
 </footer>
   </body>
