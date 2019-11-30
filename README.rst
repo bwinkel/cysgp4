@@ -11,9 +11,19 @@ cysgp4
     :target: https://pypi.python.org/pypi/cysgp4
     :alt: PyPI tag
 
-.. image:: https://img.shields.io/badge/license-GPL-blue.svg
-    :target: https://www.github.com/bwinkel/cysgp4/blob/master/COPYING
-    :alt: License
+.. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
+    :target: https://www.github.com/bwinkel/cysgp4/blob/master/COPYING.GPLv3.txt
+    :alt: License-GPL3
+
+.. image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
+    :target: https://www.github.com/bwinkel/cysgp4/blob/master/COPYING.Apache2
+    :alt: License-Apache
+
+.. image:: https://img.shields.io/badge/License-BSD%203--Clause-blue.svg
+    :target: https://www.github.com/bwinkel/cysgp4/blob/master/TEMPLATE_LICENCE.rst
+    :alt: License-BSD3
+    
+    
 
 Project Status
 ==============
@@ -185,3 +195,16 @@ If you encounter any problems or have questions, do not hesitate to raise an
 issue or make a pull request. Moreover, you can contact the devs directly:
 
 - <bwinkel@mpifr.de>
+
+Licenses
+========
+
+`cysgp4` itself is published under `GPL v3 <https://www.github.com/bwinkel/cysgp4/blob/master/COPYING.GPLv3.txt>`_, an open-source license. The package
+is a `Cython <https://www.cython.org>`_-powered wrapper of the `sgp4lib
+<https://www.danrw.com/sgp4/>`_ library (by Daniel Warner) to compute
+satellite positions from two-line elements (TLE). The sgp4lib source code is
+licensed under `Apache-2.0 license
+<https://www.github.com/bwinkel/cysgp4/blob/master/COPYING.Apache2>`_
+
+The package is partly based on the `Astropy-affiliated package template <https://github.com/astropy/package-template>`_, which is under `BSD 3-clause <https://github.com/bwinkel/cysgp4/blob/master/TEMPLATE_LICENCE.rst>`_ license.
+
