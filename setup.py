@@ -30,6 +30,8 @@ AUTHOR = metadata.get('author', 'Benjamin Winkel')
 AUTHOR_EMAIL = metadata.get('author_email', '')
 LICENSE = metadata.get('license', 'unknown')
 URL = metadata.get('url', 'https://github.com/bwinkel/cysgp4')
+# PROJECT_URLS = metadata.get('project_urls', '')
+CLASSIFIERS = metadata.get('classifiers', '').split('\n')
 __minimum_python_version__ = metadata.get("minimum_python_version", "3.5")
 
 if os.path.exists('README.rst'):
@@ -146,4 +148,5 @@ setup(
     # download_url='https://github.com/bwinkel/cyaatm/tarball/0.1.0',
     # keywords=['astronomy']
     python_requires='>={}'.format(__minimum_python_version__),
+    classifiers=CLASSIFIERS,
     )

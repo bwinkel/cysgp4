@@ -2,8 +2,9 @@
 cysgp4
 ******
 
-- *Version:* 0.2.0
+- *Version:* 0.3.0
 - *Author:* Benjamin Winkel
+- *Repository:* `on GitHub <https://github.com/bwinkel/cysgp4>`__
 - *User manual:* `stable <https://bwinkel.github.io/cysgp4/>`__ |
   `developer <https://bwinkel.github.io/cysgp4/latest/>`__
 
@@ -22,8 +23,8 @@ cysgp4
 .. image:: https://img.shields.io/badge/License-BSD%203--Clause-blue.svg
     :target: https://www.github.com/bwinkel/cysgp4/blob/master/TEMPLATE_LICENCE.rst
     :alt: License-BSD3
-    
-    
+
+
 
 Project Status
 ==============
