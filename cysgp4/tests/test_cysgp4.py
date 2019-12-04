@@ -707,6 +707,7 @@ def test_propagate_many_cysgp4_vs_many_cysgp4_slow():
 
 
 @pytest.mark.xfail
+@skip_sgp4
 def test_propagate_many_cysgp4_vs_many_sgp4():
     '''
     Currently, very distant satellites can have a relatively large deviation

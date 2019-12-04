@@ -1,14 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import importlib
-import os
-# import requests
-import pytest
 import datetime
-import numpy as np
-from sgp4.earth_gravity import wgs72
-from sgp4.io import twoline2rv
 from numpy.testing import assert_equal, assert_allclose
 from cysgp4 import *
 
