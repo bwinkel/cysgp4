@@ -52,7 +52,7 @@ def get_compile_args():
         'include_dirs': [
             numpy.get_include(),
             'cysgp4/',
-            'cextern/sgp4-05d8cc2fc596/libsgp4/',
+            'cextern/sgp4-f5cb54b3/libsgp4/',
             ],
         }
 
@@ -90,7 +90,7 @@ def get_compile_args():
     return comp_args
 
 
-CPPSOURCES = glob.glob('cextern/sgp4-05d8cc2fc596/libsgp4/*.cpp')
+CPPSOURCES = glob.glob('cextern/sgp4-f5cb54b3/libsgp4/*.cc')
 # print(cppsources)
 
 SGP_EXT = Extension(
