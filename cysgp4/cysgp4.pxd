@@ -33,6 +33,7 @@ cimport cython
 from cython.operator cimport dereference as deref, preincrement as inc
 from libcpp.string cimport string
 from libcpp cimport bool
+from libc.stdint cimport uint32_t, int64_t
 
 
 cdef extern from 'Globals.h':
@@ -61,9 +62,10 @@ cdef extern from 'Globals.h':
         const double kSECONDS_PER_DAY
         const double kMINUTES_PER_DAY
         const double kHOURS_PER_DAY
-        const double kEPOCH_JAN1_00H_1900
-        const double kEPOCH_JAN1_12H_1900
-        const double kEPOCH_JAN1_12H_2000
+        # const double kEPOCH_JAN1_00H_1900
+        # const double kEPOCH_JAN1_12H_1900
+        # const double kEPOCH_JAN1_12H_2000
+        const double kA3OVK2
 
 
 cdef extern from 'Tle.h':
@@ -175,8 +177,8 @@ cdef extern from 'DateTime.h':
     cdef cppclass DateTime:
 
         DateTime() nogil except +
-        DateTime(unsigned long long ticks) nogil except +
-        DateTime(int year, double doy) nogil except +
+        DateTime(int64_t ticks) nogil except +
+        DateTime(unsigned int year, double doy) nogil except +
         void Initialise(
             int year, int month, int day,
             int hour, int minute, int second, int microsecond
@@ -184,8 +186,8 @@ cdef extern from 'DateTime.h':
         double ToGreenwichSiderealTime() nogil const
         double ToLocalMeanSiderealTime(const double lon) nogil const
         string ToString() nogil const
-        DateTime AddTicks(long long ticks) nogil const
-        long long Ticks() nogil const
+        DateTime AddTicks(int64_t ticks) nogil const
+        int64_t Ticks() nogil const
 
         int DayOfYear(int year, int month, int day) const
         int Year() nogil const
@@ -286,8 +288,8 @@ cdef extern from *:
     void array_delete[T](T* x)
 
 
-cdef long long ticks_from_mjd(double mjd) nogil
-cdef double mjd_from_ticks(long long ticks) nogil
+cdef int64_t ticks_from_mjd(double mjd) nogil
+cdef double mjd_from_ticks(int64_t ticks) nogil
 cdef DateTime datetime_from_mjd(double mjd) nogil
 cdef (double, double, double) ecef_from_geo(
     double lon_rad, double lat_rad, double alt_km

@@ -31,14 +31,14 @@ fast `~numpy`-array functional approach. The former works like this::
     >>> sat.eci_pos().vel  # ECI cartesian velocity, km/s
     (-1.8205895517672226, 7.374044252723081, -0.20697960810978586)
     >>> sat.geo_pos()  # geographic (geodetic) position, lon/lat/alt
-    <PyCoordGeodetic: 112.2146d, 28.5509d, 538.0186km>
+    <PyCoordGeodetic: 112.2146d, 28.5509d, 538.0173km>
     >>> sat.topo_pos()  # topocentric position, az/el/dist/dist_rate
-    <PyCoordTopocentric: 60.2453d, -35.6844d, 8314.5683km, 3.5087km/s>
+    <PyCoordTopocentric: 60.2453d, -35.6845d, 8314.5681km, 3.5087km/s>
 
     >>> # One can change time to determine positions at another moment
     >>> sat.mjd += 1 / 720.  # one minute later
     >>> sat.topo_pos()
-    <PyCoordTopocentric: 54.8446d, -38.2749d, 8734.9195km, 3.4885km/s>
+    <PyCoordTopocentric: 54.8446d, -38.2749d, 8734.9196km, 3.4885km/s>
 
 In many cases, however, one probably wants to calculate coordinates for a
 (large) number of satellites, observer locations, and/or observing times. For

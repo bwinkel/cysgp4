@@ -49,6 +49,7 @@ from cython.operator cimport preincrement as inc
 from cpython cimport bool as python_bool
 from libcpp cimport bool as cpp_bool
 from libc.math cimport M_PI, floor, fabs, fmod, sqrt, sin, cos
+from libc.stdint cimport uint32_t, int64_t
 from .cysgp4 cimport *
 
 import datetime
@@ -61,7 +62,7 @@ cdef double NAN = np.nan
 cdef double DEG2RAD = M_PI / 180.
 cdef double RAD2DEG = 180. / M_PI
 cdef double MJD_RESOLUTION = 0.001 / 24. / 3600.
-cdef long long MJD0_TICKS = 58628880000000000
+cdef int64_t MJD0_TICKS = 58628880000000000
 
 
 ctypedef SGP4* sgp4_ptr_t
@@ -94,27 +95,27 @@ def set_num_threads(int nthreads):
     openmp.omp_set_num_threads(nthreads)
 
 
-cdef inline long long ticks_from_mjd(double mjd) nogil:
+cdef inline int64_t ticks_from_mjd(double mjd) nogil:
 
     cdef:
         double days, fdays
-        long long idays
+        int64_t idays
 
-    idays = <long long> mjd
+    idays = <int64_t> mjd
     fdays = mjd - idays
 
     return (
         idays * 86400 * 1000000 +
-        (<long long> (fdays * 86400 * 1000000)) +
+        (<int64_t> (fdays * 86400 * 1000000)) +
         MJD0_TICKS
         )
 
 
-cdef inline double mjd_from_ticks(long long ticks) nogil:
+cdef inline double mjd_from_ticks(int64_t ticks) nogil:
 
     cdef:
         double days, fdays
-        long long idays
+        int64_t idays
 
     ticks -= MJD0_TICKS
     return ticks / 8.64e10
@@ -124,7 +125,7 @@ cdef inline DateTime datetime_from_mjd(double mjd) nogil:
 
     cdef:
 
-        unsigned long long ticks = ticks_from_mjd(mjd)
+        int64_t ticks = ticks_from_mjd(mjd)
         DateTime dt = DateTime(ticks)
 
     return dt
@@ -252,7 +253,7 @@ cdef class PyDateTime(object):
             self._set_datetime(dt)
 
     @classmethod
-    def from_ticks(cls, unsigned long long ticks):
+    def from_ticks(cls, int64_t ticks):
         '''
         Creates a new `~cysgp4.PyDateTime` instance from "ticks".
 
@@ -261,7 +262,7 @@ cdef class PyDateTime(object):
 
         Parameters
         ----------
-        ticks : unsigned long long
+        ticks : int64_t
             Number of micro-seconds since 1. January 0001, 00:00.
 
         Returns
@@ -425,15 +426,15 @@ cdef class PyDateTime(object):
             )
 
     def _get_ticks(self):
-        return <long long> self._cobj.Ticks()
+        return <int64_t> self._cobj.Ticks()
 
-    def _set_ticks(self, unsigned long long ticks):
+    def _set_ticks(self, int64_t ticks):
 
         # this is a bit ugly, but there is to setter method in the C++ code
 
         cdef:
-            long long ticks_new = ticks
-            long long ticks_old = self._get_ticks()
+            int64_t ticks_new = ticks
+            int64_t ticks_old = self._get_ticks()
 
         # AddTicks returns a new instance...
         self._cobj = self._cobj.AddTicks(ticks_new - ticks_old)
@@ -450,8 +451,8 @@ cdef class PyDateTime(object):
         # this is a bit ugly, but there is to setter method in the C++ code
 
         cdef:
-            long long ticks_new = ticks_from_mjd(mjd)
-            long long ticks_old = self._get_ticks()
+            int64_t ticks_new = ticks_from_mjd(mjd)
+            int64_t ticks_old = self._get_ticks()
 
         # AddTicks returns a new instance...
         self._cobj = self._cobj.AddTicks(ticks_new - ticks_old)
