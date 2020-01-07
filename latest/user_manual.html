@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Cysgp4 user manual &#8212; cysgp4 v0.3.1.dev1+ge591296</title>
+    <title>Cysgp4 user manual &#8212; cysgp4 v0.3.1.dev7+gaa44917</title>
     <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="index.html">cysgp4 v0.3.1.dev1+ge591296</a>
+	<a href="index.html">cysgp4 v0.3.1.dev7+gaa44917</a>
 	 &#187;
       </li>
       
@@ -414,14 +414,14 @@ would look like:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">eci_pos</span><span class="p">()</span><span class="o">.</span><span class="n">vel</span>  <span class="c1"># ECI cartesian velocity</span>
 <span class="go">(-1.8205895517672226, 7.374044252723081, -0.20697960810978586)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">geo_pos</span><span class="p">()</span>  <span class="c1"># geographic position</span>
-<span class="go">&lt;PyCoordGeodetic: 112.2146d, 28.5509d, 538.0186km&gt;</span>
+<span class="go">&lt;PyCoordGeodetic: 112.2146d, 28.5509d, 538.0173km&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">topo_pos</span><span class="p">()</span>  <span class="c1"># topocentric position</span>
-<span class="go">&lt;PyCoordTopocentric: 60.2453d, -35.6844d, 8314.5683km, 3.5087km/s&gt;</span>
+<span class="go">&lt;PyCoordTopocentric: 60.2453d, -35.6845d, 8314.5681km, 3.5087km/s&gt;</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># ... also for different times, also for different times</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">mjd</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">/</span> <span class="mf">720.</span>  <span class="c1"># one minute later</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">topo_pos</span><span class="p">()</span>
-<span class="go">&lt;PyCoordTopocentric: 54.8446d, -38.2749d, 8734.9195km, 3.4885km/s&gt;</span>
+<span class="go">&lt;PyCoordTopocentric: 54.8446d, -38.2749d, 8734.9196km, 3.4885km/s&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">topo_pos</span><span class="p">()</span><span class="o">.</span><span class="n">az</span><span class="p">,</span> <span class="n">sat</span><span class="o">.</span><span class="n">topo_pos</span><span class="p">()</span><span class="o">.</span><span class="n">el</span>
 <span class="go">(54.84463503781068, -38.274852915850126)</span>
 
@@ -475,7 +475,7 @@ product”. Here we choose to make <code class="xref py py-obj docutils literal 
 </pre></div>
 </div>
 <p>Here, <code class="xref py py-obj docutils literal notranslate"><span class="pre">result</span></code> is a Python dictionary, with the following entries:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
 <span class="go">[&#39;eci_pos&#39;, &#39;eci_vel&#39;, &#39;geo&#39;, &#39;topo&#39;]</span>
 </pre></div>
 </div>
@@ -734,9 +734,9 @@ interface as <a class="reference internal" href="api/cysgp4.propagate_many.html#
        rel="nofollow">Page Source</a> &nbsp;
     <a href="#">Back to Top</a></p>
   <p>
-    &copy; Copyright 2019, Benjamin Winkel.<br/>
-    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
-    Last built 30 Nov 2019. <br/>
+    &copy; Copyright 2020, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.3.1. &nbsp;
+    Last built 07 Jan 2020. <br/>
   </p>
 </footer>
   </body>

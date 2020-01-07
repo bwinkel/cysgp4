@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>PyDateTime &#8212; cysgp4 v0.3.1.dev1+ge591296</title>
+    <title>PyDateTime &#8212; cysgp4 v0.3.1.dev7+gaa44917</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.3.1.dev1+ge591296</a>
+	<a href="../index.html">cysgp4 v0.3.1.dev7+gaa44917</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -188,7 +188,7 @@ properties and methods:</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.from_mjd" title="cysgp4.PyDateTime.from_mjd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_mjd</span></code></a>(type cls, double mjd)</p></td>
 <td><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from MJD.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.from_ticks" title="cysgp4.PyDateTime.from_ticks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_ticks</span></code></a>(type cls, unsigned long long ticks)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.from_ticks" title="cysgp4.PyDateTime.from_ticks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_ticks</span></code></a>(type cls, int64_t ticks)</p></td>
 <td><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from “ticks”.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cysgp4.PyDateTime.from_tle_epoch" title="cysgp4.PyDateTime.from_tle_epoch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_tle_epoch</span></code></a>(type cls, double tle_epoch)</p></td>
@@ -265,14 +265,14 @@ timescale, which is often used in astronomy.</p>
 
 <dl class="method">
 <dt id="cysgp4.PyDateTime.from_ticks">
-<code class="sig-name descname">from_ticks</code><span class="sig-paren">(</span><em class="sig-param">type cls</em>, <em class="sig-param">unsigned long long ticks</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.from_ticks" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">from_ticks</code><span class="sig-paren">(</span><em class="sig-param">type cls</em>, <em class="sig-param">int64_t ticks</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.from_ticks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from “ticks”.</p>
 <p>Internally, DateTime objects store time on a linear scale, “ticks”,
 which is the number of micro-seconds since 1. January 0001, 00:00.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ticks</strong><span class="classifier">unsigned long long</span></dt><dd><p>Number of micro-seconds since 1. January 0001, 00:00.</p>
+<dt><strong>ticks</strong><span class="classifier">int64_t</span></dt><dd><p>Number of micro-seconds since 1. January 0001, 00:00.</p>
 </dd>
 </dl>
 </dd>
@@ -417,9 +417,9 @@ or <a class="reference external" href="https://celestrak.com/columns/v04n03/">Ce
        rel="nofollow">Page Source</a> &nbsp;
     <a href="#">Back to Top</a></p>
   <p>
-    &copy; Copyright 2019, Benjamin Winkel.<br/>
-    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
-    Last built 30 Nov 2019. <br/>
+    &copy; Copyright 2020, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.3.1. &nbsp;
+    Last built 07 Jan 2020. <br/>
   </p>
 </footer>
   </body>

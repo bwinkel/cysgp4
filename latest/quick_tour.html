@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Cysgp4 quick tour &#8212; cysgp4 v0.3.1.dev1+ge591296</title>
+    <title>Cysgp4 quick tour &#8212; cysgp4 v0.3.1.dev7+gaa44917</title>
     <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="index.html">cysgp4 v0.3.1.dev1+ge591296</a>
+	<a href="index.html">cysgp4 v0.3.1.dev7+gaa44917</a>
 	 &#187;
       </li>
       
@@ -99,14 +99,14 @@ fast <a class="reference external" href="https://docs.scipy.org/doc/numpy/refere
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">eci_pos</span><span class="p">()</span><span class="o">.</span><span class="n">vel</span>  <span class="c1"># ECI cartesian velocity, km/s</span>
 <span class="go">(-1.8205895517672226, 7.374044252723081, -0.20697960810978586)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">geo_pos</span><span class="p">()</span>  <span class="c1"># geographic (geodetic) position, lon/lat/alt</span>
-<span class="go">&lt;PyCoordGeodetic: 112.2146d, 28.5509d, 538.0186km&gt;</span>
+<span class="go">&lt;PyCoordGeodetic: 112.2146d, 28.5509d, 538.0173km&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">topo_pos</span><span class="p">()</span>  <span class="c1"># topocentric position, az/el/dist/dist_rate</span>
-<span class="go">&lt;PyCoordTopocentric: 60.2453d, -35.6844d, 8314.5683km, 3.5087km/s&gt;</span>
+<span class="go">&lt;PyCoordTopocentric: 60.2453d, -35.6845d, 8314.5681km, 3.5087km/s&gt;</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># One can change time to determine positions at another moment</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">mjd</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">/</span> <span class="mf">720.</span>  <span class="c1"># one minute later</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sat</span><span class="o">.</span><span class="n">topo_pos</span><span class="p">()</span>
-<span class="go">&lt;PyCoordTopocentric: 54.8446d, -38.2749d, 8734.9195km, 3.4885km/s&gt;</span>
+<span class="go">&lt;PyCoordTopocentric: 54.8446d, -38.2749d, 8734.9196km, 3.4885km/s&gt;</span>
 </pre></div>
 </div>
 <p>In many cases, however, one probably wants to calculate coordinates for a
@@ -192,9 +192,9 @@ tutorial notebook</a>.</p>
        rel="nofollow">Page Source</a> &nbsp;
     <a href="#">Back to Top</a></p>
   <p>
-    &copy; Copyright 2019, Benjamin Winkel.<br/>
-    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.2.1. &nbsp;
-    Last built 30 Nov 2019. <br/>
+    &copy; Copyright 2020, Benjamin Winkel.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.3.1. &nbsp;
+    Last built 07 Jan 2020. <br/>
   </p>
 </footer>
   </body>
