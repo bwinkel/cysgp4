@@ -32,6 +32,7 @@ LICENSE = metadata.get('license', 'unknown')
 URL = metadata.get('url', 'https://github.com/bwinkel/cysgp4')
 # PROJECT_URLS = metadata.get('project_urls', '')
 CLASSIFIERS = metadata.get('classifiers', '').split('\n')
+CLASSIFIERS = [c for c in CLASSIFIERS if len(c)]  # filter out empty strings
 __minimum_python_version__ = metadata.get("minimum_python_version", "3.5")
 
 if os.path.exists('README.rst'):
