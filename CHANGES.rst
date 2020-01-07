@@ -1,5 +1,15 @@
-0.3.1 (unreleased)
+0.3.2 (unreleased)
 =======================
+
+0.3.1 (2020-01-07)
+=======================
+
+New Features
+------------
+- Migrate to the latest `libsgp4` version (master, hash: f5cb54b3), which can
+  be downloaded from Dan Warners repository: https://github.com/dnwrnr/sgp4.
+  Thanks to Cees Bassa for pointing out that the ancient version that was
+  previously in use was having accuracy issues.
 
 0.3.0 (2019-11-28)
 =======================
