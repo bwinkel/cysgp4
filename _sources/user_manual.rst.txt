@@ -367,14 +367,14 @@ would look like::
     >>> sat.eci_pos().vel  # ECI cartesian velocity
     (-1.8205895517672226, 7.374044252723081, -0.20697960810978586)
     >>> sat.geo_pos()  # geographic position
-    <PyCoordGeodetic: 112.2146d, 28.5509d, 538.0186km>
+    <PyCoordGeodetic: 112.2146d, 28.5509d, 538.0173km>
     >>> sat.topo_pos()  # topocentric position
-    <PyCoordTopocentric: 60.2453d, -35.6844d, 8314.5683km, 3.5087km/s>
+    <PyCoordTopocentric: 60.2453d, -35.6845d, 8314.5681km, 3.5087km/s>
 
     >>> # ... also for different times, also for different times
     >>> sat.mjd += 1 / 720.  # one minute later
     >>> sat.topo_pos()
-    <PyCoordTopocentric: 54.8446d, -38.2749d, 8734.9195km, 3.4885km/s>
+    <PyCoordTopocentric: 54.8446d, -38.2749d, 8734.9196km, 3.4885km/s>
     >>> sat.topo_pos().az, sat.topo_pos().el
     (54.84463503781068, -38.274852915850126)
 
