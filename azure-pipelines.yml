@@ -69,15 +69,15 @@ jobs:
       #   py_whl: 38
       #   numpy.version: '1.14.5'
       mac35:
-        imageName: 'macos-10.13'
+        imageName: 'macos-10.14'
         python.version: '3.5'
         numpy.version: '1.13.1'
       mac36:
-        imageName: 'macos-10.13'
+        imageName: 'macos-10.14'
         python.version: '3.6'
         numpy.version: '1.13.1'
       mac37:
-        imageName: 'macos-10.13'
+        imageName: 'macos-10.14'
         python.version: '3.7'
         numpy.version: '1.14.5'
       # mac38:
