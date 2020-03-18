@@ -80,10 +80,11 @@ def get_compile_args():
             '-mmacosx-version-min={:s}'.format(mac_version),
             ]
 
-        if ('clang' in getoutput('gcc -v')) and all(
-                'command not found' in getoutput('gcc-{:d} -v'.format(d))
-                for d in [6, 7, 8]
-                ):
+        # if ('clang' in getoutput('gcc -v')) and all(
+        #         'command not found' in getoutput('gcc-{:d} -v'.format(d))
+        #         for d in [6, 7, 8]
+        #         ):
+        if 'clang' in getoutput('gcc -v'):
             extra_compile_args += ['-stdlib=libc++', ]
 
         comp_args['extra_compile_args'] = extra_compile_args
