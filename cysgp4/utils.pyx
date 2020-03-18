@@ -363,8 +363,8 @@ cpdef tuple tle_linestrings_from_orbital_parameters(
             mean_anomaly_deg, mean_motion_per_day
         ))
 
-        str tle1 = '{:s}{:d}'.format(tmp1[:-1], tle_checksum(tmp1))
-        str tle2 = '{:s}{:d}'.format(tmp2[:-1], tle_checksum(tmp2))
+        str tle1 = '{:s}{:d}'.format(tmp1[:68], tle_checksum(tmp1))
+        str tle2 = '{:s}{:d}'.format(tmp2[:68], tle_checksum(tmp2))
 
     if eccentricity < 0.:
         raise ValueError('Eccentricity must be >= 0.')
