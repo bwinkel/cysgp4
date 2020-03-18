@@ -138,6 +138,12 @@ jobs:
       echo "imageName" $(imageName)
     displayName: Show Vars
 
+  - bash: |
+      gcc -v
+    displayName: Show gcc version
+    # condition: not(eq(variables['is.win'], true))
+    condition: not(startsWith(variables['Agent.OS'], 'Windows'))
+
   - script: conda create --yes --quiet --name cysgp4-env -c conda-forge
     displayName: Create Anaconda environment
 
