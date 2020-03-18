@@ -42,7 +42,7 @@ from __future__ import unicode_literals
 cimport cython
 cimport numpy as np
 # from libc.math cimport M_PI, floor, fabs, fmod, sqrt, sin, cos
-from libc.math cimport M_PI, sqrt
+from libc.math cimport M_PI, sqrt, modf
 from libc.stdlib cimport atoi
 from libc.string cimport strcpy, strcmp, memcpy
 from .cysgp4 cimport kMU, kXKMPER  # aka astropy.constants.{GM_earth,R_earth}
@@ -248,6 +248,8 @@ cpdef tuple tle_linestrings_from_orbital_parameters(
         double mjd_epoch,
         double inclination_deg,
         double raan_deg,
+        double eccentricity,
+        double argument_of_perigee_deg,
         double mean_anomaly_deg,
         double mean_motion_per_day,
         ):
@@ -278,6 +280,11 @@ cpdef tuple tle_linestrings_from_orbital_parameters(
         Inclination of the orbit [deg].
     raan_deg : float
         Right ascension of the ascending node of the orbit [deg].
+    eccentricity : float
+        Eccentricity of the orbit [dimensionless].
+        Note that in the TLE only the decimal digits are stored.
+    argument_of_perigee_deg : float
+        Argument of Perigee [deg].
     mean_anomaly_deg : float
         Mean anomaly of the node [deg].
     mean_motion_per_day : float
@@ -285,8 +292,6 @@ cpdef tuple tle_linestrings_from_orbital_parameters(
 
     Returns
     -------
-    mean_motion : double
-        Mean motion of satellite in revolutions per day [1 / day].
     tle_lines : (str, str, str)
         TLE tuple of the satellite, consisting of the line strings.
 
@@ -303,6 +308,8 @@ cpdef tuple tle_linestrings_from_orbital_parameters(
         >>> mean_motion = cysgp4.satellite_mean_motion(alt_km)
         >>> inclination = 10.  # deg
         >>> raan = 35.  # deg
+        >>> eccentricity = 0.0001
+        >>> argument_of_perigee = 0.  # deg
         >>> mean_anomaly = 112.  # deg
 
         >>> # assume, the parameters are valid for the following time
@@ -318,6 +325,8 @@ cpdef tuple tle_linestrings_from_orbital_parameters(
         ...     mjd_epoch,
         ...     inclination,
         ...     raan,
+        ...     eccentricity,
+        ...     argument_of_perigee,
         ...     mean_anomaly,
         ...     mean_motion,
         ...     )
@@ -340,21 +349,27 @@ cpdef tuple tle_linestrings_from_orbital_parameters(
             dt.Second() / 86400. +
             dt.Microsecond() * 1.e-6
             )
+        double _i
+        int ecc = int(modf(eccentricity, &_i) * 1e7 + 0.5)
 
         str tmp1 = (
         '1 {:05d}U 20001A   {:14.8f}  .00000000  00000-0  50000-4 '
         '0    0X'.format(sat_nr, epoch)
         )
         str tmp2 = (
-        '2 {:05d} {:8.4f} {:8.4f} 0001000   0.0000 {:8.4f} '
+        '2 {:05d} {:8.4f} {:8.4f} {:07d} {:8.4f} {:8.4f} '
         '{:11.8f}    0X'.format(
-            sat_nr, inclination_deg, raan_deg,
+            sat_nr, inclination_deg, raan_deg, ecc, argument_of_perigee_deg,
             mean_anomaly_deg, mean_motion_per_day
         ))
 
         str tle1 = '{:s}{:d}'.format(tmp1[:-1], tle_checksum(tmp1))
         str tle2 = '{:s}{:d}'.format(tmp2[:-1], tle_checksum(tmp2))
 
+    if eccentricity < 0.:
+        raise ValueError('Eccentricity must be >= 0.')
+    if eccentricity >= 1.:
+        raise ValueError('Eccentricity must be < 1.')
     if year < 1957 or year > 2056:
         raise ValueError('Year must be between 1957 and 2056')
 

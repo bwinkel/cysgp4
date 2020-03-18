@@ -1,6 +1,12 @@
 0.3.2 (unreleased)
 =======================
 
+Bugfixes
+~~~~~~~~~~
+- In the `tle_linestrings_from_orbital_parameters` two parameters were missing
+  (eccentricity and argument of perigee), which are necessary for a complete
+  orbit description. [#11]
+
 0.3.1 (2020-01-07)
 =======================
 

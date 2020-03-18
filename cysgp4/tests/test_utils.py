@@ -60,6 +60,8 @@ def test_tle_linestrings_from_orbital_parameters():
     mean_motion = satellite_mean_motion(alt_km)
     inclination = 10.  # deg
     raan = 35.  # deg
+    eccentricity = 0.0001
+    argument_of_perigee = 0.  # deg
     mean_anomaly = 112.  # deg
 
     # assume, the parameters are valid for the following time
@@ -72,6 +74,8 @@ def test_tle_linestrings_from_orbital_parameters():
         pydt.mjd,
         inclination,
         raan,
+        eccentricity,
+        argument_of_perigee,
         mean_anomaly,
         mean_motion,
         )
