@@ -48,7 +48,7 @@ from cython.operator cimport address as addr
 from cython.operator cimport preincrement as inc
 from cpython cimport bool as python_bool
 from libcpp cimport bool as cpp_bool
-from libc.math cimport M_PI, floor, fabs, fmod, sqrt, sin, cos
+from libc.math cimport M_PI, floor, fabs, fmod, sqrt, sin, cos, atan2, acos
 from libc.stdint cimport uint32_t, int64_t
 from .cysgp4 cimport *
 
@@ -157,6 +157,60 @@ cdef inline (double, double, double) ecef_from_geo(
         double z = (b ** 2 / a ** 2 * N + alt_km) * sphi
 
     return x, y, z
+
+
+cdef inline Vector normalize_vector(Vector a) nogil:
+
+    cdef double norm = sqrt(a.x ** 2 + a.y ** 2 + a.z ** 2)
+    a.x /= norm
+    a.y /= norm
+    a.z /= norm
+
+    return a
+
+
+cdef inline Vector cross_prod(Vector a, Vector b) nogil:
+
+    return Vector(
+        a.y * b.z - a.z * b.y,
+        a.z * b.x - a.x * b.z,
+        a.x * b.y - a.y * b.x,
+        )
+
+cdef inline double dot_prod(Vector a, Vector b) nogil:
+
+    return a.x * b.x + a.y * b.y + a.z * b.z
+
+
+cdef inline (double, double, double) calc_sat_azel(
+        Vector sat_pos, Vector sat_vel, Vector obs_pos
+        ) nogil:
+
+    cdef:
+
+        double norm
+        Vector e_x, e_y, e_z
+        Vector sat_azel, diff_pos
+        double b_x, b_y, b_z
+        double sat_dist, sat_az, sat_el
+
+    e_z = normalize_vector(sat_vel)
+    e_x = normalize_vector(Vector(-sat_pos.x, -sat_pos.y, -sat_pos.z))
+    e_y = normalize_vector(cross_prod(e_z, e_x))
+    e_x = cross_prod(e_y, e_z)
+
+    diff_pos.x = obs_pos.x - sat_pos.x
+    diff_pos.y = obs_pos.y - sat_pos.y
+    diff_pos.z = obs_pos.z - sat_pos.z
+    b_x = dot_prod(diff_pos, e_x)
+    b_y = dot_prod(diff_pos, e_y)
+    b_z = dot_prod(diff_pos, e_z)
+
+    sat_dist = sqrt(b_x ** 2 + b_y ** 2 + b_z ** 2)
+    sat_el = M_PI / 2 - acos(b_z / sat_dist)
+    sat_az = atan2(b_y, b_x)
+
+    return sat_dist, sat_az, sat_el
 
 
 cdef class PyDateTime(object):
@@ -1544,6 +1598,7 @@ def propagate_many(
         mjds, tles, observers=None,
         bint do_eci_pos=True, bint do_eci_vel=True,
         bint do_geo=True, bint do_topo=True,
+        bint do_obs_pos=False, bint do_sat_azel=False,
         str on_error='raise',
         ):
     '''
@@ -1553,9 +1608,9 @@ def propagate_many(
     perform calculations for different satellite TLEs, observers and times
     in a parallelized manner. `~numpy` broadcasting rules apply.
 
-    With the Boolean parameters, `do_eci_pos`, `do_eci_vel`, `do_geo`, and
-    `do_topo` the user can decide, which position frames are returned
-    in the output dictionary.
+    With the Boolean parameters, `do_eci_pos`, `do_eci_vel`, `do_geo`,
+    `do_topo`, `do_obs_pos`, and `do_sat_azel` the user can decide, which
+    position frames are returned in the output dictionary.
 
     Satellite are defined via TLEs (see `~cysgp4.PyTle`). The
     `~.cysgp4.propagate_many` function works with a single (scalar) PyTle
@@ -1591,6 +1646,11 @@ def propagate_many(
         Whether to include geographic/geodetic positions in the result.
     do_topo : Boolean, optional (default: True)
         Whether to include topocentric positions in the result.
+    do_obs_pos : Boolean, optional (default: True)
+        Whether to include the observer ECI position in the results.
+    do_sat_azel : Boolean, optional (default: True)
+        Whether to include the observer position as seen by the satellite
+        (distance/azimuth/elevation) in the results.
     on_error : str, optional (either 'raise' or 'coerce_to_nan', default: 'raise')
         If the underlying SGP C++ library throws an error (which often
         happens if one works with times that are strongly deviating from
@@ -1606,28 +1666,43 @@ def propagate_many(
         Resulting positions for each requested frame:
 
         - `eci_pos` : `~numpy.ndarray` of float
+
           Satellites ECI cartesian positions. Last dimension has length 3,
-          one for each of `x`, `y`, and `z`. First dimensions are
-          determined by the (broadcasted) shape of the inputs `mjd`,
-          `tles`, and `observers`.
+          one for each of `x`, `y`, and `z`.
 
         - `eci_vel` : `~numpy.ndarray` of float
+
           Satellites ECI cartesian velicities. Last dimension has length 3,
-          one for each of `v_x`, `v_y`, and `v_z`. First dimensions are
-          determined by the (broadcasted) shape of the inputs `mjd`,
-          `tles`, and `observers`.
+          one for each of `v_x`, `v_y`, and `v_z`.
 
         - `geo` : `~numpy.ndarray` of float
+
           Satellites Geodetic positions. Last dimension has length 3, one
-          for each of `lon`, `lat`, and `alt`. First dimensions are
-          determined by the (broadcasted) shape of the inputs `mjd`,
-          `tles`, and `observers`.
+          for each of `lon`, `lat`, and `alt`.
 
         - `topo` : `~numpy.ndarray` of float
+
           Satellites Topocentric positions. Last dimension has length 4,
-          one for each of `az`, `el`, `dist`, and `dist_rate`. First
-          dimensions are determined by the (broadcasted) shape of the
-          inputs `mjd`, `tles`, and `observers`.
+          one for each of `az`, `el`, `dist`, and `dist_rate`.
+
+        - `obs_pos` : `~numpy.ndarray` of float
+
+          Observer positions in ECI frame (Cartesian). Last dimension has
+          length 3, one for each of `x`, `y`, and `z`.
+
+        - `sat_azel` : `~numpy.ndarray` of float
+
+          Observer positions in the (moving) satellite frame given as azimuth,
+          elevation, and distance. Last dimension has length 3,
+          one for each of, `az`, `el`, `dist`. Note that the moving satellite
+          frame is constructed from the satellite motion vector (`z` axis)
+          and a vector that is perpendicular to the plane defined by the
+          motion vector and the ECI zero point aka Earth center (`y` axis).
+          The `x` axis is orthogonal to `y` and `z` axes and is approximately
+          pointing to the nadir.
+
+        In all cases the first dimensions are determined by the
+        (broadcasted) shape of the inputs `mjd`, `tles`, and `observers`.
 
     Examples
     --------
@@ -1675,19 +1750,22 @@ def propagate_many(
         Tle *_tle_ptr
         Observer _obs
         # PyEci py_nan_eci = PyEci(geo_loc=PyCoordGeodetic(NAN, NAN, NAN))
-        Eci _eci
+        Eci _sat_eci, _obs_eci
         # Eci _nan_eci = py_nan_eci._cobj
         DateTime _dt
         CoordGeodetic _geo
         CoordTopocentric _topo
-        Vector _eci_pos, _eci_vel
+        Vector _sat_pos, _sat_vel, _obs_pos
+        double _sat_dist, _sat_az, _sat_el  # observer pos in sat frame
 
         np.ndarray[double] mjd
         np.ndarray[object] tle, obs
-        double[:, ::1] eci_pos_v
-        double[:, ::1] eci_vel_v
+        double[:, ::1] sat_pos_v
+        double[:, ::1] sat_vel_v
         double[:, ::1] geo_v  # geodetic
         double[:, ::1] topo_v  # topocentric
+        double[:, ::1] obs_pos_v  # observer eci position
+        double[:, ::1] sat_azel_v  # observer pos in sat frame (as dist/az/el)
         int i, size, n, pnum
 
         tle_ptr_t* _tle_ptr_array
@@ -1703,9 +1781,6 @@ def propagate_many(
     if observers is None:
         observers = PyObserver()
 
-    # TODO: allocate only those arrays, which are actually requested
-    # ("do_topo" etc.)
-
     pnum = 0
     out_dts = []
     if do_eci_pos:
@@ -1719,6 +1794,12 @@ def propagate_many(
         pnum += 1
     if do_topo:
         out_dts.append(np.dtype(('float64', 4)))
+        pnum += 1
+    if do_obs_pos:
+        out_dts.append(np.dtype(('float64', 3)))
+        pnum += 1
+    if do_sat_azel:
+        out_dts.append(np.dtype(('float64', 3)))
         pnum += 1
 
     it = np.nditer(
@@ -1741,11 +1822,11 @@ def propagate_many(
 
         n = 3
         if do_eci_pos:
-            eci_pos_v = itup[n]
+            sat_pos_v = itup[n]
             n += 1
 
         if do_eci_vel:
-            eci_vel_v = itup[n]
+            sat_vel_v = itup[n]
             n += 1
 
         if do_geo:
@@ -1754,6 +1835,14 @@ def propagate_many(
 
         if do_topo:
             topo_v = itup[n]
+            n += 1
+
+        if do_obs_pos:
+            obs_pos_v = itup[n]
+            n += 1
+
+        if do_sat_azel:
+            sat_azel_v = itup[n]
             n += 1
 
         size = mjd.shape[0]
@@ -1781,39 +1870,58 @@ def propagate_many(
             # where re-used!
             _sgp4_ptr = new SGP4(deref(_tle_ptr))
             if on_error_raise:
-                _eci = _sgp4_ptr.FindPosition(_dt)
+                _sat_eci = _sgp4_ptr.FindPosition(_dt)
             else:
                 # "FindPositionE" will return NaNs if an error occured
                 # at C++ level
-                _eci = _sgp4_ptr.FindPositionNaN(_dt)
+                _sat_eci = _sgp4_ptr.FindPositionNaN(_dt)
 
             del _sgp4_ptr
 
             if do_eci_pos:
-                _eci_pos = _eci.Position()
-                eci_pos_v[i, 0] = _eci_pos.x
-                eci_pos_v[i, 1] = _eci_pos.y
-                eci_pos_v[i, 2] = _eci_pos.z
+                _sat_pos = _sat_eci.Position()
+                sat_pos_v[i, 0] = _sat_pos.x
+                sat_pos_v[i, 1] = _sat_pos.y
+                sat_pos_v[i, 2] = _sat_pos.z
 
             if do_eci_vel:
-                _eci_vel = _eci.Velocity()
-                eci_vel_v[i, 0] = _eci_vel.x
-                eci_vel_v[i, 1] = _eci_vel.y
-                eci_vel_v[i, 2] = _eci_vel.z
+                _sat_vel = _sat_eci.Velocity()
+                sat_vel_v[i, 0] = _sat_vel.x
+                sat_vel_v[i, 1] = _sat_vel.y
+                sat_vel_v[i, 2] = _sat_vel.z
 
             if do_geo:
-                _geo = _eci.ToGeodetic()
+                _geo = _sat_eci.ToGeodetic()
                 geo_v[i, 0] = _geo.longitude * RAD2DEG
                 geo_v[i, 1] = _geo.latitude * RAD2DEG
                 geo_v[i, 2] = _geo.altitude
 
             if do_topo:
                 _obs = Observer(_obs_ptr_array[i].GetLocation())
-                _topo = _obs.GetLookAngle(_eci)
+                _topo = _obs.GetLookAngle(_sat_eci)
                 topo_v[i, 0] = _topo.azimuth * RAD2DEG
                 topo_v[i, 1] = _topo.elevation * RAD2DEG
                 topo_v[i, 2] = _topo.distance
                 topo_v[i, 3] = _topo.distance_rate
+
+            if do_obs_pos:
+                _obs_eci = Eci(_dt, _obs_ptr_array[i].GetLocation())
+                _obs_pos = _obs_eci.Position()
+                obs_pos_v[i, 0] = _obs_pos.x
+                obs_pos_v[i, 1] = _obs_pos.y
+                obs_pos_v[i, 2] = _obs_pos.z
+
+            if do_sat_azel:
+                _obs_eci = Eci(_dt, _obs_ptr_array[i].GetLocation())
+                _sat_pos = _sat_eci.Position()
+                _sat_vel = _sat_eci.Velocity()
+                _obs_pos = _obs_eci.Position()
+                _sat_dist, _sat_az, _sat_el = calc_sat_azel(
+                    _sat_pos, _sat_vel, _obs_pos
+                    )
+                sat_azel_v[i, 0] = _sat_az * RAD2DEG
+                sat_azel_v[i, 1] = _sat_el * RAD2DEG
+                sat_azel_v[i, 2] = _sat_dist
 
         array_delete(_tle_ptr_array)
         array_delete(_obs_ptr_array)
@@ -1835,6 +1943,14 @@ def propagate_many(
 
     if do_topo:
         result['topo'] = it.operands[n]
+        n += 1
+
+    if do_obs_pos:
+        result['obs_pos'] = it.operands[n]
+        n += 1
+
+    if do_sat_azel:
+        result['sat_azel'] = it.operands[n]
         n += 1
 
     return result

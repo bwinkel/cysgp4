@@ -525,16 +525,23 @@ def test_propagate_many():
     tles = PyTle(*TLE_ISS)
     observers = PyObserver(6.88375, 50.525, 0.366)
     mjds = np.linspace(56458.123, 56459.123, 4)
-    result = propagate_many(mjds, tles, observers)
+    result = propagate_many(
+        mjds, tles, observers,
+        do_obs_pos=True, do_sat_azel=True,
+        )
     eci_pos, eci_vel = result['eci_pos'], result['eci_vel']
     geo_pos = result['geo']
     topo_pos = result['topo']
+    obs_pos = result['obs_pos']
+    sat_azel = result['sat_azel']
 
     print(eci_pos.shape, topo_pos.shape)
     print(eci_pos)
     print(eci_vel)
     print(geo_pos)
     print(topo_pos)
+    print(obs_pos)
+    print(sat_azel)
     assert_allclose(
         eci_pos,
         np.array([
@@ -575,6 +582,28 @@ def test_propagate_many():
             [358.119836, -43.4672737, 9374.28958, 3.05851389],
             [82.2696201, -51.3260658, 10485.1513, 4.30601995],
             [153.994985, -50.6392658, 10376.5039, 3.23016271],
+            ]),
+        atol=1.e-5
+        )
+
+    assert_allclose(
+        obs_pos,
+        np.array([
+            [2859.23210332, -2886.91773032, 4900.40220555],
+            [1048.03439902, 3925.70071462, 4900.40220555],
+            [-3917.6583239, -1077.70842971, 4900.40220555],
+            [2908.46963417, -2837.30622059, 4900.40220555],
+            ]),
+        atol=1.e-5
+        )
+
+    assert_allclose(
+        sat_azel,
+        np.array([
+            [34.9918665, 35.4610563, 8406.37384],
+            [36.9218028, -23.4419077, 9374.28958],
+            [-0.677338121, -35.8893119, 10485.1513],
+            [26.9563006, -25.6785627, 10376.5039],
             ]),
         atol=1.e-5
         )
