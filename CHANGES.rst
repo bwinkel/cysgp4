@@ -1,5 +1,11 @@
-0.3.2 (unreleased)
+0.3.2 (2020-03-26)
 =======================
+
+New Features
+------------
+- Add observer coordinates (in eci frame and moving satellite frame) to
+  propagate_many function. This can be useful if one wants to calculate
+  satellite communication antenna gains w.r.t. observer on Earth. [#12]
 
 Bugfixes
 ~~~~~~~~~~
