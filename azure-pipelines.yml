@@ -136,6 +136,7 @@ jobs:
       echo "py_whl" $(py_whl)
       echo "numpy.version" $(numpy.version)
       echo "imageName" $(imageName)
+      echo "conda version"; conda -V
     displayName: Show Vars
 
   - bash: |
