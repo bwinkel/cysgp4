@@ -4,16 +4,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>propagate_many &#8212; cysgp4 v0.3.1</title>
+    <title>propagate_many &#8212; cysgp4 v0.3.2</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <script type="text/javascript" src="../_static/sidebar.js"></script>
     <script type="text/javascript" src="../_static/copybutton.js"></script>
     <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.3.1</a>
+	<a href="../index.html">cysgp4 v0.3.2</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -78,14 +78,14 @@
 <h1>propagate_many<a class="headerlink" href="#propagate-many" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="cysgp4.propagate_many">
-<code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">propagate_many</code><span class="sig-paren">(</span><em class="sig-param">mjds</em>, <em class="sig-param">tles</em>, <em class="sig-param">observers=None</em>, <em class="sig-param">bool do_eci_pos=True</em>, <em class="sig-param">bool do_eci_vel=True</em>, <em class="sig-param">bool do_geo=True</em>, <em class="sig-param">bool do_topo=True</em>, <em class="sig-param">unicode on_error=u'raise'</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.propagate_many" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">propagate_many</code><span class="sig-paren">(</span><em class="sig-param">mjds</em>, <em class="sig-param">tles</em>, <em class="sig-param">observers=None</em>, <em class="sig-param">bool do_eci_pos=True</em>, <em class="sig-param">bool do_eci_vel=True</em>, <em class="sig-param">bool do_geo=True</em>, <em class="sig-param">bool do_topo=True</em>, <em class="sig-param">bool do_obs_pos=False</em>, <em class="sig-param">bool do_sat_azel=False</em>, <em class="sig-param">unicode on_error=u'raise'</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.propagate_many" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate positions of many satellites at a various times at once.</p>
 <p>This is an array interface to the sgp4 calculations, which allows to
 perform calculations for different satellite TLEs, observers and times
 in a parallelized manner. <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/index.html#module-numpy" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy</span></code></a> broadcasting rules apply.</p>
-<p>With the Boolean parameters, <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_eci_pos</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_eci_vel</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_geo</span></code>, and
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">do_topo</span></code> the user can decide, which position frames are returned
-in the output dictionary.</p>
+<p>With the Boolean parameters, <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_eci_pos</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_eci_vel</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_geo</span></code>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">do_topo</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_obs_pos</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_sat_azel</span></code> the user can decide, which
+position frames are returned in the output dictionary.</p>
 <p>Satellite are defined via TLEs (see <a class="reference internal" href="cysgp4.PyTle.html#cysgp4.PyTle" title="cysgp4.PyTle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTle</span></code></a>). The
 <a class="reference internal" href="#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a> function works with a single (scalar) PyTle
 object or a list/array of them. The same is true for the <code class="xref py py-obj docutils literal notranslate"><span class="pre">mjds</span></code> and
@@ -118,6 +118,11 @@ the environment variable <code class="xref py py-obj docutils literal notranslat
 </dd>
 <dt><strong>do_topo</strong><span class="classifier">Boolean, optional (default: True)</span></dt><dd><p>Whether to include topocentric positions in the result.</p>
 </dd>
+<dt><strong>do_obs_pos</strong><span class="classifier">Boolean, optional (default: True)</span></dt><dd><p>Whether to include the observer ECI position in the results.</p>
+</dd>
+<dt><strong>do_sat_azel</strong><span class="classifier">Boolean, optional (default: True)</span></dt><dd><p>Whether to include the observer position as seen by the satellite
+(distance/azimuth/elevation) in the results.</p>
+</dd>
 <dt><strong>on_error</strong><span class="classifier">str, optional (either ‘raise’ or ‘coerce_to_nan’, default: ‘raise’)</span></dt><dd><p>If the underlying SGP C++ library throws an error (which often
 happens if one works with times that are strongly deviating from
 the TLE epoch), a Python RuntimeError is usually thrown. For batch
@@ -129,30 +134,42 @@ instead.</p>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
+<dd class="field-even"><dl>
 <dt><strong>result</strong><span class="classifier">dict</span></dt><dd><p>Resulting positions for each requested frame:</p>
-<ul class="simple">
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">eci_pos</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float
-Satellites ECI cartesian positions. Last dimension has length 3,
-one for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code>. First dimensions are
-determined by the (broadcasted) shape of the inputs <code class="xref py py-obj docutils literal notranslate"><span class="pre">mjd</span></code>,
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">tles</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">observers</span></code>.</p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">eci_vel</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float
-Satellites ECI cartesian velicities. Last dimension has length 3,
-one for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">v_x</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">v_y</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">v_z</span></code>. First dimensions are
-determined by the (broadcasted) shape of the inputs <code class="xref py py-obj docutils literal notranslate"><span class="pre">mjd</span></code>,
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">tles</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">observers</span></code>.</p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">geo</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float
-Satellites Geodetic positions. Last dimension has length 3, one
-for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">lon</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">lat</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">alt</span></code>. First dimensions are
-determined by the (broadcasted) shape of the inputs <code class="xref py py-obj docutils literal notranslate"><span class="pre">mjd</span></code>,
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">tles</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">observers</span></code>.</p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">topo</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float
-Satellites Topocentric positions. Last dimension has length 4,
-one for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">az</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">el</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">dist</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">dist_rate</span></code>. First
-dimensions are determined by the (broadcasted) shape of the
-inputs <code class="xref py py-obj docutils literal notranslate"><span class="pre">mjd</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">tles</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">observers</span></code>.</p></li>
+<ul>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">eci_pos</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
+<p>Satellites ECI cartesian positions. Last dimension has length 3,
+one for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code>.</p>
+</li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">eci_vel</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
+<p>Satellites ECI cartesian velicities. Last dimension has length 3,
+one for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">v_x</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">v_y</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">v_z</span></code>.</p>
+</li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">geo</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
+<p>Satellites Geodetic positions. Last dimension has length 3, one
+for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">lon</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">lat</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">alt</span></code>.</p>
+</li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">topo</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
+<p>Satellites Topocentric positions. Last dimension has length 4,
+one for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">az</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">el</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">dist</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">dist_rate</span></code>.</p>
+</li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">obs_pos</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
+<p>Observer positions in ECI frame (Cartesian). Last dimension has
+length 3, one for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code>.</p>
+</li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sat_azel</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
+<p>Observer positions in the (moving) satellite frame given as azimuth,
+elevation, and distance. Last dimension has length 3,
+one for each of, <code class="xref py py-obj docutils literal notranslate"><span class="pre">az</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">el</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">dist</span></code>. Note that the moving satellite
+frame is constructed from the satellite motion vector (<code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code> axis)
+and a vector that is perpendicular to the plane defined by the
+motion vector and the ECI zero point aka Earth center (<code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code> axis).
+The <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> axis is orthogonal to <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code> axes and is approximately
+pointing to the nadir.</p>
+</li>
 </ul>
+<p>In all cases the first dimensions are determined by the
+(broadcasted) shape of the inputs <code class="xref py py-obj docutils literal notranslate"><span class="pre">mjd</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">tles</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">observers</span></code>.</p>
 </dd>
 </dl>
 </dd>
@@ -215,14 +232,14 @@ function:</p>
     </div>
 <footer class="footer">
   <p class="pull-right">
-    <a href="https://github.com/bwinkel/cysgp4/tree/v0.3.1/docs/api/cysgp4.propagate_many.rst">Edit This Page on Github</a> &nbsp;
+    <a href="https://github.com/bwinkel/cysgp4/tree/v0.3.2/docs/api/cysgp4.propagate_many.rst">Edit This Page on Github</a> &nbsp;
     <a href="../_sources/api/cysgp4.propagate_many.rst.txt"
        rel="nofollow">Page Source</a> &nbsp;
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2020, Benjamin Winkel.<br/>
-    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.3.1. &nbsp;
-    Last built 07 Jan 2020. <br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.4. &nbsp;
+    Last built 26 Mar 2020. <br/>
   </p>
 </footer>
   </body>
