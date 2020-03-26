@@ -209,7 +209,7 @@ cpdef double satellite_mean_motion(
     Parameters
     ----------
     alt_km : float
-        Text containing TLE line strings.
+        Satellite altitude above Earth's surface.
     mu_km3_s2 : float, optional (default: 398600.8)
         Nominal Earth mass parameter [km^3 / s^2].
     r_earth_km : float, optional (default: 6378.135)
