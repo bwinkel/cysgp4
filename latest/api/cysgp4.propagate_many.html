@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>propagate_many &#8212; cysgp4 v0.3.3.dev3+gb04fa59</title>
+    <title>propagate_many &#8212; cysgp4 v0.3.4.dev2+g508ffee</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.3.3.dev3+gb04fa59</a>
+	<a href="../index.html">cysgp4 v0.3.4.dev2+g508ffee</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -78,7 +78,7 @@
 <h1>propagate_many<a class="headerlink" href="#propagate-many" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="cysgp4.propagate_many">
-<code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">propagate_many</code><span class="sig-paren">(</span><em class="sig-param">mjds</em>, <em class="sig-param">tles</em>, <em class="sig-param">observers=None</em>, <em class="sig-param">bool do_eci_pos=True</em>, <em class="sig-param">bool do_eci_vel=True</em>, <em class="sig-param">bool do_geo=True</em>, <em class="sig-param">bool do_topo=True</em>, <em class="sig-param">bool do_obs_pos=False</em>, <em class="sig-param">bool do_sat_azel=False</em>, <em class="sig-param">unicode on_error=u'raise'</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.propagate_many" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">propagate_many</code><span class="sig-paren">(</span><em class="sig-param">mjds</em>, <em class="sig-param">tles</em>, <em class="sig-param">observers=None</em>, <em class="sig-param">bool do_eci_pos=True</em>, <em class="sig-param">bool do_eci_vel=True</em>, <em class="sig-param">bool do_geo=True</em>, <em class="sig-param">bool do_topo=True</em>, <em class="sig-param">bool do_obs_pos=False</em>, <em class="sig-param">bool do_sat_azel=False</em>, <em class="sig-param">unicode sat_frame=u'zxy'</em>, <em class="sig-param">unicode on_error=u'raise'</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.propagate_many" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate positions of many satellites at a various times at once.</p>
 <p>This is an array interface to the sgp4 calculations, which allows to
 perform calculations for different satellite TLEs, observers and times
@@ -123,6 +123,17 @@ the environment variable <code class="xref py py-obj docutils literal notranslat
 <dt><strong>do_sat_azel</strong><span class="classifier">Boolean, optional (default: True)</span></dt><dd><p>Whether to include the observer position as seen by the satellite
 (distance/azimuth/elevation) in the results.</p>
 </dd>
+<dt><strong>sat_frame</strong><span class="classifier">‘zxy’ or ‘xyz’, optional (default: ‘zxy’)</span></dt><dd><p>How the moving satellite frame is defined. Two options are
+implemented, ‘zxy’ and ‘xyz’.  If ‘zxy’ is chosen, the moving
+satellite frame is constructed such that the <code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code> axis is aligned with
+the satellite motion vector. The <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code> axis is constructed as a vector
+that is perpendicular to the plane defined by the motion vector and
+the ECI zero point (aka Earth center). The resulting <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> axis, which
+is orthogonal to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code> axes, is then approximately pointing
+to the nadir. Alternatively, if the frame is set as <code class="xref py py-obj docutils literal notranslate"><span class="pre">xyz</span></code>, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code>
+axes is the motion vector, <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code> has the same meaning and <code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code> is
+approximately pointing towards the nadir.</p>
+</dd>
 <dt><strong>on_error</strong><span class="classifier">str, optional (either ‘raise’ or ‘coerce_to_nan’, default: ‘raise’)</span></dt><dd><p>If the underlying SGP C++ library throws an error (which often
 happens if one works with times that are strongly deviating from
 the TLE epoch), a Python RuntimeError is usually thrown. For batch
@@ -158,14 +169,13 @@ one for each of <code class="xref py py-obj docutils literal notranslate"><span 
 length 3, one for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code>.</p>
 </li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sat_azel</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
-<p>Observer positions in the (moving) satellite frame given as azimuth,
-elevation, and distance. Last dimension has length 3,
-one for each of, <code class="xref py py-obj docutils literal notranslate"><span class="pre">az</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">el</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">dist</span></code>. Note that the moving satellite
-frame is constructed from the satellite motion vector (<code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code> axis)
-and a vector that is perpendicular to the plane defined by the
-motion vector and the ECI zero point aka Earth center (<code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code> axis).
-The <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> axis is orthogonal to <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code> axes and is approximately
-pointing to the nadir.</p>
+<p>Observer positions in the (moving) satellite frame either given as
+azimuth (aka across track), elevation (aka along track), and
+distance - if <code class="xref py py-obj docutils literal notranslate"><span class="pre">sat_frame</span></code> is ‘zxy’, or given as ‘theta’, ‘phi’, and
+distance if <code class="xref py py-obj docutils literal notranslate"><span class="pre">sat_frame</span></code> is ‘xyz’ (with ISO definition of the angles
+theta and phi); see also <code class="xref py py-obj docutils literal notranslate"><span class="pre">sat_frame</span></code> parameter description. Last
+dimension has length 3, one for each of, (<code class="xref py py-obj docutils literal notranslate"><span class="pre">az</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">el</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">dist</span></code>) or
+(<code class="xref py py-obj docutils literal notranslate"><span class="pre">theta',</span> <span class="pre">`phi</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">dist</span></code>), respectively.</p>
 </li>
 </ul>
 <p>In all cases the first dimensions are determined by the
