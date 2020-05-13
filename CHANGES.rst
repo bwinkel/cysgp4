@@ -1,3 +1,14 @@
+0.3.3 (unreleased)
+=======================
+
+Bugfixes
+~~~~~~~~~~
+- `PyDateTime` was using wrong time zone if current time was requested (e.g.,
+  by calling it with empty init arguments, or setting the `datetime` property
+  to None). The wrong behavior had its origin in a call to `datetime.now()`
+  while the correct call must be `datetime.utcnow` (as `PyDateTime` is
+  defined in the UTC frame. [#13]
+
 0.3.2 (2020-03-26)
 =======================
 

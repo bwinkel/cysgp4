@@ -237,7 +237,7 @@ cdef class PyDateTime(object):
     dt : `~datetime.datetime` object, or None (default: None)
         Construct the `~cysgp4.PyDateTime` instance with a given
         Python `~datetime.datetime` object, or - if None - use the
-        current date and time (as given by `~datetime.datetime.now()`)
+        current date and time (as given by `~datetime.datetime.utcnow()`)
     init : Boolean (default: True)
         If set to true, the `~datetime.datetime` object will ignore the
         `dt` parameter and set the internal ticks variable to 0.
@@ -433,7 +433,7 @@ cdef class PyDateTime(object):
         '''
 
         if dt is None:
-            dt = datetime.datetime.now()
+            dt = datetime.datetime.utcnow()
 
         assert isinstance(dt, datetime.datetime)
 
@@ -1334,7 +1334,7 @@ cdef class Satellite(object):
     pydt : `~cysgp4.PyDateTime` or `None` (default: None)
         Date and time at which to calculate the position. If `None` then
         the current datetime is used, as given by a call to
-        `~datetime.datetime.now()`.
+        `~datetime.datetime.utcnow()`.
     mjd_cache_resolution : double (default: 0.001)
         Granularity of the internal cache [s]. Satellite positions are
         calculated only if the newly requested datetime differs by more than
