@@ -52,6 +52,11 @@ TLE_ELSQ_ERR = (  # if MJD is far in the future: Error: (elsq >= 1.0)
 #  '1 28485U 04047A   19321.65306734  .00000791  00000-0  23585-4 0  9996',
 #  '2 28485  20.5570  74.4329 0010989 245.6346 114.2940 15.04483561821407'
 #     )
+TLE_FRAMES = (
+    'EXAMPLE-1',
+    '1 12345U 19999AB  19329.97966201  .00000000  00000-0  00000-0 0  9996',
+    '2 12345  97.7597  36.0000 0000001   0.0000 264.2060 14.91626663    16',
+    )
 
 
 class TestPyDateTime:
@@ -635,6 +640,45 @@ def test_propagate_many_pos_switches():
         do_eci_pos=False, do_eci_vel=True, do_geo=True, do_topo=True,
         )
     assert ('eci_pos' not in result) and ('eci_vel' in result)
+
+
+def test_propagate_many_sat_frames():
+
+    tles = PyTle(*TLE_FRAMES)
+    mjd_epoch = 58813.5
+    start_mjd = mjd_epoch - 3.26938 / 2 / np.pi
+    mjds = start_mjd + np.array([0., 77400.]) / 86400.
+    observer = cysgp4.PyObserver(0., 50., 0.)
+
+    result = propagate_many(
+        mjds, tles, observer,
+        do_sat_azel=True, do_obs_pos=True,
+        sat_frame='zxy'
+        )
+
+    assert_allclose(
+        result['sat_azel'],
+        np.array([
+            [-1.01254740e+01, 1.53870011e+01, 1.25977770e+04],
+            [2.56035984e+01, 6.29046345e+01, 2.43357584e+03],
+            ]),
+        atol=1.e-5
+        )
+
+    result = propagate_many(
+        mjds, tles, observer,
+        do_sat_azel=True, do_obs_pos=True,
+        sat_frame='xyz'
+        )
+
+    assert_allclose(
+        result['sat_azel'],
+        np.array([
+            [3.25712537e+01, 1.83522007e+01, 1.25977770e+04],
+            [-1.24672104e+01, 6.57481737e+01, 2.43357584e+03],
+            ]),
+        atol=1.e-5
+        )
 
 
 def test_propagate_many_raises_error():

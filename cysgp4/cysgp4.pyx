@@ -213,6 +213,37 @@ cdef inline (double, double, double) calc_sat_azel(
     return sat_dist, sat_az, sat_el
 
 
+cdef inline (double, double, double) calc_sat_iso(
+        Vector sat_pos, Vector sat_vel, Vector obs_pos
+        ) nogil:
+
+    cdef:
+
+        double norm
+        Vector e_x, e_y, e_z
+        Vector sat_iso, diff_pos
+        double b_x, b_y, b_z
+        double sat_dist, sat_theta, sat_phi
+
+    e_x = normalize_vector(sat_vel)
+    e_z = normalize_vector(Vector(-sat_pos.x, -sat_pos.y, -sat_pos.z))
+    e_y = normalize_vector(cross_prod(e_z, e_x))
+    e_z = cross_prod(e_x, e_y)
+
+    diff_pos.x = obs_pos.x - sat_pos.x
+    diff_pos.y = obs_pos.y - sat_pos.y
+    diff_pos.z = obs_pos.z - sat_pos.z
+    b_x = dot_prod(diff_pos, e_x)
+    b_y = dot_prod(diff_pos, e_y)
+    b_z = dot_prod(diff_pos, e_z)
+
+    sat_dist = sqrt(b_x ** 2 + b_y ** 2 + b_z ** 2)
+    sat_theta = acos(b_z / sat_dist)
+    sat_phi = atan2(b_y, b_x)
+
+    return sat_dist, sat_phi, sat_theta
+
+
 cdef class PyDateTime(object):
     '''
     Thin wrapper around sgp4 (C++) DateTime class.
@@ -1599,7 +1630,7 @@ def propagate_many(
         bint do_eci_pos=True, bint do_eci_vel=True,
         bint do_geo=True, bint do_topo=True,
         bint do_obs_pos=False, bint do_sat_azel=False,
-        str on_error='raise',
+        str sat_frame='zxy', str on_error='raise',
         ):
     '''
     Calculate positions of many satellites at a various times at once.
@@ -1651,6 +1682,17 @@ def propagate_many(
     do_sat_azel : Boolean, optional (default: True)
         Whether to include the observer position as seen by the satellite
         (distance/azimuth/elevation) in the results.
+    sat_frame : 'zxy' or 'xyz', optional (default: 'zxy')
+        How the moving satellite frame is defined. Two options are
+        implemented, 'zxy' and 'xyz'.  If 'zxy' is chosen, the moving
+        satellite frame is constructed such that the `z` axis is aligned with
+        the satellite motion vector. The `y` axis is constructed as a vector
+        that is perpendicular to the plane defined by the motion vector and
+        the ECI zero point (aka Earth center). The resulting `x` axis, which
+        is orthogonal to the `y` and `z` axes, is then approximately pointing
+        to the nadir. Alternatively, if the frame is set as `xyz`, the `x`
+        axes is the motion vector, `y` has the same meaning and `z` is
+        approximately pointing towards the nadir.
     on_error : str, optional (either 'raise' or 'coerce_to_nan', default: 'raise')
         If the underlying SGP C++ library throws an error (which often
         happens if one works with times that are strongly deviating from
@@ -1692,14 +1734,13 @@ def propagate_many(
 
         - `sat_azel` : `~numpy.ndarray` of float
 
-          Observer positions in the (moving) satellite frame given as azimuth,
-          elevation, and distance. Last dimension has length 3,
-          one for each of, `az`, `el`, `dist`. Note that the moving satellite
-          frame is constructed from the satellite motion vector (`z` axis)
-          and a vector that is perpendicular to the plane defined by the
-          motion vector and the ECI zero point aka Earth center (`y` axis).
-          The `x` axis is orthogonal to `y` and `z` axes and is approximately
-          pointing to the nadir.
+          Observer positions in the (moving) satellite frame either given as
+          azimuth (aka across track), elevation (aka along track), and
+          distance - if `sat_frame` is 'zxy', or given as 'theta', 'phi', and
+          distance if `sat_frame` is 'xyz' (with ISO definition of the angles
+          theta and phi); see also `sat_frame` parameter description. Last
+          dimension has length 3, one for each of, (`az`, `el`, `dist`) or
+          (`theta', `phi`, `dist`), respectively.
 
         In all cases the first dimensions are determined by the
         (broadcasted) shape of the inputs `mjd`, `tles`, and `observers`.
@@ -1773,7 +1814,13 @@ def propagate_many(
 
         bint on_error_raise = True
 
+        int _sat_frame = 0  # 0: 'zxy', 1: 'xyz'
+
     assert on_error in ['raise', 'coerce_to_nan']
+    assert sat_frame in ['zxy', 'xyz']
+
+    if sat_frame == 'xyz':
+        _sat_frame = 1
 
     if on_error == 'coerce_to_nan':
         on_error_raise = False
@@ -1916,9 +1963,14 @@ def propagate_many(
                 _sat_pos = _sat_eci.Position()
                 _sat_vel = _sat_eci.Velocity()
                 _obs_pos = _obs_eci.Position()
-                _sat_dist, _sat_az, _sat_el = calc_sat_azel(
-                    _sat_pos, _sat_vel, _obs_pos
-                    )
+                if _sat_frame == 0:
+                    _sat_dist, _sat_az, _sat_el = calc_sat_azel(
+                        _sat_pos, _sat_vel, _obs_pos
+                        )
+                elif _sat_frame == 1:
+                    _sat_dist, _sat_az, _sat_el = calc_sat_iso(
+                        _sat_pos, _sat_vel, _obs_pos
+                        )
                 sat_azel_v[i, 0] = _sat_az * RAD2DEG
                 sat_azel_v[i, 1] = _sat_el * RAD2DEG
                 sat_azel_v[i, 2] = _sat_dist

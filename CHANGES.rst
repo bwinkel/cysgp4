@@ -1,6 +1,13 @@
 0.3.4 (unreleased)
 =======================
 
+New Features
+------------
+- Add an option to choose the satellite coordinate frame in the
+  `propagate_many` function. The two available choices differ in the order
+  of the Cartesian axes (how x/y/z are mapped to motion and nadir directions)
+  and the choice of angles. (See function description.)
+
 0.3.3 (2020-05-13)
 =======================
 
