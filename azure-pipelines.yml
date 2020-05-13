@@ -34,6 +34,7 @@ jobs:
     # plat: manylinux1_x86_64
     # image: skhep/manylinuxgcc-x86_64
     python.architecture: x64
+    sphinx.version: '<3.0'
 
   strategy:
     matrix:
@@ -141,6 +142,7 @@ jobs:
       echo "py_whl" $(py_whl)
       echo "numpy.version" $(numpy.version)
       echo "imageName" $(imageName)
+      echo "sphinx.version" $(sphinx.version)
       echo "conda version"; conda -V
     displayName: Show Vars
 
@@ -184,7 +186,7 @@ jobs:
 
   - script: |
       $(conda.activate) cysgp4-env
-      conda install --yes --quiet --name cysgp4-env -c conda-forge astropy sphinx-astropy
+      conda install --yes --quiet --name cysgp4-env -c conda-forge astropy "sphinx$(sphinx.version)" sphinx-astropy
       sphinx-build docs docs/_build/html -W -b html
     displayName: Make docs
     condition: succeeded()
