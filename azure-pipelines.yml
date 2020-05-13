@@ -159,7 +159,7 @@ jobs:
   # pip installation)
   - script: |
       $(conda.activate) cysgp4-env
-      conda install --yes --quiet -c conda-forge python=$(python.version) cython numpy==$(numpy.version) setuptools_scm twine pytest pytest-astropy pytest-doctestplus sgp4 wheel
+      conda install --yes --quiet -c conda-forge python=$(python.version) cython numpy==$(numpy.version) setuptools_scm twine pytest pytest-astropy "pytest-doctestplus<0.6.1" sgp4 wheel
     displayName: Install Anaconda packages
 
   # need to fix cctools and ld64 to slightly older version, otherwise an
