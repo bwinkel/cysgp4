@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Cysgp4 quick tour &#8212; cysgp4 v0.3.4.dev2+g508ffee</title>
+    <title>Cysgp4 quick tour &#8212; cysgp4 v0.3.4.dev3+gb4b7652</title>
     <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="index.html">cysgp4 v0.3.4.dev2+g508ffee</a>
+	<a href="index.html">cysgp4 v0.3.4.dev3+gb4b7652</a>
 	 &#187;
       </li>
       
@@ -76,7 +76,7 @@
   <div class="section" id="cysgp4-quick-tour">
 <h1>Cysgp4 quick tour<a class="headerlink" href="#cysgp4-quick-tour" title="Permalink to this headline">¶</a></h1>
 <p>Using cysgp4 is possible via an object-oriented interface or with a
-fast <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/index.html#module-numpy" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy</span></code></a>-array functional approach. The former works like this:</p>
+fast <a class="reference external" href="https://numpy.org/doc/stable/reference/index.html#module-numpy" title="(in NumPy v1.18)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy</span></code></a>-array functional approach. The former works like this:</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cysgp4</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define a date/time and an observer</span>
@@ -114,7 +114,7 @@ fast <a class="reference external" href="https://docs.scipy.org/doc/numpy/refere
 this, the function <a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a> is useful. This is an array
 interface to the sgp4 calculations, which allows to perform calculations for
 different satellite TLEs, observers and times in a parallelized manner.
-<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/index.html#module-numpy" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy</span></code></a> broadcasting <a class="reference external" href="https://docs.scipy.org/doc/numpy/user/basics.broadcasting.html">rules</a> apply:</p>
+<a class="reference external" href="https://numpy.org/doc/stable/reference/index.html#module-numpy" title="(in NumPy v1.18)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy</span></code></a> broadcasting <a class="reference external" href="https://docs.scipy.org/doc/numpy/user/basics.broadcasting.html">rules</a> apply:</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="kn">import</span> <span class="n">PyTle</span><span class="p">,</span> <span class="n">PyObserver</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="kn">import</span> <span class="n">get_example_tles</span><span class="p">,</span> <span class="n">propagate_many</span>
@@ -194,7 +194,7 @@ tutorial notebook</a>.</p>
   <p>
     &copy; Copyright 2020, Benjamin Winkel.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.4. &nbsp;
-    Last built 13 May 2020. <br/>
+    Last built 09 Jun 2020. <br/>
   </p>
 </footer>
   </body>

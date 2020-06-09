@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>propagate_many &#8212; cysgp4 v0.3.4.dev2+g508ffee</title>
+    <title>propagate_many &#8212; cysgp4 v0.3.4.dev3+gb4b7652</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.3.4.dev2+g508ffee</a>
+	<a href="../index.html">cysgp4 v0.3.4.dev3+gb4b7652</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -82,7 +82,7 @@
 <dd><p>Calculate positions of many satellites at a various times at once.</p>
 <p>This is an array interface to the sgp4 calculations, which allows to
 perform calculations for different satellite TLEs, observers and times
-in a parallelized manner. <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/index.html#module-numpy" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy</span></code></a> broadcasting rules apply.</p>
+in a parallelized manner. <a class="reference external" href="https://numpy.org/doc/stable/reference/index.html#module-numpy" title="(in NumPy v1.18)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy</span></code></a> broadcasting rules apply.</p>
 <p>With the Boolean parameters, <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_eci_pos</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_eci_vel</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_geo</span></code>,
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_topo</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_obs_pos</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">do_sat_azel</span></code> the user can decide, which
 position frames are returned in the output dictionary.</p>
@@ -103,11 +103,11 @@ the environment variable <code class="xref py py-obj docutils literal notranslat
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>mjds</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a>, or scalar of float</span></dt><dd><p>Modified Julian Date.</p>
+<dt><strong>mjds</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a>, or scalar of float</span></dt><dd><p>Modified Julian Date.</p>
 </dd>
-<dt><strong>tles</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a>, or scalar of <a class="reference internal" href="cysgp4.PyTle.html#cysgp4.PyTle" title="cysgp4.PyTle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTle</span></code></a></span></dt><dd><p>TLE instance of the satellite of interest.</p>
+<dt><strong>tles</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a>, or scalar of <a class="reference internal" href="cysgp4.PyTle.html#cysgp4.PyTle" title="cysgp4.PyTle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTle</span></code></a></span></dt><dd><p>TLE instance of the satellite of interest.</p>
 </dd>
-<dt><strong>observers</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a>, or scalar of <a class="reference internal" href="cysgp4.PyObserver.html#cysgp4.PyObserver" title="cysgp4.PyObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyObserver</span></code></a> or None (default: None)</span></dt><dd><p>Observer instance. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then the observer location is set to
+<dt><strong>observers</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a>, or scalar of <a class="reference internal" href="cysgp4.PyObserver.html#cysgp4.PyObserver" title="cysgp4.PyObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyObserver</span></code></a> or None (default: None)</span></dt><dd><p>Observer instance. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then the observer location is set to
 (0 deg, 0 deg, 0 km).</p>
 </dd>
 <dt><strong>do_eci_pos</strong><span class="classifier">Boolean, optional (default: True)</span></dt><dd><p>Whether to include ECI cartesian positions in the result.</p>
@@ -148,27 +148,27 @@ instead.</p>
 <dd class="field-even"><dl>
 <dt><strong>result</strong><span class="classifier">dict</span></dt><dd><p>Resulting positions for each requested frame:</p>
 <ul>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">eci_pos</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">eci_pos</span></code> : <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
 <p>Satellites ECI cartesian positions. Last dimension has length 3,
 one for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code>.</p>
 </li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">eci_vel</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">eci_vel</span></code> : <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
 <p>Satellites ECI cartesian velicities. Last dimension has length 3,
 one for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">v_x</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">v_y</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">v_z</span></code>.</p>
 </li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">geo</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">geo</span></code> : <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
 <p>Satellites Geodetic positions. Last dimension has length 3, one
 for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">lon</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">lat</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">alt</span></code>.</p>
 </li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">topo</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">topo</span></code> : <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
 <p>Satellites Topocentric positions. Last dimension has length 4,
 one for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">az</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">el</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">dist</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">dist_rate</span></code>.</p>
 </li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">obs_pos</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">obs_pos</span></code> : <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
 <p>Observer positions in ECI frame (Cartesian). Last dimension has
 length 3, one for each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code>.</p>
 </li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sat_azel</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sat_azel</span></code> : <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of float</p>
 <p>Observer positions in the (moving) satellite frame either given as
 azimuth (aka across track), elevation (aka along track), and
 distance - if <code class="xref py py-obj docutils literal notranslate"><span class="pre">sat_frame</span></code> is ‘zxy’, or given as ‘theta’, ‘phi’, and
@@ -249,7 +249,7 @@ function:</p>
   <p>
     &copy; Copyright 2020, Benjamin Winkel.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.4. &nbsp;
-    Last built 13 May 2020. <br/>
+    Last built 09 Jun 2020. <br/>
   </p>
 </footer>
   </body>
