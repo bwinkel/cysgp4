@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import pytest
 from numpy.testing import assert_equal, assert_allclose
 from cysgp4 import *
 
@@ -80,3 +81,43 @@ def test_tle_linestrings_from_orbital_parameters():
         mean_motion,
         )
     assert tle_tuple == MYSAT
+
+
+def test_tle_linestrings_from_orbital_parameters_raises():
+
+    # assume, the parameters are valid for the following time
+    dt = datetime.datetime(2019, 11, 2, 2, 5, 14)
+    pydt = PyDateTime(dt)
+
+    # Define satellite orbital parameters
+    alt_km = 3000.
+    mm = satellite_mean_motion(alt_km)
+
+    kwargs = dict(
+        sat_name='MYSAT',
+        sat_nr=1,
+        mjd_epoch=pydt.mjd,
+        inclination_deg=10.,
+        raan_deg=35.,
+        eccentricity=0.0001,
+        argument_of_perigee_deg=0.,
+        mean_anomaly_deg=112.,
+        mean_motion_per_day=mm,
+        )
+
+    with pytest.raises(ValueError):
+        _kwargs = kwargs.copy()
+        _kwargs['sat_nr'] = 100000
+        tle_linestrings_from_orbital_parameters(**_kwargs)
+
+    with pytest.raises(ValueError):
+        _kwargs = kwargs.copy()
+        _kwargs['eccentricity'] = 1.1
+        tle_linestrings_from_orbital_parameters(**_kwargs)
+
+    with pytest.raises(ValueError):
+        _kwargs = kwargs.copy()
+        dt = datetime.datetime(2057, 11, 2, 2, 5, 14)
+        pydt = PyDateTime(dt)
+        _kwargs['mjd_epoch'] = pydt.mjd
+        tle_linestrings_from_orbital_parameters(**_kwargs)

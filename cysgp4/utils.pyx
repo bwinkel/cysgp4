@@ -337,10 +337,23 @@ cpdef tuple tle_linestrings_from_orbital_parameters(
 
     '''
 
+    if sat_nr < 0 or sat_nr > 99999:
+        raise ValueError('sat_nr must be a 5-digit number')
+    if eccentricity < 0.:
+        raise ValueError('Eccentricity must be >= 0.')
+    if eccentricity >= 1.:
+        raise ValueError('Eccentricity must be < 1.')
+
     cdef:
 
         DateTime dt = datetime_from_mjd(mjd_epoch)
         int year = dt.Year()
+
+    if year < 1957 or year > 2056:
+        raise ValueError('Year must be between 1957 and 2056')
+
+    cdef:
+
         double epoch = (
             (year % 100) * 1000. +
             dt.DayOfYear(dt.Year(), dt.Month(), dt.Day()) +
@@ -366,11 +379,5 @@ cpdef tuple tle_linestrings_from_orbital_parameters(
         str tle1 = '{:s}{:d}'.format(tmp1[:68], tle_checksum(tmp1))
         str tle2 = '{:s}{:d}'.format(tmp2[:68], tle_checksum(tmp2))
 
-    if eccentricity < 0.:
-        raise ValueError('Eccentricity must be >= 0.')
-    if eccentricity >= 1.:
-        raise ValueError('Eccentricity must be < 1.')
-    if year < 1957 or year > 2056:
-        raise ValueError('Year must be between 1957 and 2056')
 
     return (sat_name, tle1, tle2)
