@@ -73,7 +73,8 @@ ctypedef Observer* obs_ptr_t
 __all__ = [
     'PyDateTime', 'PyTle', 'PyObserver',
     'PyCoordGeodetic', 'PyCoordTopocentric', 'PyEci',
-    'Satellite', 'propagate_many', 'set_num_threads',
+    'Satellite', 'set_num_threads',
+    'eci_to_geo', 'geo_to_eci', 'lookangles',
     ]
 
 
@@ -861,6 +862,13 @@ cdef class PyTle(object):
 
         return self.thisptr.BStar()
 
+    # need comparison operators for finding unique TLEs
+    def __lt__(self, other):
+        return self.tle_strings() < other.tle_strings()
+
+    def __eq__(self, other):
+        return self.tle_strings() == other.tle_strings()
+
 
 cdef class PyCoordGeodetic(object):
     '''
@@ -1200,6 +1208,17 @@ cdef class PyObserver(object):
         _get_location, _set_location, None,
         doc='Geographic location (see also Class documentation).'
         )
+
+    # need comparison operators for finding unique observers
+    def __lt__(self, other):
+        return self.loc.lon < other.loc.lon
+
+    def __eq__(self, other):
+        return (
+            self.loc.lon == other.loc.lon and
+            self.loc.lat == other.loc.lat and
+            self.loc.alt == other.loc.alt
+            )
 
 
 cdef class PyEci(object):
@@ -1625,7 +1644,7 @@ cdef class Satellite(object):
         self._pos_dirty = <python_bool> False
 
 
-def propagate_many(
+def _propagate_many_cysgp4(
         mjds, tles, observers=None,
         bint do_eci_pos=True, bint do_eci_vel=True,
         bint do_geo=True, bint do_topo=True,
@@ -1754,7 +1773,7 @@ def propagate_many(
         >>> from cysgp4 import PyTle, PyObserver, propagate_many
         >>> from cysgp4 import get_example_tles, tles_from_text
 
-        >>> tle_text = cysgp4.get_example_tles()
+        >>> tle_text = get_example_tles()
         >>> tles = np.array(
         ...     tles_from_text(tle_text)
         ...     )[np.newaxis, np.newaxis, :20]  # use first 20 TLEs
@@ -2006,3 +2025,231 @@ def propagate_many(
         n += 1
 
     return result
+
+
+def eci_to_geo(eci_x, eci_y, eci_z, mjds):
+
+    cdef:
+
+        Eci _eci
+        DateTime _dt
+        CoordGeodetic _geo
+        Vector _eci_pos
+
+        np.ndarray[double] mjd
+        const double[:] eci_x_v
+        const double[:] eci_y_v
+        const double[:] eci_z_v
+        double[:] geo_lon_v
+        double[:] geo_lat_v
+        double[:] geo_alt_v
+        int i, size
+
+    it = np.nditer(
+        [mjds, eci_x, eci_y, eci_z] + [None] * 3,
+        flags=['external_loop', 'buffered', 'delay_bufalloc', 'refs_ok'],
+        op_flags=[['readonly']] * 4 + [['readwrite', 'allocate']] * 3,
+        op_dtypes=['float64'] * 7,
+        )
+
+    # it would be better to use the context manager but
+    # "with it:" requires numpy >= 1.14
+
+    it.reset()
+
+    for itup in it:
+
+        mjd = itup[0]
+        eci_x_v = itup[1]
+        eci_y_v = itup[2]
+        eci_z_v = itup[3]
+        geo_lon_v = itup[4]
+        geo_lat_v = itup[5]
+        geo_alt_v = itup[6]
+
+        size = mjd.shape[0]
+
+        for i in prange(size, nogil=True):
+
+            # AddTicks returns a new instance...
+            _dt = _dt.AddTicks(ticks_from_mjd(mjd[i]) - _dt.Ticks())
+            _eci_pos = Vector(eci_x_v[i], eci_y_v[i], eci_z_v[i])
+            _eci = Eci(_dt, _eci_pos)
+
+            _geo = _eci.ToGeodetic()
+            # attributes are in rad!
+            geo_lon_v[i] = _geo.longitude * RAD2DEG
+            geo_lat_v[i] = _geo.latitude * RAD2DEG
+            geo_alt_v[i] = _geo.altitude
+
+    return it.operands[4:7]
+
+
+def geo_to_eci(lon, lat, alt, mjds):
+
+    cdef:
+
+        Eci _eci
+        DateTime _dt
+        CoordGeodetic _geo
+        Vector _eci_pos
+
+        np.ndarray[double] mjd
+        double[:] eci_x_v
+        double[:] eci_y_v
+        double[:] eci_z_v
+        const double[:] geo_lon_v
+        const double[:] geo_lat_v
+        const double[:] geo_alt_v
+        int i, size
+
+    it = np.nditer(
+        [mjds, lon, lat, alt] + [None] * 3,
+        flags=['external_loop', 'buffered', 'delay_bufalloc', 'refs_ok'],
+        op_flags=[['readonly']] * 4 + [['readwrite', 'allocate']] * 3,
+        op_dtypes=['float64'] * 7,
+        )
+
+    # it would be better to use the context manager but
+    # "with it:" requires numpy >= 1.14
+
+    it.reset()
+
+    for itup in it:
+
+        mjd = itup[0]
+        geo_lon_v = itup[1]
+        geo_lat_v = itup[2]
+        geo_alt_v = itup[3]
+        eci_x_v = itup[4]
+        eci_y_v = itup[5]
+        eci_z_v = itup[6]
+
+        size = mjd.shape[0]
+
+        for i in prange(size, nogil=True):
+
+            # AddTicks returns a new instance...
+            _dt = _dt.AddTicks(ticks_from_mjd(mjd[i]) - _dt.Ticks())
+            # constructor uses radians by default
+            _eci = Eci(_dt, geo_lat_v[i], geo_lon_v[i], geo_alt_v[i])
+            _eci_pos = _eci.Position()
+
+            eci_x_v[i] = _eci_pos.x
+            eci_y_v[i] = _eci_pos.y
+            eci_z_v[i] = _eci_pos.z
+
+    return it.operands[4:7]
+
+
+def lookangles(
+        sat_pos_x, sat_pos_y, sat_pos_z,
+        sat_vel_x, sat_vel_y, sat_vel_z,
+        mjds, observers, str sat_frame='zxy',
+        ):
+
+    cdef:
+
+        Eci _sat_eci, _obs_eci
+        DateTime _dt
+        Observer _obs
+        # CoordGeodetic _geo
+        CoordTopocentric _topo
+        Vector _obs_pos, _sat_pos, _sat_vel
+        double _sat_dist, _sat_az, _sat_el
+
+        np.ndarray[double] mjd
+        np.ndarray[object] obs
+
+        const double[:] sat_pos_x_v
+        const double[:] sat_pos_y_v
+        const double[:] sat_pos_z_v
+        const double[:] sat_vel_x_v
+        const double[:] sat_vel_y_v
+        const double[:] sat_vel_z_v
+        double[:] obs_az_v, obs_el_v, sat_az_v, sat_el_v
+        double[:] dist_v
+        double[:] distrate_v
+
+        obs_ptr_t* _obs_ptr_array
+
+        int i, size
+        int _sat_frame = 0  # 0: 'zxy', 1: 'xyz'
+
+    assert sat_frame in ['zxy', 'xyz']
+
+    if sat_frame == 'xyz':
+        _sat_frame = 1
+
+    it = np.nditer(
+        [
+            mjds, observers,
+            sat_pos_x, sat_pos_y, sat_pos_z,
+            sat_vel_x, sat_vel_y, sat_vel_z,
+            ] + [None] * 6,
+        flags=['external_loop', 'buffered', 'delay_bufalloc', 'refs_ok'],
+        op_flags=[['readonly']] * 8 + [['readwrite', 'allocate']] * 6,
+        op_dtypes=['float64', 'object'] + ['float64'] * 12,
+        )
+
+    # it would be better to use the context manager but
+    # "with it:" requires numpy >= 1.14
+
+    it.reset()
+
+    for itup in it:
+
+        mjd = itup[0]
+        obs = itup[1]
+        sat_pos_x_v = itup[2]
+        sat_pos_y_v = itup[3]
+        sat_pos_z_v = itup[4]
+        sat_vel_x_v = itup[5]
+        sat_vel_y_v = itup[6]
+        sat_vel_z_v = itup[7]
+        obs_az_v = itup[8]
+        obs_el_v = itup[9]
+        sat_az_v = itup[10]
+        sat_el_v = itup[11]
+        dist_v = itup[12]
+        distrate_v = itup[13]
+
+        size = mjd.shape[0]
+        _obs_ptr_array = array_new[obs_ptr_t](size)
+
+        for i in range(size):
+            # unfortunately, it is not possible in nogil loop to access
+            # the cdef'ed class members; therefore, we have to maintain
+            # arrays of pointers to the sgp4 and observer objects
+            _obs_ptr_array[i] = &(<PyObserver> obs[i])._cobj
+
+        for i in prange(size, nogil=True):
+
+            # AddTicks returns a new instance...
+            _dt = _dt.AddTicks(ticks_from_mjd(mjd[i]) - _dt.Ticks())
+            _sat_pos = Vector(sat_pos_x_v[i], sat_pos_y_v[i], sat_pos_z_v[i])
+            _sat_vel = Vector(sat_vel_x_v[i], sat_vel_y_v[i], sat_vel_z_v[i])
+            _sat_eci = Eci(_dt, _sat_pos, _sat_vel)
+
+            _obs = Observer(_obs_ptr_array[i].GetLocation())
+            _topo = _obs.GetLookAngle(_sat_eci)
+            obs_az_v[i] = _topo.azimuth * RAD2DEG
+            obs_el_v[i] = _topo.elevation * RAD2DEG
+            dist_v[i] = _topo.distance
+            distrate_v[i] = _topo.distance_rate
+
+            _obs_eci = Eci(_dt, _obs_ptr_array[i].GetLocation())
+            _obs_pos = _obs_eci.Position()
+
+            if _sat_frame == 0:
+                _sat_dist, _sat_az, _sat_el = calc_sat_azel(
+                    _sat_pos, _sat_vel, _obs_pos
+                    )
+            elif _sat_frame == 1:
+                _sat_dist, _sat_az, _sat_el = calc_sat_iso(
+                    _sat_pos, _sat_vel, _obs_pos
+                    )
+            sat_az_v[i] = _sat_az * RAD2DEG
+            sat_el_v[i] = _sat_el * RAD2DEG
+
+    return it.operands[8:14]
