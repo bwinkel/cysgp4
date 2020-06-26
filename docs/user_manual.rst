@@ -208,7 +208,9 @@ below).
     The `Geodetic frame`_ goes usually along with a specific definition of
     the Geoid (Earth's ellipsoid). For many application, the
     `WGS84 <https://en.wikipedia.org/wiki/World_Geodetic_System#A_new_World_Geodetic_System:_WGS_84>`_ is used.
-    However, most TLEs, which can be downloaded, still use WGS72.
+    However, most TLEs, which can be downloaded, still use WGS72. The
+    underlying `C++ SGP4 Satellite Library`_ unfortunately has the WGS72
+    hardcoded.
 
 Constructing and using a `~cysgp4.PyCoordGeodetic` object is straightforward::
 

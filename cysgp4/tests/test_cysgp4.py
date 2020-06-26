@@ -14,7 +14,7 @@ from cysgp4 import *
 # skip over sgp4 related tests, if not package present:
 skip_sgp4 = pytest.mark.skipif(
     importlib.util.find_spec('sgp4') is None,
-    reason='"pycraf" package not installed'
+    reason='"sgp4" package not installed'
     )
 # skip over pycraf related tests, if not package present:
 skip_pycraf = pytest.mark.skipif(
@@ -525,6 +525,108 @@ class TestSatellite:
             )
 
 
+def test_geo_to_eci():
+
+    lon = 6.88375
+    lat = 50.525
+    alt = 0.366
+    mjds = np.linspace(56458.123, 56459.123, 4)
+
+    x, y, z = geo_to_eci(lon, lat, alt, mjds)
+
+    assert_allclose(
+        x,
+        np.array([2859.232103, 1048.034399, -3917.658324, 2908.469634]),
+        atol=1.e-6,
+        )
+    assert_allclose(
+        y,
+        np.array([-2886.91773, 3925.700715, -1077.70843, -2837.306221]),
+        atol=1.e-6,
+        )
+    assert_allclose(
+        z,
+        np.array([4900.402206, 4900.402206, 4900.402206, 4900.402206]),
+        atol=1.e-6,
+        )
+
+
+def test_eci_to_geo():
+
+    x = np.array([2859.232103, 1048.034399, -3917.658324, 2908.469634])
+    y = np.array([-2886.91773, 3925.700715, -1077.70843, -2837.306221])
+    z = np.array([4900.402206, 4900.402206, 4900.402206, 4900.402206])
+    mjds = np.linspace(56458.123, 56459.123, 4)
+
+    lon, lat, alt = eci_to_geo(x, y, z, mjds)
+
+    assert_allclose(
+        lon,
+        np.array([6.88375] * 4),
+        atol=1.e-5,
+        )
+    assert_allclose(
+        lat,
+        np.array([50.525] * 4),
+        atol=1.e-5,
+        )
+    assert_allclose(
+        alt,
+        np.array([0.366] * 4),
+        atol=1.e-5,
+        )
+
+
+def test_lookangles():
+
+    sat_x = np.array([22859.23210, 21048.03439, -23917.65832, 22908.46963])
+    sat_y = np.array([-22886.91773, 23925.70071, -21077.70843, -22837.30622])
+    sat_z = np.array([24900.40220, 24900.40220, 24900.40220, 24900.40220])
+    sat_dx = np.array([59.23210, 48.03439, 17.65832, 8.46963])
+    sat_dy = np.array([-86.91773, 25.70071, -77.70843, -37.30622])
+    sat_dz = np.array([2.40220, 4.40220, 9.40220, 2.40220])
+
+    observers = PyObserver(6.88375, 50.525, 0.366)
+    mjds = np.linspace(56458.123, 56459.123, 4)
+
+    obs_az, obs_el, sat_az, sat_el, dist, distrate = lookangles(
+        sat_x, sat_y, sat_z,
+        sat_dx, sat_dy, sat_dz,
+        mjds, observers, sat_frame='zxy',
+        )
+
+    assert_allclose(
+        obs_az,
+        np.array([179.143698, 246.418774, 114.140759, 182.200472]),
+        atol=1.e-6,
+        )
+    assert_allclose(
+        obs_el,
+        np.array([74.738078, 63.502906, 63.754966, 74.730727]),
+        atol=1.e-6,
+        )
+    assert_allclose(
+        sat_az,
+        np.array([-1.266363, 1.69216, 2.243545, -2.476661]),
+        atol=1.e-6,
+        )
+    assert_allclose(
+        sat_el,
+        np.array([-54.607417, -55.629171, -29.981193, -46.524641]),
+        atol=1.e-6,
+        )
+    assert_allclose(
+        dist,
+        np.array([34641.016146, 34641.01614, 34641.016146, 34641.016145]),
+        atol=1.e-6,
+        )
+    assert_allclose(
+        distrate,
+        np.array([85.765389, 45.233744, 39.978745, 27.818606]),
+        atol=1.e-6,
+        )
+
+
 def test_propagate_many():
 
     tles = PyTle(*TLE_ISS)
@@ -754,9 +856,9 @@ def _propagate_prepare():
     return mjds, tles, observers
 
 
-def _propagate_many_cysgp4():
+def _propagate_many_cysgp4(**kwargs):
 
-    return propagate_many(*_propagate_prepare())
+    return propagate_many(*_propagate_prepare(), **kwargs)
 
 
 def _propagate_many_cysgp4_slow():
@@ -764,9 +866,11 @@ def _propagate_many_cysgp4_slow():
     return propagate_many_slow(*_propagate_prepare())
 
 
-def _propagate_many_sgp4():
+def _propagate_many_sgp4(**kwargs):
 
-    return propagate_many_sgp4(*_propagate_prepare())
+    return propagate_many(
+        *_propagate_prepare(), method='vallado', **kwargs
+        )
 
 
 def test_propagate_many_cysgp4_vs_many_cysgp4_slow():
@@ -779,7 +883,7 @@ def test_propagate_many_cysgp4_vs_many_cysgp4_slow():
         assert_allclose(res_many[k], res_many_slow[k], atol=1.e-5)
 
 
-@pytest.mark.xfail
+# @pytest.mark.xfail
 @skip_sgp4
 def test_propagate_many_cysgp4_vs_many_sgp4():
     '''
@@ -789,8 +893,14 @@ def test_propagate_many_cysgp4_vs_many_sgp4():
     zero in x, y or z)
     '''
 
-    res_many = _propagate_many_cysgp4()
-    res_many_sgp4 = _propagate_many_sgp4()
+    kwargs = dict(
+        do_eci_pos=True, do_eci_vel=True,
+        do_geo=True, do_topo=True,
+        do_obs_pos=True, do_sat_azel=True,
+        sat_frame='zxy'
+        )
+    res_many = _propagate_many_cysgp4(**kwargs)
+    res_many_sgp4 = _propagate_many_sgp4(**kwargs)
 
     # idxs = np.where(np.abs(res_many['eci_pos'] - res_many_sgp4['eci_pos']) > 1.e-2)
 
@@ -802,8 +912,19 @@ def test_propagate_many_cysgp4_vs_many_sgp4():
     #     print(res_many['eci_pos'][tidxs])
     #     print(res_many_sgp4['eci_pos'][tidxs])
 
-    assert_allclose(res_many['eci_pos'], res_many_sgp4['eci_pos'], rtol=1.e-2)
-    assert_allclose(res_many['eci_vel'], res_many_sgp4['eci_vel'], rtol=1.e-5)
+    # error with respect to cysgp4 depends on sgp4 version...
+    try:
+        from sgp4 import api
+        version = 2
+    except ImportError:
+        version = 1
+
+    for k in ['eci_pos', 'eci_vel', 'geo', 'topo', 'sat_azel', 'obs_pos']:
+
+        assert_allclose(
+            res_many[k], res_many_sgp4[k],
+            atol=1.e-4 if version == 2 else 1.e-3
+            )
 
 
 @pytest.mark.benchmark

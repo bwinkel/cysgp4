@@ -226,6 +226,12 @@ cdef extern from 'Eci.h':
             const double altitude
             ) nogil except +
         Eci(const DateTime& dt, const CoordGeodetic& geo) nogil except +
+        Eci(const DateTime& dt, const Vector &position) nogil except +
+        Eci(
+            const DateTime& dt,
+            const Vector &position,
+            const Vector &velocity
+            ) nogil except +
         void Update(const DateTime& dt, const CoordGeodetic& geo) nogil
         DateTime GetDateTime() nogil const
         CoordGeodetic ToGeodetic() nogil const
