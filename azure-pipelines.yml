@@ -38,11 +38,11 @@ jobs:
 
   strategy:
     matrix:
-      linux35:
-        imageName: 'ubuntu-16.04'
-        python.version: '3.5'
-        py_whl: 35
-        numpy.version: '1.13.1'
+      # linux35:
+      #   imageName: 'ubuntu-16.04'
+      #   python.version: '3.5'
+      #   py_whl: 35
+      #   numpy.version: '1.13.1'
       linux36:
         imageName: 'ubuntu-16.04'
         python.version: '3.6'
@@ -64,15 +64,15 @@ jobs:
         python.version: '3.7'
         py_whl: 37
         numpy.version: '1.14.5'
-      # linux38:
-      #   imageName: 'ubuntu-16.04'
-      #   python.version: '3.8'
-      #   py_whl: 38
-      #   numpy.version: '1.14.5'
-      mac35:
-        imageName: 'macos-10.14'
-        python.version: '3.5'
-        numpy.version: '1.13.1'
+      linux38:
+        imageName: 'ubuntu-16.04'
+        python.version: '3.8'
+        py_whl: 38
+        numpy.version: '1.16.5'
+      # mac35:
+      #   imageName: 'macos-10.14'
+      #   python.version: '3.5'
+      #   numpy.version: '1.13.1'
       mac36:
         imageName: 'macos-10.14'
         python.version: '3.6'
@@ -81,14 +81,14 @@ jobs:
         imageName: 'macos-10.14'
         python.version: '3.7'
         numpy.version: '1.14.5'
-      # mac38:
-      #   imageName: 'macos-10.13'
-      #   python.version: '3.8'
-      #   numpy.version: '1.14.5'
-      win35:
-        imageName: 'vs2017-win2016'
-        python.version: '3.5'
-        numpy.version: '1.13.1'
+      mac38:
+        imageName: 'macos-10.14'
+        python.version: '3.8'
+        numpy.version: '1.16.5'
+      # win35:
+      #   imageName: 'vs2017-win2016'
+      #   python.version: '3.5'
+      #   numpy.version: '1.13.1'
       win36:
         imageName: 'vs2017-win2016'
         python.version: '3.6'
@@ -97,10 +97,10 @@ jobs:
         imageName: 'vs2017-win2016'
         python.version: '3.7'
         numpy.version: '1.14.5'
-      # win38:
-      #   imageName: 'vs2017-win2016'
-      #   python.version: '3.8'
-      #   numpy.version: '1.14.5'
+      win38:
+        imageName: 'vs2017-win2016'
+        python.version: '3.8'
+        numpy.version: '1.16.5'
 
   pool:
     vmImage: $(imageName)
