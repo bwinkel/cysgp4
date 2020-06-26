@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>propagate_many &#8212; cysgp4 v0.3.4.dev3+gb4b7652</title>
+    <title>propagate_many &#8212; cysgp4 v0.3.4.dev5+g35aca71</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -19,8 +19,8 @@
     <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="propagate_many_sgp4" href="cysgp4.propagate_many_sgp4.html" />
-    <link rel="prev" title="get_example_tles" href="cysgp4.get_example_tles.html" />
+    <link rel="next" title="propagate_many_slow" href="cysgp4.propagate_many_slow.html" />
+    <link rel="prev" title="lookangles" href="cysgp4.lookangles.html" />
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
 
   </head><body>
@@ -48,18 +48,18 @@
     <h3>Navigation</h3>
     <ul>
       <li class="right">
-	<a href="cysgp4.propagate_many_sgp4.html" title="propagate_many_sgp4">
+	<a href="cysgp4.propagate_many_slow.html" title="propagate_many_slow">
 	  next &raquo;
 	</a>
       </li>
       <li class="right">
-	<a href="cysgp4.get_example_tles.html" title="get_example_tles">
+	<a href="cysgp4.lookangles.html" title="lookangles">
 	  &laquo; previous
 	</a>
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.3.4.dev3+gb4b7652</a>
+	<a href="../index.html">cysgp4 v0.3.4.dev5+g35aca71</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -78,7 +78,7 @@
 <h1>propagate_many<a class="headerlink" href="#propagate-many" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="cysgp4.propagate_many">
-<code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">propagate_many</code><span class="sig-paren">(</span><em class="sig-param">mjds</em>, <em class="sig-param">tles</em>, <em class="sig-param">observers=None</em>, <em class="sig-param">bool do_eci_pos=True</em>, <em class="sig-param">bool do_eci_vel=True</em>, <em class="sig-param">bool do_geo=True</em>, <em class="sig-param">bool do_topo=True</em>, <em class="sig-param">bool do_obs_pos=False</em>, <em class="sig-param">bool do_sat_azel=False</em>, <em class="sig-param">unicode sat_frame=u'zxy'</em>, <em class="sig-param">unicode on_error=u'raise'</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.propagate_many" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">propagate_many</code><span class="sig-paren">(</span><em class="sig-param">mjds</em>, <em class="sig-param">tles</em>, <em class="sig-param">observers=None</em>, <em class="sig-param">do_eci_pos=True</em>, <em class="sig-param">do_eci_vel=True</em>, <em class="sig-param">do_geo=True</em>, <em class="sig-param">do_topo=True</em>, <em class="sig-param">do_obs_pos=False</em>, <em class="sig-param">do_sat_azel=False</em>, <em class="sig-param">sat_frame='zxy'</em>, <em class="sig-param">on_error='raise'</em>, <em class="sig-param">method='dwarner'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cysgp4/helpers.html#propagate_many"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/bwinkel/cysgp4/tree/master/cysgp4/helpers.py#L533" title="Push the Edit button on the next page"><span class="edit-on-github viewcode-link">&nbsp;[edit on github]</span></a><a class="headerlink" href="#cysgp4.propagate_many" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate positions of many satellites at a various times at once.</p>
 <p>This is an array interface to the sgp4 calculations, which allows to
 perform calculations for different satellite TLEs, observers and times
@@ -141,6 +141,13 @@ processing, this is not always desirable. If
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">on_error</span> <span class="pre">=</span> <span class="pre">'coerce_to_nan'</span></code> then C++ errors will be suppressed and
 the resulting position vectors will be converted to NaN-values
 instead.</p>
+<p>Note: this option is only relevant for <code class="xref py py-obj docutils literal notranslate"><span class="pre">method='dwarner'</span></code>!</p>
+</dd>
+<dt><strong>method</strong><span class="classifier">str, optional (either ‘dwarner’ or ‘vallado’)</span></dt><dd><p>This option can be used to change from the default SGP C++ library
+(by Daniel Warner) to the Vallado model. For the latter, the
+external <code class="xref py py-obj docutils literal notranslate"><span class="pre">python-sgp4</span></code> library is used. ‘vallado’ may be slower
+due to the additional boiler-plate code and differences in the
+model itself and implementation details.</p>
 </dd>
 </dl>
 </dd>
@@ -191,7 +198,7 @@ function:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="kn">import</span> <span class="n">PyTle</span><span class="p">,</span> <span class="n">PyObserver</span><span class="p">,</span> <span class="n">propagate_many</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="kn">import</span> <span class="n">get_example_tles</span><span class="p">,</span> <span class="n">tles_from_text</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tle_text</span> <span class="o">=</span> <span class="n">cysgp4</span><span class="o">.</span><span class="n">get_example_tles</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tle_text</span> <span class="o">=</span> <span class="n">get_example_tles</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">tles_from_text</span><span class="p">(</span><span class="n">tle_text</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="p">)[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:</span><span class="mi">20</span><span class="p">]</span>  <span class="c1"># use first 20 TLEs</span>
@@ -249,7 +256,7 @@ function:</p>
   <p>
     &copy; Copyright 2020, Benjamin Winkel.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.4. &nbsp;
-    Last built 09 Jun 2020. <br/>
+    Last built 26 Jun 2020. <br/>
   </p>
 </footer>
   </body>

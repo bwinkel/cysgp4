@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Cysgp4 user manual &#8212; cysgp4 v0.3.4.dev3+gb4b7652</title>
+    <title>Cysgp4 user manual &#8212; cysgp4 v0.3.4.dev5+g35aca71</title>
     <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -19,7 +19,7 @@
     <link rel="shortcut icon" href="_static/astropy_logo.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="get_example_tles" href="api/cysgp4.get_example_tles.html" />
+    <link rel="next" title="eci_to_geo" href="api/cysgp4.eci_to_geo.html" />
     <link rel="prev" title="Cysgp4 quick tour" href="quick_tour.html" />
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
 
@@ -48,7 +48,7 @@
     <h3>Navigation</h3>
     <ul>
       <li class="right">
-	<a href="api/cysgp4.get_example_tles.html" title="get_example_tles">
+	<a href="api/cysgp4.eci_to_geo.html" title="eci_to_geo">
 	  next &raquo;
 	</a>
       </li>
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="index.html">cysgp4 v0.3.4.dev3+gb4b7652</a>
+	<a href="index.html">cysgp4 v0.3.4.dev5+g35aca71</a>
 	 &#187;
       </li>
       
@@ -262,7 +262,9 @@ below).</p>
 <p>The <a class="reference external" href="https://en.wikipedia.org/wiki/Geodetic_datum">Geodetic frame</a> goes usually along with a specific definition of
 the Geoid (Earth’s ellipsoid). For many application, the
 <a class="reference external" href="https://en.wikipedia.org/wiki/World_Geodetic_System#A_new_World_Geodetic_System:_WGS_84">WGS84</a> is used.
-However, most TLEs, which can be downloaded, still use WGS72.</p>
+However, most TLEs, which can be downloaded, still use WGS72. The
+underlying <a class="reference external" href="https://www.danrw.com/sgp4/">C++ SGP4 Satellite Library</a> unfortunately has the WGS72
+hardcoded.</p>
 </div>
 <p>Constructing and using a <a class="reference internal" href="api/cysgp4.PyCoordGeodetic.html#cysgp4.PyCoordGeodetic" title="cysgp4.PyCoordGeodetic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyCoordGeodetic</span></code></a> object is straightforward:</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cysgp4</span> <span class="kn">import</span> <span class="n">PyCoordGeodetic</span>
@@ -578,7 +580,7 @@ routine like this:</p>
 <a class="reference external" href="https://pypi.org/project/sgp4/">sgp4</a> Python package (by Brandon Rhodes). Again, for the sole purpose of
 benchmarking, a function was added, which uses <a class="reference external" href="https://pypi.org/project/sgp4/">sgp4</a> but has the same
 interface as <a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a>. The source code of
-<a class="reference internal" href="api/cysgp4.propagate_many_sgp4.html#cysgp4.propagate_many_sgp4" title="cysgp4.propagate_many_sgp4"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many_sgp4</span></code></a> is available in the <a class="reference external" href="_modules/cysgp4/helpers.html#propagate_many_sgp4">manual</a>, as well. Here are the results:</p>
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many_sgp4</span></code> is available in the <a class="reference external" href="_modules/cysgp4/helpers.html#propagate_many_sgp4">manual</a>, as well. Here are the results:</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">run_times</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span>  
 <span class="gp">... </span>    <span class="s1">&#39;cysgp4.propagate_many_sgp4(mjds, tles, observers)&#39;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">()</span>
@@ -612,14 +614,20 @@ interface as <a class="reference internal" href="api/cysgp4.propagate_many.html#
 <col style="width: 90%" />
 </colgroup>
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.eci_to_geo.html#cysgp4.eci_to_geo" title="cysgp4.eci_to_geo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eci_to_geo</span></code></a>(eci_x, eci_y, eci_z, mjds)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.geo_to_eci.html#cysgp4.geo_to_eci" title="cysgp4.geo_to_eci"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geo_to_eci</span></code></a>(lon, lat, alt, mjds)</p></td>
+<td><p></p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.get_example_tles.html#cysgp4.get_example_tles" title="cysgp4.get_example_tles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_example_tles</span></code></a>()</p></td>
 <td><p>Return a text with example TLE entries for testing purposes.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a>(mjds, tles[, observers])</p></td>
-<td><p>Calculate positions of many satellites at a various times at once.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.lookangles.html#cysgp4.lookangles" title="cysgp4.lookangles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lookangles</span></code></a>(sat_pos_x, sat_pos_y, sat_pos_z, …)</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.propagate_many_sgp4.html#cysgp4.propagate_many_sgp4" title="cysgp4.propagate_many_sgp4"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many_sgp4</span></code></a>(mjds, tles[, observers, …])</p></td>
-<td><p>This is an <a class="reference external" href="https://pypi.org/project/sgp4/">sgp4</a>-based variant (non-parallelized, Python-looping) of <a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a> that is meant for testing and benchmarking only.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a>(mjds, tles[, observers, …])</p></td>
+<td><p>Calculate positions of many satellites at a various times at once.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.propagate_many_slow.html#cysgp4.propagate_many_slow" title="cysgp4.propagate_many_slow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many_slow</span></code></a>(mjds, tles[, observers, …])</p></td>
 <td><p>This is a slow (non-parallelized, Python-looping) version of <a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a> that is meant for testing and benchmarking only.</p></td>
@@ -736,7 +744,7 @@ interface as <a class="reference internal" href="api/cysgp4.propagate_many.html#
   <p>
     &copy; Copyright 2020, Benjamin Winkel.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.4. &nbsp;
-    Last built 09 Jun 2020. <br/>
+    Last built 26 Jun 2020. <br/>
   </p>
 </footer>
   </body>

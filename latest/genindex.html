@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Index &#8212; cysgp4 v0.3.4.dev3+gb4b7652</title>
+    <title>Index &#8212; cysgp4 v0.3.4.dev5+g35aca71</title>
     <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -47,7 +47,7 @@
     <h3>Navigation</h3>
     <ul>
       <li>
-	<a href="index.html">cysgp4 v0.3.4.dev3+gb4b7652</a>
+	<a href="index.html">cysgp4 v0.3.4.dev5+g35aca71</a>
 	 &#187;
       </li>
       
@@ -133,9 +133,11 @@
 </li>
       <li><a href="api/cysgp4.PyCoordGeodetic.html#cysgp4.PyCoordGeodetic.ecef">ecef (cysgp4.PyCoordGeodetic attribute)</a>
 </li>
+      <li><a href="api/cysgp4.Satellite.html#cysgp4.Satellite.eci_pos">eci_pos() (cysgp4.Satellite method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/cysgp4.Satellite.html#cysgp4.Satellite.eci_pos">eci_pos() (cysgp4.Satellite method)</a>
+      <li><a href="api/cysgp4.eci_to_geo.html#cysgp4.eci_to_geo">eci_to_geo() (in module cysgp4)</a>
 </li>
       <li><a href="api/cysgp4.PyCoordTopocentric.html#cysgp4.PyCoordTopocentric.el">el (cysgp4.PyCoordTopocentric attribute)</a>
 </li>
@@ -164,6 +166,8 @@
       <li><a href="api/cysgp4.PyEci.html#cysgp4.PyEci.geo_loc">geo_loc (cysgp4.PyEci attribute)</a>
 </li>
       <li><a href="api/cysgp4.Satellite.html#cysgp4.Satellite.geo_pos">geo_pos() (cysgp4.Satellite method)</a>
+</li>
+      <li><a href="api/cysgp4.geo_to_eci.html#cysgp4.geo_to_eci">geo_to_eci() (in module cysgp4)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -195,15 +199,17 @@
 </li>
       <li><a href="api/cysgp4.PyDateTime.html#cysgp4.PyDateTime.lmst">lmst() (cysgp4.PyDateTime method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/cysgp4.PyEci.html#cysgp4.PyEci.loc">loc (cysgp4.PyEci attribute)</a>
 
       <ul>
         <li><a href="api/cysgp4.PyObserver.html#cysgp4.PyObserver.loc">(cysgp4.PyObserver attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/cysgp4.PyCoordGeodetic.html#cysgp4.PyCoordGeodetic.lon">lon (cysgp4.PyCoordGeodetic attribute)</a>
+</li>
+      <li><a href="api/cysgp4.lookangles.html#cysgp4.lookangles">lookangles() (in module cysgp4)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -235,18 +241,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/cysgp4.propagate_many.html#cysgp4.propagate_many">propagate_many() (in module cysgp4)</a>
 </li>
-      <li><a href="api/cysgp4.propagate_many_sgp4.html#cysgp4.propagate_many_sgp4">propagate_many_sgp4() (in module cysgp4)</a>
-</li>
       <li><a href="api/cysgp4.propagate_many_slow.html#cysgp4.propagate_many_slow">propagate_many_slow() (in module cysgp4)</a>
 </li>
       <li><a href="api/cysgp4.PyCoordGeodetic.html#cysgp4.PyCoordGeodetic">PyCoordGeodetic (class in cysgp4)</a>
 </li>
       <li><a href="api/cysgp4.PyCoordTopocentric.html#cysgp4.PyCoordTopocentric">PyCoordTopocentric (class in cysgp4)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/cysgp4.PyDateTime.html#cysgp4.PyDateTime">PyDateTime (class in cysgp4)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/cysgp4.PyEci.html#cysgp4.PyEci.pydt">pydt (cysgp4.PyEci attribute)</a>
 
       <ul>
@@ -344,7 +348,7 @@
   <p>
     &copy; Copyright 2020, Benjamin Winkel.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.4. &nbsp;
-    Last built 09 Jun 2020. <br/>
+    Last built 26 Jun 2020. <br/>
   </p>
 </footer>
   </body>

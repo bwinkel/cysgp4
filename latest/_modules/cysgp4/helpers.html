@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>cysgp4.helpers &#8212; cysgp4 v0.3.4.dev3+gb4b7652</title>
+    <title>cysgp4.helpers &#8212; cysgp4 v0.3.4.dev5+g35aca71</title>
     <link rel="stylesheet" href="../../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -46,7 +46,7 @@
     <h3>Navigation</h3>
     <ul>
       <li>
-	<a href="../../index.html">cysgp4 v0.3.4.dev3+gb4b7652</a>
+	<a href="../../index.html">cysgp4 v0.3.4.dev5+g35aca71</a>
 	 &#187;
       </li>
       <li><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
@@ -68,9 +68,10 @@
 <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_stream</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">.cysgp4</span> <span class="kn">import</span> <span class="n">PyDateTime</span><span class="p">,</span> <span class="n">Satellite</span><span class="p">,</span> <span class="n">PyObserver</span>
+<span class="kn">from</span> <span class="nn">.cysgp4</span> <span class="kn">import</span> <span class="n">eci_to_geo</span><span class="p">,</span> <span class="n">geo_to_eci</span><span class="p">,</span> <span class="n">lookangles</span><span class="p">,</span> <span class="n">_propagate_many_cysgp4</span>
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;get_example_tles&#39;</span><span class="p">,</span> <span class="s1">&#39;propagate_many_slow&#39;</span><span class="p">,</span> <span class="s1">&#39;propagate_many_sgp4&#39;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;get_example_tles&#39;</span><span class="p">,</span> <span class="s1">&#39;propagate_many_slow&#39;</span><span class="p">,</span> <span class="s1">&#39;propagate_many&#39;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="get_example_tles"><a class="viewcode-back" href="../../api/cysgp4.get_example_tles.html#cysgp4.get_example_tles">[docs]</a><span class="k">def</span> <span class="nf">get_example_tles</span><span class="p">():</span>
@@ -225,26 +226,290 @@
     <span class="k">return</span> <span class="n">result</span></div>
 
 
-<div class="viewcode-block" id="propagate_many_sgp4"><a class="viewcode-back" href="../../api/cysgp4.propagate_many_sgp4.html#cysgp4.propagate_many_sgp4">[docs]</a><span class="k">def</span> <span class="nf">propagate_many_sgp4</span><span class="p">(</span>
+<span class="c1"># def propagate_many_sgp4(</span>
+<span class="c1">#         mjds, tles, observers=None,</span>
+<span class="c1">#         do_eci_pos=True, do_eci_vel=True,</span>
+<span class="c1">#         do_geo=True, do_topo=True,</span>
+<span class="c1">#         do_obs_pos=False, do_sat_azel=False,</span>
+<span class="c1">#         sat_frame=&#39;zxy&#39;,  # on_error=&#39;raise&#39;,</span>
+<span class="c1">#         ):</span>
+<span class="c1">#     &#39;&#39;&#39;</span>
+<span class="c1">#     This is an `sgp4`_-based variant (non-parallelized, Python-looping) of</span>
+<span class="c1">#     `~cysgp4.propagate_many` that is meant for testing and benchmarking</span>
+<span class="c1">#     only. It has the same interface.</span>
+
+<span class="c1">#     Note: `sgp4 &lt;https://pypi.org/project/sgp4/&gt;`_ Package by Brandon Rhodes</span>
+<span class="c1">#     &#39;&#39;&#39;</span>
+
+<span class="c1">#     try:</span>
+<span class="c1">#         import sgp4</span>
+<span class="c1">#     except ImportError as e:</span>
+<span class="c1">#         import warnings</span>
+<span class="c1">#         warnings.warn(&#39;&#39;&#39;</span>
+<span class="c1">#             Package sgp4 needed to use this function. Can install with</span>
+<span class="c1">#             &quot;pip install sgp4&quot; or &quot;conda install -c conda-forge sgp4&quot;.</span>
+<span class="c1">#             &#39;&#39;&#39;)</span>
+<span class="c1">#         raise e</span>
+
+<span class="c1">#     # check whether sgp4 v1 or v2 are installed</span>
+
+<span class="c1">#     try:</span>
+<span class="c1">#         from sgp4 import api</span>
+<span class="c1">#         version = 2</span>
+<span class="c1">#     except ImportError:</span>
+<span class="c1">#         version = 1</span>
+
+<span class="c1">#     if version == 1:</span>
+<span class="c1">#         from sgp4.earth_gravity import wgs72</span>
+<span class="c1">#         from sgp4.io import twoline2rv</span>
+<span class="c1">#     elif version == 2:</span>
+<span class="c1">#         from sgp4.api import Satrec, SGP4_ERRORS</span>
+
+<span class="c1">#     if observers is None:</span>
+<span class="c1">#         observers = PyObserver()</span>
+
+<span class="c1">#     out_dts = [np.dtype((&#39;float64&#39;, 3))]</span>
+
+<span class="c1">#     it = np.nditer(</span>
+<span class="c1">#         [tles, observers, mjds] + [None] * 2,</span>
+<span class="c1">#         flags=[&#39;external_loop&#39;, &#39;buffered&#39;, &#39;delay_bufalloc&#39;, &#39;refs_ok&#39;],</span>
+<span class="c1">#         op_flags=[[&#39;readonly&#39;]] * 3 + [[&#39;readwrite&#39;, &#39;allocate&#39;]] * 2,</span>
+<span class="c1">#         op_dtypes=[&#39;object&#39;, &#39;object&#39;, &#39;float64&#39;] + out_dts + out_dts</span>
+<span class="c1">#         )</span>
+
+<span class="c1">#     it.reset()</span>
+<span class="c1">#     for itup in it:</span>
+
+<span class="c1">#         tle = itup[0]</span>
+<span class="c1">#         mjd = itup[2]</span>
+
+<span class="c1">#         size = mjd.shape[0]</span>
+
+<span class="c1">#         # TODO code path for api.accelerated == True</span>
+
+<span class="c1">#         for i in range(size):</span>
+
+<span class="c1">#             line1, line2 = tle[i].tle_strings()[1:]</span>
+
+<span class="c1">#             if version == 1:</span>
+<span class="c1">#                 dt_tup = PyDateTime.from_mjd(mjd[i]).get_datetime_tuple()</span>
+<span class="c1">#                 sat = twoline2rv(line1, line2, wgs72)</span>
+<span class="c1">#                 pos, vel = sat.propagate(</span>
+<span class="c1">#                     *dt_tup[:-2], dt_tup[-2] + dt_tup[-1] / 1e6</span>
+<span class="c1">#                     )</span>
+<span class="c1">#             elif version == 2:</span>
+<span class="c1">#                 sat = Satrec.twoline2rv(line1, line2)</span>
+<span class="c1">#                 _f, _i = np.modf(mjd[i])</span>
+<span class="c1">#                 err_code, pos, vel = sat.sgp4(_i + 2400000.5, _f)</span>
+
+<span class="c1">#                 if err_code:</span>
+<span class="c1">#                     raise ValueError(</span>
+<span class="c1">#                         &#39;Satellite propagation error&#39;, err_code,</span>
+<span class="c1">#                         &#39;({})&#39;.format(SGP4_ERRORS[err_code])</span>
+<span class="c1">#                         )</span>
+
+<span class="c1">#             eci_pos_x, eci_pos_y, eci_pos_z = pos</span>
+<span class="c1">#             eci_vel_x, eci_vel_y, eci_vel_z = vel</span>
+
+<span class="c1">#             itup[3][i][0] = eci_pos_x</span>
+<span class="c1">#             itup[3][i][1] = eci_pos_y</span>
+<span class="c1">#             itup[3][i][2] = eci_pos_z</span>
+
+<span class="c1">#             itup[4][i][0] = eci_vel_x</span>
+<span class="c1">#             itup[4][i][1] = eci_vel_y</span>
+<span class="c1">#             itup[4][i][2] = eci_vel_z</span>
+
+<span class="c1">#     eci_pos = it.operands[3]</span>
+<span class="c1">#     eci_vel = it.operands[4]</span>
+<span class="c1">#     eci_pos_x, eci_pos_y, eci_pos_z = (eci_pos[..., i] for i in range(3))</span>
+<span class="c1">#     eci_vel_x, eci_vel_y, eci_vel_z = (eci_vel[..., i] for i in range(3))</span>
+
+<span class="c1">#     # why is this not working???</span>
+<span class="c1">#     # obs_geo_lon, obs_geo_lat, obs_geo_alt = np.vectorize(</span>
+<span class="c1">#     #     lambda o: np.array([o.loc.lon, o.loc.lat, o.loc.alt]),</span>
+<span class="c1">#     #     otypes=[np.float64, np.float64, np.float64]</span>
+<span class="c1">#     #     )(observers)</span>
+
+<span class="c1">#     obs_geo_lon = np.empty(observers.shape, dtype=np.float64)</span>
+<span class="c1">#     obs_geo_lon.flat[:] = [o.loc.lon for o in observers.flat]</span>
+<span class="c1">#     obs_geo_lat = np.empty(observers.shape, dtype=np.float64)</span>
+<span class="c1">#     obs_geo_lat.flat[:] = [o.loc.lat for o in observers.flat]</span>
+<span class="c1">#     obs_geo_alt = np.empty(observers.shape, dtype=np.float64)</span>
+<span class="c1">#     obs_geo_alt.flat[:] = [o.loc.alt for o in observers.flat]</span>
+
+<span class="c1">#     (</span>
+<span class="c1">#         tles,</span>
+<span class="c1">#         obs_geo_lon, obs_geo_lat, obs_geo_alt,</span>
+<span class="c1">#         mjds,</span>
+<span class="c1">#         eci_pos_x, eci_pos_y, eci_pos_z,</span>
+<span class="c1">#         eci_vel_x, eci_vel_y, eci_vel_z,</span>
+<span class="c1">#         ) = np.broadcast_arrays(</span>
+<span class="c1">#             tles,</span>
+<span class="c1">#             obs_geo_lon, obs_geo_lat, obs_geo_alt,</span>
+<span class="c1">#             mjds,</span>
+<span class="c1">#             eci_pos_x, eci_pos_y, eci_pos_z,</span>
+<span class="c1">#             eci_vel_x, eci_vel_y, eci_vel_z,</span>
+<span class="c1">#             )</span>
+
+<span class="c1">#     result = {}</span>
+
+<span class="c1">#     if do_eci_pos:</span>
+<span class="c1">#         result[&#39;eci_pos&#39;] = np.stack(</span>
+<span class="c1">#             [eci_pos_x, eci_pos_y, eci_pos_z], axis=-1</span>
+<span class="c1">#             )</span>
+
+<span class="c1">#     if do_eci_vel:</span>
+<span class="c1">#         result[&#39;eci_vel&#39;] = np.stack(</span>
+<span class="c1">#             [eci_vel_x, eci_vel_y, eci_vel_z], axis=-1</span>
+<span class="c1">#             )</span>
+
+<span class="c1">#     if do_geo:</span>
+<span class="c1">#         geo_lon, geo_lat, geo_alt = eci_to_geo(</span>
+<span class="c1">#             eci_pos_x, eci_pos_y, eci_pos_z, mjds</span>
+<span class="c1">#             )</span>
+<span class="c1">#         result[&#39;geo&#39;] = np.stack([geo_lon, geo_lat, geo_alt], axis=-1)</span>
+
+<span class="c1">#     if do_topo or do_sat_azel:</span>
+<span class="c1">#         obs_az, obs_el, sat_az, sat_el, dist, dist_rate = lookangles(</span>
+<span class="c1">#             eci_pos_x, eci_pos_y, eci_pos_z,</span>
+<span class="c1">#             eci_vel_x, eci_vel_y, eci_vel_z,</span>
+<span class="c1">#             mjds, observers, sat_frame</span>
+<span class="c1">#             )</span>
+<span class="c1">#         topo = np.stack([obs_az, obs_el, dist, dist_rate], axis=-1)</span>
+<span class="c1">#         sat_azel = np.stack([sat_az, sat_el, dist], axis=-1)</span>
+
+<span class="c1">#     if do_topo:</span>
+<span class="c1">#         result[&#39;topo&#39;] = topo</span>
+
+<span class="c1">#     if do_sat_azel:</span>
+<span class="c1">#         result[&#39;sat_azel&#39;] = sat_azel</span>
+
+<span class="c1">#     if do_obs_pos:</span>
+<span class="c1">#         obs_x, obs_y, obs_z = geo_to_eci(</span>
+<span class="c1">#             obs_geo_lon, obs_geo_lat, obs_geo_alt, mjds</span>
+<span class="c1">#             )</span>
+<span class="c1">#         result[&#39;obs_pos&#39;] = np.stack([obs_x, obs_y, obs_z], axis=-1)</span>
+
+<span class="c1">#     return result</span>
+
+
+<span class="k">def</span> <span class="nf">_sat_eci_sgp4_nonaccelerated</span><span class="p">(</span><span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="p">,</span> <span class="n">mjds</span><span class="p">):</span>
+
+    <span class="kn">from</span> <span class="nn">sgp4.api</span> <span class="kn">import</span> <span class="n">Satrec</span><span class="p">,</span> <span class="n">SGP4_ERRORS</span>
+
+    <span class="n">out_dts</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))]</span>
+
+    <span class="n">it</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="p">,</span> <span class="n">mjds</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">flags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;external_loop&#39;</span><span class="p">,</span> <span class="s1">&#39;buffered&#39;</span><span class="p">,</span> <span class="s1">&#39;delay_bufalloc&#39;</span><span class="p">,</span> <span class="s1">&#39;refs_ok&#39;</span><span class="p">],</span>
+        <span class="n">op_flags</span><span class="o">=</span><span class="p">[[</span><span class="s1">&#39;readonly&#39;</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">+</span> <span class="p">[[</span><span class="s1">&#39;readwrite&#39;</span><span class="p">,</span> <span class="s1">&#39;allocate&#39;</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">op_dtypes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;float64&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">out_dts</span> <span class="o">+</span> <span class="n">out_dts</span>
+        <span class="p">)</span>
+
+    <span class="n">it</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">itup</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
+
+        <span class="n">tle</span> <span class="o">=</span> <span class="n">itup</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">mjd</span> <span class="o">=</span> <span class="n">itup</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">size</span> <span class="o">=</span> <span class="n">mjd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># TODO code path for api.accelerated == True</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+
+            <span class="n">line1</span><span class="p">,</span> <span class="n">line2</span> <span class="o">=</span> <span class="n">tle</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tle_strings</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">sat</span> <span class="o">=</span> <span class="n">Satrec</span><span class="o">.</span><span class="n">twoline2rv</span><span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">line2</span><span class="p">)</span>
+            <span class="n">_f</span><span class="p">,</span> <span class="n">_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">modf</span><span class="p">(</span><span class="n">mjd</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">err_code</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">vel</span> <span class="o">=</span> <span class="n">sat</span><span class="o">.</span><span class="n">sgp4</span><span class="p">(</span><span class="n">_i</span> <span class="o">+</span> <span class="mf">2400000.5</span><span class="p">,</span> <span class="n">_f</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">err_code</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s1">&#39;Satellite propagation error&#39;</span><span class="p">,</span> <span class="n">err_code</span><span class="p">,</span>
+                    <span class="s1">&#39;(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">SGP4_ERRORS</span><span class="p">[</span><span class="n">err_code</span><span class="p">])</span>
+                    <span class="p">)</span>
+
+            <span class="n">eci_pos_x</span><span class="p">,</span> <span class="n">eci_pos_y</span><span class="p">,</span> <span class="n">eci_pos_z</span> <span class="o">=</span> <span class="n">pos</span>
+            <span class="n">eci_vel_x</span><span class="p">,</span> <span class="n">eci_vel_y</span><span class="p">,</span> <span class="n">eci_vel_z</span> <span class="o">=</span> <span class="n">vel</span>
+
+            <span class="n">itup</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">eci_pos_x</span>
+            <span class="n">itup</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">eci_pos_y</span>
+            <span class="n">itup</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">eci_pos_z</span>
+
+            <span class="n">itup</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">eci_vel_x</span>
+            <span class="n">itup</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">eci_vel_y</span>
+            <span class="n">itup</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">eci_vel_z</span>
+
+    <span class="n">eci_pos</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">operands</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">eci_vel</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">operands</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">eci_pos</span><span class="p">,</span> <span class="n">eci_vel</span>
+
+
+<span class="k">def</span> <span class="nf">_sat_eci_sgp4_accelerated</span><span class="p">(</span><span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="p">,</span> <span class="n">mjds</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Note, on a single core, this version is not really faster than</span>
+<span class="sd">    the non-accelerated version. Probably the overhead of the python</span>
+<span class="sd">    iteration can mostly be neglected.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="kn">from</span> <span class="nn">sgp4.api</span> <span class="kn">import</span> <span class="n">Satrec</span><span class="p">,</span> <span class="n">SGP4_ERRORS</span>
+
+    <span class="n">unique_tles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">tles</span><span class="p">)</span>
+    <span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="p">,</span> <span class="n">mjds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_arrays</span><span class="p">(</span><span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="p">,</span> <span class="n">mjds</span><span class="p">)</span>
+
+    <span class="n">eci_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">tles</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">3</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">eci_vel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">tles</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">3</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">u_tle</span> <span class="ow">in</span> <span class="n">unique_tles</span><span class="p">:</span>
+
+        <span class="c1"># doesn&#39;t work, as array doesn&#39;t know tle_strings method</span>
+        <span class="c1"># mask = u_tle == tles</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">u_tle</span> <span class="o">==</span> <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tles</span><span class="o">.</span><span class="n">flat</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">tles</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="n">mjd</span> <span class="o">=</span> <span class="n">mjds</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+
+        <span class="n">line1</span><span class="p">,</span> <span class="n">line2</span> <span class="o">=</span> <span class="n">u_tle</span><span class="o">.</span><span class="n">tle_strings</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+
+        <span class="n">sat</span> <span class="o">=</span> <span class="n">Satrec</span><span class="o">.</span><span class="n">twoline2rv</span><span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">line2</span><span class="p">)</span>
+        <span class="n">_f</span><span class="p">,</span> <span class="n">_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">modf</span><span class="p">(</span><span class="n">mjd</span><span class="p">)</span>
+        <span class="n">err_code</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">vel</span> <span class="o">=</span> <span class="n">sat</span><span class="o">.</span><span class="n">sgp4_array</span><span class="p">(</span><span class="n">_i</span> <span class="o">+</span> <span class="mf">2400000.5</span><span class="p">,</span> <span class="n">_f</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">err_code</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Satellite propagation error&#39;</span><span class="p">,</span> <span class="n">err_code</span><span class="p">,</span>
+                <span class="s1">&#39;(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">SGP4_ERRORS</span><span class="p">[</span><span class="n">err_code</span><span class="p">])</span>
+                <span class="p">)</span>
+
+        <span class="n">eci_pos</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span>
+        <span class="n">eci_vel</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">vel</span>
+
+    <span class="k">return</span> <span class="n">eci_pos</span><span class="p">,</span> <span class="n">eci_vel</span>
+
+
+<span class="k">def</span> <span class="nf">_propagate_many_sgp4</span><span class="p">(</span>
         <span class="n">mjds</span><span class="p">,</span> <span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">do_eci_pos</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">do_eci_vel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">do_geo</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">do_topo</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">do_obs_pos</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_sat_azel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">sat_frame</span><span class="o">=</span><span class="s1">&#39;zxy&#39;</span><span class="p">,</span>  <span class="c1"># on_error=&#39;raise&#39;,</span>
         <span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    This is an `sgp4`_-based variant (non-parallelized, Python-looping) of</span>
+<span class="sd">    This is an `sgp4`_-based variant (Python-looping) of</span>
 <span class="sd">    `~cysgp4.propagate_many` that is meant for testing and benchmarking</span>
-<span class="sd">    only. It has (almost) the same interface, except that `do_geo`, `do_topo`,</span>
-<span class="sd">    and `on_error` are not handled.</span>
+<span class="sd">    only. It has the same interface.</span>
 
 <span class="sd">    Note: `sgp4 &lt;https://pypi.org/project/sgp4/&gt;`_ Package by Brandon Rhodes</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">sgp4.earth_gravity</span> <span class="kn">import</span> <span class="n">wgs72</span>
-        <span class="kn">from</span> <span class="nn">sgp4.io</span> <span class="kn">import</span> <span class="n">twoline2rv</span>
+        <span class="kn">from</span> <span class="nn">sgp4</span> <span class="kn">import</span> <span class="n">api</span>
     <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="kn">import</span> <span class="nn">warnings</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
-<span class="s1">            Package sgp4 needed to use this function. Can install with</span>
+<span class="s1">            Package sgp4 2.x needed to use this function. Can install with</span>
 <span class="s1">            &quot;pip install sgp4&quot; or &quot;conda install -c conda-forge sgp4&quot;.</span>
 <span class="s1">            &#39;&#39;&#39;</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">e</span>
@@ -252,94 +517,282 @@
     <span class="k">if</span> <span class="n">observers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">observers</span> <span class="o">=</span> <span class="n">PyObserver</span><span class="p">()</span>
 
-    <span class="n">pnum</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">out_dts</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="n">do_eci_pos</span><span class="p">:</span>
-        <span class="n">out_dts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
-        <span class="n">pnum</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="k">if</span> <span class="n">do_eci_vel</span><span class="p">:</span>
-        <span class="n">out_dts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
-        <span class="n">pnum</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="c1"># if do_geo:</span>
-    <span class="c1">#     out_dts.append(np.dtype((&#39;float64&#39;, 3)))</span>
-    <span class="c1">#     pnum += 1</span>
-    <span class="c1"># if do_topo:</span>
-    <span class="c1">#     out_dts.append(np.dtype((&#39;float64&#39;, 4)))</span>
-    <span class="c1">#     pnum += 1</span>
+    <span class="k">if</span> <span class="n">api</span><span class="o">.</span><span class="n">accelerated</span><span class="p">:</span>
+        <span class="n">eci_pos</span><span class="p">,</span> <span class="n">eci_vel</span> <span class="o">=</span> <span class="n">_sat_eci_sgp4_accelerated</span><span class="p">(</span><span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="p">,</span> <span class="n">mjds</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">eci_pos</span><span class="p">,</span> <span class="n">eci_vel</span> <span class="o">=</span> <span class="n">_sat_eci_sgp4_nonaccelerated</span><span class="p">(</span><span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="p">,</span> <span class="n">mjds</span><span class="p">)</span>
 
-    <span class="n">it</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="p">,</span> <span class="n">mjds</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">pnum</span><span class="p">,</span>
-        <span class="n">flags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;external_loop&#39;</span><span class="p">,</span> <span class="s1">&#39;buffered&#39;</span><span class="p">,</span> <span class="s1">&#39;delay_bufalloc&#39;</span><span class="p">,</span> <span class="s1">&#39;refs_ok&#39;</span><span class="p">],</span>
-        <span class="n">op_flags</span><span class="o">=</span><span class="p">[[</span><span class="s1">&#39;readonly&#39;</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">+</span> <span class="p">[[</span><span class="s1">&#39;readwrite&#39;</span><span class="p">,</span> <span class="s1">&#39;allocate&#39;</span><span class="p">]]</span> <span class="o">*</span> <span class="n">pnum</span><span class="p">,</span>
-        <span class="n">op_dtypes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;float64&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">out_dts</span>
-        <span class="p">)</span>
+    <span class="n">eci_pos_x</span><span class="p">,</span> <span class="n">eci_pos_y</span><span class="p">,</span> <span class="n">eci_pos_z</span> <span class="o">=</span> <span class="p">(</span><span class="n">eci_pos</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">eci_vel_x</span><span class="p">,</span> <span class="n">eci_vel_y</span><span class="p">,</span> <span class="n">eci_vel_z</span> <span class="o">=</span> <span class="p">(</span><span class="n">eci_vel</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
 
-    <span class="n">it</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">itup</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
+    <span class="c1"># why is this not working???</span>
+    <span class="c1"># obs_geo_lon, obs_geo_lat, obs_geo_alt = np.vectorize(</span>
+    <span class="c1">#     lambda o: np.array([o.loc.lon, o.loc.lat, o.loc.alt]),</span>
+    <span class="c1">#     otypes=[np.float64, np.float64, np.float64]</span>
+    <span class="c1">#     )(observers)</span>
 
-        <span class="n">tle</span> <span class="o">=</span> <span class="n">itup</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">obs</span> <span class="o">=</span> <span class="n">itup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">mjd</span> <span class="o">=</span> <span class="n">itup</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">obs_geo_lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">observers</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">obs_geo_lon</span><span class="o">.</span><span class="n">flat</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">loc</span><span class="o">.</span><span class="n">lon</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">observers</span><span class="o">.</span><span class="n">flat</span><span class="p">]</span>
+    <span class="n">obs_geo_lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">observers</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">obs_geo_lat</span><span class="o">.</span><span class="n">flat</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">loc</span><span class="o">.</span><span class="n">lat</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">observers</span><span class="o">.</span><span class="n">flat</span><span class="p">]</span>
+    <span class="n">obs_geo_alt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">observers</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">obs_geo_alt</span><span class="o">.</span><span class="n">flat</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">loc</span><span class="o">.</span><span class="n">alt</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">observers</span><span class="o">.</span><span class="n">flat</span><span class="p">]</span>
 
-        <span class="n">size</span> <span class="o">=</span> <span class="n">mjd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
-
-            <span class="n">dt_tup</span> <span class="o">=</span> <span class="n">PyDateTime</span><span class="o">.</span><span class="n">from_mjd</span><span class="p">(</span><span class="n">mjd</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">get_datetime_tuple</span><span class="p">()</span>
-            <span class="n">line1</span><span class="p">,</span> <span class="n">line2</span> <span class="o">=</span> <span class="n">tle</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tle_strings</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
-            <span class="n">sat</span> <span class="o">=</span> <span class="n">twoline2rv</span><span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">line2</span><span class="p">,</span> <span class="n">wgs72</span><span class="p">)</span>
-            <span class="n">pos</span><span class="p">,</span> <span class="n">vel</span> <span class="o">=</span> <span class="n">sat</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span>
-                <span class="o">*</span><span class="n">dt_tup</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">dt_tup</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt_tup</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mf">1e6</span>
-                <span class="p">)</span>
-
-            <span class="n">eci_pos_x</span><span class="p">,</span> <span class="n">eci_pos_y</span><span class="p">,</span> <span class="n">eci_pos_z</span> <span class="o">=</span> <span class="n">pos</span>
-            <span class="n">eci_vel_x</span><span class="p">,</span> <span class="n">eci_vel_y</span><span class="p">,</span> <span class="n">eci_vel_z</span> <span class="o">=</span> <span class="n">vel</span>
-
-            <span class="n">n</span> <span class="o">=</span> <span class="mi">3</span>
-            <span class="k">if</span> <span class="n">do_eci_pos</span><span class="p">:</span>
-                <span class="n">itup</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">eci_pos_x</span>
-                <span class="n">itup</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">eci_pos_y</span>
-                <span class="n">itup</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">eci_pos_z</span>
-                <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
-
-            <span class="k">if</span> <span class="n">do_eci_vel</span><span class="p">:</span>
-                <span class="n">itup</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">eci_vel_x</span>
-                <span class="n">itup</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">eci_vel_y</span>
-                <span class="n">itup</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">eci_vel_z</span>
-                <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
-
-            <span class="c1"># if do_geo:</span>
-            <span class="c1">#     itup[n][i][0] = geo_pos.lon</span>
-            <span class="c1">#     itup[n][i][1] = geo_pos.lat</span>
-            <span class="c1">#     itup[n][i][2] = geo_pos.alt</span>
-            <span class="c1">#     n += 1</span>
-
-            <span class="c1"># if do_topo:</span>
-            <span class="c1">#     itup[n][i][0] = topo_pos.az</span>
-            <span class="c1">#     itup[n][i][1] = topo_pos.el</span>
-            <span class="c1">#     itup[n][i][2] = topo_pos.dist</span>
-            <span class="c1">#     itup[n][i][3] = topo_pos.dist_rate</span>
-            <span class="c1">#     n += 1</span>
+    <span class="p">(</span>
+        <span class="n">tles</span><span class="p">,</span>
+        <span class="n">obs_geo_lon</span><span class="p">,</span> <span class="n">obs_geo_lat</span><span class="p">,</span> <span class="n">obs_geo_alt</span><span class="p">,</span>
+        <span class="n">mjds</span><span class="p">,</span>
+        <span class="n">eci_pos_x</span><span class="p">,</span> <span class="n">eci_pos_y</span><span class="p">,</span> <span class="n">eci_pos_z</span><span class="p">,</span>
+        <span class="n">eci_vel_x</span><span class="p">,</span> <span class="n">eci_vel_y</span><span class="p">,</span> <span class="n">eci_vel_z</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_arrays</span><span class="p">(</span>
+            <span class="n">tles</span><span class="p">,</span>
+            <span class="n">obs_geo_lon</span><span class="p">,</span> <span class="n">obs_geo_lat</span><span class="p">,</span> <span class="n">obs_geo_alt</span><span class="p">,</span>
+            <span class="n">mjds</span><span class="p">,</span>
+            <span class="n">eci_pos_x</span><span class="p">,</span> <span class="n">eci_pos_y</span><span class="p">,</span> <span class="n">eci_pos_z</span><span class="p">,</span>
+            <span class="n">eci_vel_x</span><span class="p">,</span> <span class="n">eci_vel_y</span><span class="p">,</span> <span class="n">eci_vel_z</span><span class="p">,</span>
+            <span class="p">)</span>
 
     <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="n">n</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="k">if</span> <span class="n">do_eci_pos</span><span class="p">:</span>
-        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;eci_pos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">operands</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
-        <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;eci_pos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">eci_pos_x</span><span class="p">,</span> <span class="n">eci_pos_y</span><span class="p">,</span> <span class="n">eci_pos_z</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span>
+            <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">do_eci_vel</span><span class="p">:</span>
-        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;eci_vel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">operands</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
-        <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;eci_vel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">eci_vel_x</span><span class="p">,</span> <span class="n">eci_vel_y</span><span class="p">,</span> <span class="n">eci_vel_z</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span>
+            <span class="p">)</span>
 
-    <span class="c1"># if do_geo:</span>
-    <span class="c1">#     result[&#39;geo&#39;] = it.operands[n]</span>
-    <span class="c1">#     n += 1</span>
+    <span class="k">if</span> <span class="n">do_geo</span><span class="p">:</span>
+        <span class="n">geo_lon</span><span class="p">,</span> <span class="n">geo_lat</span><span class="p">,</span> <span class="n">geo_alt</span> <span class="o">=</span> <span class="n">eci_to_geo</span><span class="p">(</span>
+            <span class="n">eci_pos_x</span><span class="p">,</span> <span class="n">eci_pos_y</span><span class="p">,</span> <span class="n">eci_pos_z</span><span class="p">,</span> <span class="n">mjds</span>
+            <span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;geo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">geo_lon</span><span class="p">,</span> <span class="n">geo_lat</span><span class="p">,</span> <span class="n">geo_alt</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="c1"># if do_topo:</span>
-    <span class="c1">#     result[&#39;topo&#39;] = it.operands[n]</span>
-    <span class="c1">#     n += 1</span>
+    <span class="k">if</span> <span class="n">do_topo</span> <span class="ow">or</span> <span class="n">do_sat_azel</span><span class="p">:</span>
+        <span class="n">obs_az</span><span class="p">,</span> <span class="n">obs_el</span><span class="p">,</span> <span class="n">sat_az</span><span class="p">,</span> <span class="n">sat_el</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">dist_rate</span> <span class="o">=</span> <span class="n">lookangles</span><span class="p">(</span>
+            <span class="n">eci_pos_x</span><span class="p">,</span> <span class="n">eci_pos_y</span><span class="p">,</span> <span class="n">eci_pos_z</span><span class="p">,</span>
+            <span class="n">eci_vel_x</span><span class="p">,</span> <span class="n">eci_vel_y</span><span class="p">,</span> <span class="n">eci_vel_z</span><span class="p">,</span>
+            <span class="n">mjds</span><span class="p">,</span> <span class="n">observers</span><span class="p">,</span> <span class="n">sat_frame</span>
+            <span class="p">)</span>
+        <span class="n">topo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">obs_az</span><span class="p">,</span> <span class="n">obs_el</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">dist_rate</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">sat_azel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">sat_az</span><span class="p">,</span> <span class="n">sat_el</span><span class="p">,</span> <span class="n">dist</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">result</span></div>
+    <span class="k">if</span> <span class="n">do_topo</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;topo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">topo</span>
+
+    <span class="k">if</span> <span class="n">do_sat_azel</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;sat_azel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sat_azel</span>
+
+    <span class="k">if</span> <span class="n">do_obs_pos</span><span class="p">:</span>
+        <span class="n">obs_x</span><span class="p">,</span> <span class="n">obs_y</span><span class="p">,</span> <span class="n">obs_z</span> <span class="o">=</span> <span class="n">geo_to_eci</span><span class="p">(</span>
+            <span class="n">obs_geo_lon</span><span class="p">,</span> <span class="n">obs_geo_lat</span><span class="p">,</span> <span class="n">obs_geo_alt</span><span class="p">,</span> <span class="n">mjds</span>
+            <span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;obs_pos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">obs_x</span><span class="p">,</span> <span class="n">obs_y</span><span class="p">,</span> <span class="n">obs_z</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<div class="viewcode-block" id="propagate_many"><a class="viewcode-back" href="../../api/cysgp4.propagate_many.html#cysgp4.propagate_many">[docs]</a><span class="k">def</span> <span class="nf">propagate_many</span><span class="p">(</span>
+        <span class="n">mjds</span><span class="p">,</span> <span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">do_eci_pos</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">do_eci_vel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">do_geo</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">do_topo</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">do_obs_pos</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_sat_azel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">sat_frame</span><span class="o">=</span><span class="s1">&#39;zxy&#39;</span><span class="p">,</span> <span class="n">on_error</span><span class="o">=</span><span class="s1">&#39;raise&#39;</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="s1">&#39;dwarner&#39;</span>
+        <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Calculate positions of many satellites at a various times at once.</span>
+
+<span class="sd">    This is an array interface to the sgp4 calculations, which allows to</span>
+<span class="sd">    perform calculations for different satellite TLEs, observers and times</span>
+<span class="sd">    in a parallelized manner. `~numpy` broadcasting rules apply.</span>
+
+<span class="sd">    With the Boolean parameters, `do_eci_pos`, `do_eci_vel`, `do_geo`,</span>
+<span class="sd">    `do_topo`, `do_obs_pos`, and `do_sat_azel` the user can decide, which</span>
+<span class="sd">    position frames are returned in the output dictionary.</span>
+
+<span class="sd">    Satellite are defined via TLEs (see `~cysgp4.PyTle`). The</span>
+<span class="sd">    `~.cysgp4.propagate_many` function works with a single (scalar) PyTle</span>
+<span class="sd">    object or a list/array of them. The same is true for the `mjds` and</span>
+<span class="sd">    optional `observers` parameters, which must be a scalar (a double and</span>
+<span class="sd">    `~cysgp4.PyObserver` instance, respectively) or a list/array of them.</span>
+
+<span class="sd">    As in most use cases, a large number of positions is probably queried,</span>
+<span class="sd">    the returned values do not use the `~cysgp4.PyEci` or</span>
+<span class="sd">    `~cysgp4.PyCoordTopocentric` classes, but pack everything in arrays.</span>
+<span class="sd">    This is not only faster, but makes it easier to further process the</span>
+<span class="sd">    results.</span>
+
+<span class="sd">    For parallelization, `OpenMP &lt;https://www.openmp.org/&gt;`_ is utilized.</span>
+<span class="sd">    To change the number of CPU cores that are used, one can either set</span>
+<span class="sd">    the environment variable `OMP_NUM_THREADS` or use</span>
+<span class="sd">    `~cysgp4.set_num_threads`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mjds : `~numpy.ndarray`, `~list`, or scalar of float</span>
+<span class="sd">        Modified Julian Date.</span>
+<span class="sd">    tles : `~numpy.ndarray`, `~list`, or scalar of `~cysgp4.PyTle`</span>
+<span class="sd">        TLE instance of the satellite of interest.</span>
+<span class="sd">    observers : `~numpy.ndarray`, `~list`, or scalar of `~cysgp4.PyObserver` or None (default: None)</span>
+<span class="sd">        Observer instance. If `None` then the observer location is set to</span>
+<span class="sd">        (0 deg, 0 deg, 0 km).</span>
+<span class="sd">    do_eci_pos : Boolean, optional (default: True)</span>
+<span class="sd">        Whether to include ECI cartesian positions in the result.</span>
+<span class="sd">    do_eci_vel : Boolean, optional (default: True)</span>
+<span class="sd">        Whether to include ECI cartesian velocity in the result.</span>
+<span class="sd">    do_geo : Boolean, optional (default: True)</span>
+<span class="sd">        Whether to include geographic/geodetic positions in the result.</span>
+<span class="sd">    do_topo : Boolean, optional (default: True)</span>
+<span class="sd">        Whether to include topocentric positions in the result.</span>
+<span class="sd">    do_obs_pos : Boolean, optional (default: True)</span>
+<span class="sd">        Whether to include the observer ECI position in the results.</span>
+<span class="sd">    do_sat_azel : Boolean, optional (default: True)</span>
+<span class="sd">        Whether to include the observer position as seen by the satellite</span>
+<span class="sd">        (distance/azimuth/elevation) in the results.</span>
+<span class="sd">    sat_frame : &#39;zxy&#39; or &#39;xyz&#39;, optional (default: &#39;zxy&#39;)</span>
+<span class="sd">        How the moving satellite frame is defined. Two options are</span>
+<span class="sd">        implemented, &#39;zxy&#39; and &#39;xyz&#39;.  If &#39;zxy&#39; is chosen, the moving</span>
+<span class="sd">        satellite frame is constructed such that the `z` axis is aligned with</span>
+<span class="sd">        the satellite motion vector. The `y` axis is constructed as a vector</span>
+<span class="sd">        that is perpendicular to the plane defined by the motion vector and</span>
+<span class="sd">        the ECI zero point (aka Earth center). The resulting `x` axis, which</span>
+<span class="sd">        is orthogonal to the `y` and `z` axes, is then approximately pointing</span>
+<span class="sd">        to the nadir. Alternatively, if the frame is set as `xyz`, the `x`</span>
+<span class="sd">        axes is the motion vector, `y` has the same meaning and `z` is</span>
+<span class="sd">        approximately pointing towards the nadir.</span>
+<span class="sd">    on_error : str, optional (either &#39;raise&#39; or &#39;coerce_to_nan&#39;, default: &#39;raise&#39;)</span>
+<span class="sd">        If the underlying SGP C++ library throws an error (which often</span>
+<span class="sd">        happens if one works with times that are strongly deviating from</span>
+<span class="sd">        the TLE epoch), a Python RuntimeError is usually thrown. For batch</span>
+<span class="sd">        processing, this is not always desirable. If</span>
+<span class="sd">        `on_error = &#39;coerce_to_nan&#39;` then C++ errors will be suppressed and</span>
+<span class="sd">        the resulting position vectors will be converted to NaN-values</span>
+<span class="sd">        instead.</span>
+
+<span class="sd">        Note: this option is only relevant for `method=&#39;dwarner&#39;`!</span>
+<span class="sd">    method : str, optional (either &#39;dwarner&#39; or &#39;vallado&#39;)</span>
+<span class="sd">        This option can be used to change from the default SGP C++ library</span>
+<span class="sd">        (by Daniel Warner) to the Vallado model. For the latter, the</span>
+<span class="sd">        external `python-sgp4` library is used. &#39;vallado&#39; may be slower</span>
+<span class="sd">        due to the additional boiler-plate code and differences in the</span>
+<span class="sd">        model itself and implementation details.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    result : dict</span>
+<span class="sd">        Resulting positions for each requested frame:</span>
+
+<span class="sd">        - `eci_pos` : `~numpy.ndarray` of float</span>
+
+<span class="sd">          Satellites ECI cartesian positions. Last dimension has length 3,</span>
+<span class="sd">          one for each of `x`, `y`, and `z`.</span>
+
+<span class="sd">        - `eci_vel` : `~numpy.ndarray` of float</span>
+
+<span class="sd">          Satellites ECI cartesian velicities. Last dimension has length 3,</span>
+<span class="sd">          one for each of `v_x`, `v_y`, and `v_z`.</span>
+
+<span class="sd">        - `geo` : `~numpy.ndarray` of float</span>
+
+<span class="sd">          Satellites Geodetic positions. Last dimension has length 3, one</span>
+<span class="sd">          for each of `lon`, `lat`, and `alt`.</span>
+
+<span class="sd">        - `topo` : `~numpy.ndarray` of float</span>
+
+<span class="sd">          Satellites Topocentric positions. Last dimension has length 4,</span>
+<span class="sd">          one for each of `az`, `el`, `dist`, and `dist_rate`.</span>
+
+<span class="sd">        - `obs_pos` : `~numpy.ndarray` of float</span>
+
+<span class="sd">          Observer positions in ECI frame (Cartesian). Last dimension has</span>
+<span class="sd">          length 3, one for each of `x`, `y`, and `z`.</span>
+
+<span class="sd">        - `sat_azel` : `~numpy.ndarray` of float</span>
+
+<span class="sd">          Observer positions in the (moving) satellite frame either given as</span>
+<span class="sd">          azimuth (aka across track), elevation (aka along track), and</span>
+<span class="sd">          distance - if `sat_frame` is &#39;zxy&#39;, or given as &#39;theta&#39;, &#39;phi&#39;, and</span>
+<span class="sd">          distance if `sat_frame` is &#39;xyz&#39; (with ISO definition of the angles</span>
+<span class="sd">          theta and phi); see also `sat_frame` parameter description. Last</span>
+<span class="sd">          dimension has length 3, one for each of, (`az`, `el`, `dist`) or</span>
+<span class="sd">          (`theta&#39;, `phi`, `dist`), respectively.</span>
+
+<span class="sd">        In all cases the first dimensions are determined by the</span>
+<span class="sd">        (broadcasted) shape of the inputs `mjd`, `tles`, and `observers`.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    The following demonstrates how to use the `~cysgp4.propagate_many`</span>
+<span class="sd">    function::</span>
+
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; from cysgp4 import PyTle, PyObserver, propagate_many</span>
+<span class="sd">        &gt;&gt;&gt; from cysgp4 import get_example_tles, tles_from_text</span>
+
+<span class="sd">        &gt;&gt;&gt; tle_text = get_example_tles()</span>
+<span class="sd">        &gt;&gt;&gt; tles = np.array(</span>
+<span class="sd">        ...     tles_from_text(tle_text)</span>
+<span class="sd">        ...     )[np.newaxis, np.newaxis, :20]  # use first 20 TLEs</span>
+<span class="sd">        &gt;&gt;&gt; observers = np.array([</span>
+<span class="sd">        ...     PyObserver(6.88375, 50.525, 0.366),</span>
+<span class="sd">        ...     PyObserver(16.88375, 50.525, 0.366),</span>
+<span class="sd">        ...     ])[np.newaxis, :, np.newaxis]</span>
+<span class="sd">        &gt;&gt;&gt; mjds = np.linspace(</span>
+<span class="sd">        ...     58805.5, 58806.5, 1000  # 1000 time steps</span>
+<span class="sd">        ...     )[:, np.newaxis, np.newaxis]</span>
+
+<span class="sd">        &gt;&gt;&gt; result = propagate_many(mjds, tles, observers)</span>
+<span class="sd">        &gt;&gt;&gt; print(sorted(result.keys()))</span>
+<span class="sd">        [&#39;eci_pos&#39;, &#39;eci_vel&#39;, &#39;geo&#39;, &#39;topo&#39;]</span>
+
+<span class="sd">        &gt;&gt;&gt; # shapes are as follows</span>
+<span class="sd">        &gt;&gt;&gt; print(np.broadcast(mjds, tles, observers).shape)</span>
+<span class="sd">        (1000, 2, 20)</span>
+<span class="sd">        &gt;&gt;&gt; print(result[&#39;eci_pos&#39;].shape, result[&#39;topo&#39;].shape)</span>
+<span class="sd">        (1000, 2, 20, 3) (1000, 2, 20, 4)</span>
+
+<span class="sd">        &gt;&gt;&gt; result = propagate_many(</span>
+<span class="sd">        ...     mjds, tles, observers,</span>
+<span class="sd">        ...     do_eci_pos=False, do_eci_vel=False, do_geo=False, do_topo=True</span>
+<span class="sd">        ...     )</span>
+<span class="sd">        &gt;&gt;&gt; print(sorted(result.keys()))</span>
+<span class="sd">        [&#39;topo&#39;]</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;dwarner&#39;</span><span class="p">,</span> <span class="s1">&#39;vallado&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;&quot;method&quot; most be one of [&quot;dwarner&quot;, &quot;vallado&quot;]&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">on_error</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;raise&#39;</span><span class="p">,</span> <span class="s1">&#39;coerce_to_nan&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;&quot;on_error&quot; most be one of [&quot;raise&quot;, &quot;coerce_to_nan&quot;]&#39;</span>
+            <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sat_frame</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;zxy&#39;</span><span class="p">,</span> <span class="s1">&#39;xyz&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;&quot;sat_frame&quot; most be one of [&quot;zxy&quot;, &quot;xyz&quot;]&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;dwarner&#39;</span><span class="p">:</span>
+
+        <span class="k">return</span> <span class="n">_propagate_many_cysgp4</span><span class="p">(</span>
+            <span class="n">mjds</span><span class="p">,</span> <span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="o">=</span><span class="n">observers</span><span class="p">,</span>
+            <span class="n">do_eci_pos</span><span class="o">=</span><span class="n">do_eci_pos</span><span class="p">,</span> <span class="n">do_eci_vel</span><span class="o">=</span><span class="n">do_eci_vel</span><span class="p">,</span>
+            <span class="n">do_geo</span><span class="o">=</span><span class="n">do_geo</span><span class="p">,</span> <span class="n">do_topo</span><span class="o">=</span><span class="n">do_topo</span><span class="p">,</span>
+            <span class="n">do_obs_pos</span><span class="o">=</span><span class="n">do_obs_pos</span><span class="p">,</span> <span class="n">do_sat_azel</span><span class="o">=</span><span class="n">do_sat_azel</span><span class="p">,</span>
+            <span class="n">sat_frame</span><span class="o">=</span><span class="n">sat_frame</span><span class="p">,</span> <span class="n">on_error</span><span class="o">=</span><span class="n">on_error</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;vallado&#39;</span><span class="p">:</span>
+
+        <span class="k">return</span> <span class="n">_propagate_many_sgp4</span><span class="p">(</span>
+            <span class="n">mjds</span><span class="p">,</span> <span class="n">tles</span><span class="p">,</span> <span class="n">observers</span><span class="o">=</span><span class="n">observers</span><span class="p">,</span>
+            <span class="n">do_eci_pos</span><span class="o">=</span><span class="n">do_eci_pos</span><span class="p">,</span> <span class="n">do_eci_vel</span><span class="o">=</span><span class="n">do_eci_vel</span><span class="p">,</span>
+            <span class="n">do_geo</span><span class="o">=</span><span class="n">do_geo</span><span class="p">,</span> <span class="n">do_topo</span><span class="o">=</span><span class="n">do_topo</span><span class="p">,</span>
+            <span class="n">do_obs_pos</span><span class="o">=</span><span class="n">do_obs_pos</span><span class="p">,</span> <span class="n">do_sat_azel</span><span class="o">=</span><span class="n">do_sat_azel</span><span class="p">,</span>
+            <span class="n">sat_frame</span><span class="o">=</span><span class="n">sat_frame</span><span class="p">,</span>
+            <span class="p">)</span></div>
 </pre></div>
 
           </div>
@@ -359,7 +812,7 @@
   <p>
     &copy; Copyright 2020, Benjamin Winkel.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.4. &nbsp;
-    Last built 09 Jun 2020. <br/>
+    Last built 26 Jun 2020. <br/>
   </p>
 </footer>
   </body>
