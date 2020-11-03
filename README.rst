@@ -5,6 +5,7 @@ cysgp4
 - *Version:* 0.3.0
 - *Author:* Benjamin Winkel
 - *Repository:* `on GitHub <https://github.com/bwinkel/cysgp4>`__
+- *Bug tracker:* `on GitHub <https://github.com/bwinkel/cysgp4/issues>`__
 - *User manual:* `stable <https://bwinkel.github.io/cysgp4/>`__ |
   `developer <https://bwinkel.github.io/cysgp4/latest/>`__
 
