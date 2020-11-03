@@ -1835,8 +1835,14 @@ def _propagate_many_cysgp4(
 
         int _sat_frame = 0  # 0: 'zxy', 1: 'xyz'
 
-    assert on_error in ['raise', 'coerce_to_nan']
-    assert sat_frame in ['zxy', 'xyz']
+    if on_error not in ['raise', 'coerce_to_nan']:
+        raise ValueError(
+            'Argument "on_error" must be one of "raise" or "coerce_to_nan"'
+            )
+    if sat_frame not in ['zxy', 'xyz']:
+        raise ValueError(
+            'Argument "sat_frame" must be one of "zxy" or "xyz"'
+            )
 
     if sat_frame == 'xyz':
         _sat_frame = 1
@@ -1919,6 +1925,19 @@ def _propagate_many_cysgp4(
             # unfortunately, it is not possible in nogil loop to access
             # the cdef'ed class members; therefore, we have to maintain
             # arrays of pointers to the sgp4 and observer objects
+            if not isinstance(tle[i], PyTle):
+                print(type(tle[i]))
+                raise TypeError(
+                    'Argument "tles" must be of type "PyTle" '
+                    '(or list/array of "PyTle")'
+                    )
+            if not isinstance(obs[i], PyObserver):
+                print(type(obs[i]))
+                raise TypeError(
+                    'Argument "observers" must be of type "PyObserver" '
+                    '(or list/array of "PyObserver")'
+                    )
+
             _tle_ptr_array[i] = (<PyTle> tle[i]).thisptr
             _obs_ptr_array[i] = &(<PyObserver> obs[i])._cobj
 

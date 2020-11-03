@@ -830,6 +830,57 @@ def test_propagate_many_suppress_error():
     assert_allclose(res['eci_pos'], np.array([np.nan] * 3))
 
 
+def test_propagate_many_argument_errors():
+
+    mjds = 56458.123
+    obs = PyObserver(6.88375, 50.525, 0.366)
+    tles = PyTle(*TLE_ISS)
+
+    propagate_many(mjds, tles, obs)
+
+    with pytest.raises(ValueError) as excinfo:
+        propagate_many(mjds, tles, obs, on_error='bla')
+
+    print(str(excinfo.value))
+    assert str(excinfo.value) == '"on_error" most be one of ["raise", "coerce_to_nan"]'
+
+    with pytest.raises(ValueError) as excinfo:
+        propagate_many(mjds, tles, obs, sat_frame='bla')
+
+    print(str(excinfo.value))
+    assert str(excinfo.value) == '"sat_frame" most be one of ["zxy", "xyz"]'
+
+    with pytest.raises(TypeError) as excinfo:
+        propagate_many(mjds, 1, obs)
+
+    print(str(excinfo.value))
+    assert str(excinfo.value) == 'Argument "tles" must be of type "PyTle" (or list/array of "PyTle")'
+
+    with pytest.raises(TypeError) as excinfo:
+        propagate_many(mjds, [tles, 1], obs)
+
+    print(str(excinfo.value))
+    assert str(excinfo.value) == 'Argument "tles" must be of type "PyTle" (or list/array of "PyTle")'
+
+    with pytest.raises(TypeError) as excinfo:
+        propagate_many(mjds, tles, 1)
+
+    print(str(excinfo.value))
+    assert str(excinfo.value) == 'Argument "observers" must be of type "PyObserver" (or list/array of "PyObserver")'
+
+    with pytest.raises(TypeError) as excinfo:
+        propagate_many(mjds, tles, [obs, 1])
+
+    print(str(excinfo.value))
+    assert str(excinfo.value) == 'Argument "observers" must be of type "PyObserver" (or list/array of "PyObserver")'
+
+    with pytest.raises(TypeError) as excinfo:
+        propagate_many('a', tles, obs)
+
+    print(str(excinfo.value))
+    assert "could not be cast" in str(excinfo.value)
+
+
 def _propagate_prepare():
 
     # url = 'http://celestrak.com/NORAD/elements/science.txt'
