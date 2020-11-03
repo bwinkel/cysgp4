@@ -1,12 +1,13 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>Cysgp4 user manual &#8212; cysgp4 v0.3.4.dev7+gc52ca9f</title>
-    <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cysgp4 user manual &#8212; cysgp4 v0.3.4.dev11+gf6e8dc0</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -59,7 +60,7 @@
 	 |
       </li>
       <li>
-	<a href="index.html">cysgp4 v0.3.4.dev7+gc52ca9f</a>
+	<a href="index.html">cysgp4 v0.3.4.dev11+gf6e8dc0</a>
 	 &#187;
       </li>
       
@@ -104,7 +105,7 @@ satellite orbits with few lines of code.</p>
 <div class="section" id="pydatetime">
 <h4>PyDateTime<a class="headerlink" href="#pydatetime" title="Permalink to this headline">¶</a></h4>
 <p><a class="reference internal" href="api/cysgp4.PyDateTime.html#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> specifies a datetime. Various conversions are provided
-for convenience, from and to <a class="reference external" href="https://en.wikipedia.org/wiki/Julian_day#Variants">Modified Julian Date (MJD)</a>, Python’s <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a>
+for convenience, from and to <a class="reference external" href="https://en.wikipedia.org/wiki/Julian_day#Variants">Modified Julian Date (MJD)</a>, Python’s <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a>
 class, so-called “ticks”, which are the number of micro-seconds since 1.
 January 0001, 00:00, but also the TLE-epoch format.</p>
 <div class="admonition note">
@@ -521,7 +522,7 @@ your system. It is possible to change that by calling:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cysgp4</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">num_cores</span><span class="p">)</span>  <span class="c1"># set desired number of cores</span>
 </pre></div>
 </div>
-<p>With the Python <a class="reference external" href="https://docs.python.org/3/library/timeit.html#module-timeit" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timeit</span></code></a> package, it is possible to do some speed testing.
+<p>With the Python <a class="reference external" href="https://docs.python.org/3/library/timeit.html#module-timeit" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timeit</span></code></a> package, it is possible to do some speed testing.
 We can also try out, how well the parallelization is working:</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cysgp4</span>
@@ -632,7 +633,7 @@ interface as <a class="reference internal" href="api/cysgp4.propagate_many.html#
 <tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.propagate_many_slow.html#cysgp4.propagate_many_slow" title="cysgp4.propagate_many_slow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many_slow</span></code></a>(mjds, tles[, observers, …])</p></td>
 <td><p>This is a slow (non-parallelized, Python-looping) version of <a class="reference internal" href="api/cysgp4.propagate_many.html#cysgp4.propagate_many" title="cysgp4.propagate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_many</span></code></a> that is meant for testing and benchmarking only.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.satellite_mean_motion.html#cysgp4.satellite_mean_motion" title="cysgp4.satellite_mean_motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">satellite_mean_motion</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.satellite_mean_motion.html#cysgp4.satellite_mean_motion" title="cysgp4.satellite_mean_motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">satellite_mean_motion</span></code></a>(double alt_km, …)</p></td>
 <td><p>Mean motion of satellite at altitude in Earth’s gravitational field.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.set_num_threads.html#cysgp4.set_num_threads" title="cysgp4.set_num_threads"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_num_threads</span></code></a>(int nthreads)</p></td>
@@ -641,10 +642,10 @@ interface as <a class="reference internal" href="api/cysgp4.propagate_many.html#
 <tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.test.html#cysgp4.test" title="cysgp4.test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test</span></code></a>(**kwargs)</p></td>
 <td><p>Run the tests for the package.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.tle_checksum.html#cysgp4.tle_checksum" title="cysgp4.tle_checksum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_checksum</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.tle_checksum.html#cysgp4.tle_checksum" title="cysgp4.tle_checksum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_checksum</span></code></a>(unicode line)</p></td>
 <td><p>Compute checksum of a <a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">TLE line string</a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.tle_linestrings_from_orbital_parameters.html#cysgp4.tle_linestrings_from_orbital_parameters" title="cysgp4.tle_linestrings_from_orbital_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_linestrings_from_orbital_parameters</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/cysgp4.tle_linestrings_from_orbital_parameters.html#cysgp4.tle_linestrings_from_orbital_parameters" title="cysgp4.tle_linestrings_from_orbital_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_linestrings_from_orbital_parameters</span></code></a>(…)</p></td>
 <td><p>Generate TLE strings from orbital parameters.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/cysgp4.tle_tuples_from_text.html#cysgp4.tle_tuples_from_text" title="cysgp4.tle_tuples_from_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tle_tuples_from_text</span></code></a>(unicode tle_text)</p></td>
@@ -694,6 +695,7 @@ interface as <a class="reference internal" href="api/cysgp4.propagate_many.html#
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -743,8 +745,8 @@ interface as <a class="reference internal" href="api/cysgp4.propagate_many.html#
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2020, Benjamin Winkel.<br/>
-    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.4. &nbsp;
-    Last built 26 Jun 2020. <br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.0. &nbsp;
+    Last built 03 Nov 2020. <br/>
   </p>
 </footer>
   </body>

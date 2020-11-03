@@ -1,12 +1,13 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>Satellite &#8212; cysgp4 v0.3.4.dev7+gc52ca9f</title>
-    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Satellite &#8212; cysgp4 v0.3.4.dev11+gf6e8dc0</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -59,7 +60,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.3.4.dev7+gc52ca9f</a>
+	<a href="../index.html">cysgp4 v0.3.4.dev11+gf6e8dc0</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -76,10 +77,10 @@
             
   <div class="section" id="satellite">
 <h1>Satellite<a class="headerlink" href="#satellite" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="cysgp4.Satellite">
 <em class="property">class </em><code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">Satellite</code><span class="sig-paren">(</span><em class="sig-param">PyTle tle</em>, <em class="sig-param">PyObserver obs=None</em>, <em class="sig-param">PyDateTime pydt=None</em>, <em class="sig-param">double mjd_cache_resolution=MJD_RESOLUTION</em>, <em class="sig-param">unicode on_error=u'raise'</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.Satellite" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Calculate position of a satellite at a given time.</p>
 <p>The satellite is defined via a TLE (see <a class="reference internal" href="cysgp4.PyTle.html#cysgp4.PyTle" title="cysgp4.PyTle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTle</span></code></a>). Furthermore,
 for apparent positions of the satellite, an observer (see
@@ -93,10 +94,10 @@ defined via the <code class="xref py py-obj docutils literal notranslate"><span 
 <dd class="field-odd"><dl>
 <dt><strong>tle</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyTle.html#cysgp4.PyTle" title="cysgp4.PyTle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyTle</span></code></a></span></dt><dd><p>TLE instance of the satellite of interest.</p>
 </dd>
-<dt><strong>obs</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyObserver.html#cysgp4.PyObserver" title="cysgp4.PyObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyObserver</span></code></a> or None (default: None)</span></dt><dd><p>Observer instance. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then the observer location is set to
+<dt><strong>obs</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyObserver.html#cysgp4.PyObserver" title="cysgp4.PyObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyObserver</span></code></a> or None (default: None)</span></dt><dd><p>Observer instance. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then the observer location is set to
 (0 deg, 0 deg, 0 km).</p>
 </dd>
-<dt><strong>pydt</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyDateTime.html#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> (default: None)</span></dt><dd><p>Date and time at which to calculate the position. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then
+<dt><strong>pydt</strong><span class="classifier"><a class="reference internal" href="cysgp4.PyDateTime.html#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> (default: None)</span></dt><dd><p>Date and time at which to calculate the position. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then
 the current datetime is used, as given by a call to
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">utcnow()</span></code>.</p>
 </dd>
@@ -199,22 +200,22 @@ class would look like:</p>
 </tbody>
 </table>
 <p class="rubric">Attributes Documentation</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.Satellite.mjd">
 <code class="sig-name descname">mjd</code><a class="headerlink" href="#cysgp4.Satellite.mjd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Modified Julian Date (see also Class documentation).</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.Satellite.pydt">
 <code class="sig-name descname">pydt</code><a class="headerlink" href="#cysgp4.Satellite.pydt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Datetime (see also Class documentation).</p>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
-<dl class="method">
+<dl class="py method">
 <dt id="cysgp4.Satellite.eci_pos">
-<code class="sig-name descname">eci_pos</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.Satellite.eci_pos" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">eci_pos</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.Satellite.eci_pos" title="Permalink to this definition">¶</a></dt>
 <dd><p>ECI position of satellite.</p>
 <p>Lazily calculated, i.e., only if difference to the timestamp
 for which the previous calculation was performed is larger
@@ -229,9 +230,9 @@ than the MJD cache resolution (see class documentation).</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="cysgp4.Satellite.geo_pos">
-<code class="sig-name descname">geo_pos</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.Satellite.geo_pos" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">geo_pos</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.Satellite.geo_pos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Geographic (geodetic) position of satellite.</p>
 <p>Lazily calculated, i.e., only if difference to the timestamp
 for which the previous calculation was performed is larger
@@ -246,9 +247,9 @@ than the MJD cache resolution (see class documentation).</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="cysgp4.Satellite.topo_pos">
-<code class="sig-name descname">topo_pos</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.Satellite.topo_pos" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">topo_pos</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.Satellite.topo_pos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Topocentric position of satellite w.r.t. given observer.</p>
 <p>Lazily calculated, i.e., only if difference to the timestamp
 for which the previous calculation was performed is larger
@@ -268,6 +269,7 @@ than the MJD cache resolution (see class documentation).</p>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -290,8 +292,8 @@ than the MJD cache resolution (see class documentation).</p>
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2020, Benjamin Winkel.<br/>
-    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.4. &nbsp;
-    Last built 26 Jun 2020. <br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.0. &nbsp;
+    Last built 03 Nov 2020. <br/>
   </p>
 </footer>
   </body>

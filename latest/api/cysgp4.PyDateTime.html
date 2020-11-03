@@ -1,12 +1,13 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>PyDateTime &#8212; cysgp4 v0.3.4.dev7+gc52ca9f</title>
-    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PyDateTime &#8212; cysgp4 v0.3.4.dev11+gf6e8dc0</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -59,7 +60,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.3.4.dev7+gc52ca9f</a>
+	<a href="../index.html">cysgp4 v0.3.4.dev11+gf6e8dc0</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -76,10 +77,10 @@
             
   <div class="section" id="pydatetime">
 <h1>PyDateTime<a class="headerlink" href="#pydatetime" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="cysgp4.PyDateTime">
-<em class="property">class </em><code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">PyDateTime</code><span class="sig-paren">(</span><em class="sig-param">dt=None</em>, <em class="sig-param">init=True</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">PyDateTime</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">init</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Thin wrapper around sgp4 (C++) DateTime class.</p>
 <p>Internally, DateTime objects store time on a linear scale, “ticks”,
 which is the number of micro-seconds since 1. January 0001, 00:00.
@@ -94,11 +95,11 @@ mean sidereal time), which can be queried using the
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>dt</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> object, or None (default: None)</span></dt><dd><p>Construct the <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance with a given
-Python <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> object, or - if None - use the
+<dt><strong>dt</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> object, or None (default: None)</span></dt><dd><p>Construct the <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance with a given
+Python <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> object, or - if None - use the
 current date and time (as given by <code class="xref py py-obj docutils literal notranslate"><span class="pre">utcnow()</span></code>)</p>
 </dd>
-<dt><strong>init</strong><span class="classifier">Boolean (default: True)</span></dt><dd><p>If set to true, the <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> object will ignore the
+<dt><strong>init</strong><span class="classifier">Boolean (default: True)</span></dt><dd><p>If set to true, the <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> object will ignore the
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">dt</span></code> parameter and set the internal ticks variable to 0.
 This is only useful for computationally heavy tasks.</p>
 </dd>
@@ -209,32 +210,32 @@ properties and methods:</p>
 </tbody>
 </table>
 <p class="rubric">Attributes Documentation</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyDateTime.datetime">
 <code class="sig-name descname">datetime</code><a class="headerlink" href="#cysgp4.PyDateTime.datetime" title="Permalink to this definition">¶</a></dt>
 <dd><p>datetime (see Class documentation).</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyDateTime.mjd">
 <code class="sig-name descname">mjd</code><a class="headerlink" href="#cysgp4.PyDateTime.mjd" title="Permalink to this definition">¶</a></dt>
 <dd><p>MJD (see Class documentation).</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyDateTime.ticks">
 <code class="sig-name descname">ticks</code><a class="headerlink" href="#cysgp4.PyDateTime.ticks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ticks (see Class documentation).</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyDateTime.tle_epoch">
 <code class="sig-name descname">tle_epoch</code><a class="headerlink" href="#cysgp4.PyDateTime.tle_epoch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Datetime in TLE epoch format. See also <code class="xref py py-obj docutils literal notranslate"><span class="pre">from_tle_epoch</span></code>.</p>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
-<dl class="method">
+<dl class="py method">
 <dt id="cysgp4.PyDateTime.from_mjd">
 <code class="sig-name descname">from_mjd</code><span class="sig-paren">(</span><em class="sig-param">type cls</em>, <em class="sig-param">double mjd</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.from_mjd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from MJD.</p>
@@ -263,7 +264,7 @@ timescale, which is often used in astronomy.</p>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="cysgp4.PyDateTime.from_ticks">
 <code class="sig-name descname">from_ticks</code><span class="sig-paren">(</span><em class="sig-param">type cls</em>, <em class="sig-param">int64_t ticks</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.from_ticks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from “ticks”.</p>
@@ -292,7 +293,7 @@ which is the number of micro-seconds since 1. January 0001, 00:00.</p>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="cysgp4.PyDateTime.from_tle_epoch">
 <code class="sig-name descname">from_tle_epoch</code><span class="sig-paren">(</span><em class="sig-param">type cls</em>, <em class="sig-param">double tle_epoch</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.from_tle_epoch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from TLE epoch format.</p>
@@ -326,14 +327,14 @@ or <a class="reference external" href="https://celestrak.com/columns/v04n03/">Ce
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="cysgp4.PyDateTime.get_datetime_tuple">
-<code class="sig-name descname">get_datetime_tuple</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.get_datetime_tuple" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_datetime_tuple</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.get_datetime_tuple" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="cysgp4.PyDateTime.gmst">
-<code class="sig-name descname">gmst</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.gmst" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">gmst</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.gmst" title="Permalink to this definition">¶</a></dt>
 <dd><p>Greenwhich mean sidereal time (GMST) of current date/time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -345,9 +346,9 @@ or <a class="reference external" href="https://celestrak.com/columns/v04n03/">Ce
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="cysgp4.PyDateTime.lmst">
-<code class="sig-name descname">lmst</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">obslon_deg</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.lmst" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">lmst</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">obslon_deg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.lmst" title="Permalink to this definition">¶</a></dt>
 <dd><p>Local mean sidereal time (LMST) of current date/time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -365,7 +366,7 @@ or <a class="reference external" href="https://celestrak.com/columns/v04n03/">Ce
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="cysgp4.PyDateTime.set">
 <code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">int year</em>, <em class="sig-param">int month</em>, <em class="sig-param">int day</em>, <em class="sig-param">int hour</em>, <em class="sig-param">int minute</em>, <em class="sig-param">int second</em>, <em class="sig-param">int microsecond</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyDateTime.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new <a class="reference internal" href="#cysgp4.PyDateTime" title="cysgp4.PyDateTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyDateTime</span></code></a> instance from given date and time.</p>
@@ -396,6 +397,7 @@ or <a class="reference external" href="https://celestrak.com/columns/v04n03/">Ce
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -418,8 +420,8 @@ or <a class="reference external" href="https://celestrak.com/columns/v04n03/">Ce
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2020, Benjamin Winkel.<br/>
-    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.4. &nbsp;
-    Last built 26 Jun 2020. <br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.0. &nbsp;
+    Last built 03 Nov 2020. <br/>
   </p>
 </footer>
   </body>

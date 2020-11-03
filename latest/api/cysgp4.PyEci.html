@@ -1,12 +1,13 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>PyEci &#8212; cysgp4 v0.3.4.dev7+gc52ca9f</title>
-    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PyEci &#8212; cysgp4 v0.3.4.dev11+gf6e8dc0</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -59,7 +60,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.3.4.dev7+gc52ca9f</a>
+	<a href="../index.html">cysgp4 v0.3.4.dev11+gf6e8dc0</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -76,10 +77,10 @@
             
   <div class="section" id="pyeci">
 <h1>PyEci<a class="headerlink" href="#pyeci" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="cysgp4.PyEci">
 <em class="property">class </em><code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">PyEci</code><span class="sig-paren">(</span><em class="sig-param">PyDateTime pydt=None</em>, <em class="sig-param">PyCoordGeodetic geo_loc=None</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyEci" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Thin wrapper around sgp4 (C++) Eci class.</p>
 <p>The Eci class holds an <a class="reference external" href="https://en.wikipedia.org/wiki/Earth-centered_inertial">ECI location</a>
 (latitude, longitude, altitude) for a particular datetime.</p>
@@ -159,32 +160,32 @@ straightforward:</p>
 </tbody>
 </table>
 <p class="rubric">Attributes Documentation</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyEci.geo_loc">
 <code class="sig-name descname">geo_loc</code><a class="headerlink" href="#cysgp4.PyEci.geo_loc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Geographic location (see also Class documentation).</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyEci.loc">
 <code class="sig-name descname">loc</code><a class="headerlink" href="#cysgp4.PyEci.loc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cartesian location (readonly, see also Class documentation).</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyEci.pydt">
 <code class="sig-name descname">pydt</code><a class="headerlink" href="#cysgp4.PyEci.pydt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Datetime (see also Class documentation).</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyEci.vel">
 <code class="sig-name descname">vel</code><a class="headerlink" href="#cysgp4.PyEci.vel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cartesian velocity (readonly, see also Class documentation).</p>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
-<dl class="method">
+<dl class="py method">
 <dt id="cysgp4.PyEci.update">
 <code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">PyDateTime pydt=None</em>, <em class="sig-param">PyCoordGeodetic geo_loc=None</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyEci.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update <a class="reference internal" href="#cysgp4.PyEci" title="cysgp4.PyEci"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyEci</span></code></a> object.</p>
@@ -205,6 +206,7 @@ straightforward:</p>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -227,8 +229,8 @@ straightforward:</p>
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2020, Benjamin Winkel.<br/>
-    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.4. &nbsp;
-    Last built 26 Jun 2020. <br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.0. &nbsp;
+    Last built 03 Nov 2020. <br/>
   </p>
 </footer>
   </body>

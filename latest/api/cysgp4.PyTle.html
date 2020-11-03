@@ -1,12 +1,13 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>PyTle &#8212; cysgp4 v0.3.4.dev7+gc52ca9f</title>
-    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PyTle &#8212; cysgp4 v0.3.4.dev11+gf6e8dc0</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -59,7 +60,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">cysgp4 v0.3.4.dev7+gc52ca9f</a>
+	<a href="../index.html">cysgp4 v0.3.4.dev11+gf6e8dc0</a>
 	 &#187;
       </li>
       <li><a href="../user_manual.html" accesskey="U">Cysgp4 user manual</a> &#187;</li>
@@ -76,10 +77,10 @@
             
   <div class="section" id="pytle">
 <h1>PyTle<a class="headerlink" href="#pytle" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="cysgp4.PyTle">
-<em class="property">class </em><code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">PyTle</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">line_one</em>, <em class="sig-param">line_two</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyTle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">cysgp4.</code><code class="sig-name descname">PyTle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">line_one</span></em>, <em class="sig-param"><span class="n">line_two</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyTle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Thin wrapper around sgp4 (C++) Tle class.</p>
 <p><a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">Two-line element sets</a> contain the
 parameters necessary to describe a satellite’s orbit (around Earth).
@@ -207,31 +208,31 @@ orbital parameters for use by other sgp4 routines.</p>
 </tbody>
 </table>
 <p class="rubric">Attributes Documentation</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyTle.arg_perigee">
 <code class="sig-name descname">arg_perigee</code><a class="headerlink" href="#cysgp4.PyTle.arg_perigee" title="Permalink to this definition">¶</a></dt>
 <dd><p>Satellite’s argument of perigee [deg].</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyTle.bstar">
 <code class="sig-name descname">bstar</code><a class="headerlink" href="#cysgp4.PyTle.bstar" title="Permalink to this definition">¶</a></dt>
 <dd><p>Satellite’s BSTAR drag term.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyTle.catalog_number">
 <code class="sig-name descname">catalog_number</code><a class="headerlink" href="#cysgp4.PyTle.catalog_number" title="Permalink to this definition">¶</a></dt>
 <dd><p>Satellite’s (NORAD) catalog number.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyTle.eccentricity">
 <code class="sig-name descname">eccentricity</code><a class="headerlink" href="#cysgp4.PyTle.eccentricity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Satellite orbit’s eccentricity [dimless].</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyTle.epoch">
 <code class="sig-name descname">epoch</code><a class="headerlink" href="#cysgp4.PyTle.epoch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Epoch of the satellites TLE.</p>
@@ -247,13 +248,13 @@ computations can have large errorbars.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyTle.inclination">
 <code class="sig-name descname">inclination</code><a class="headerlink" href="#cysgp4.PyTle.inclination" title="Permalink to this definition">¶</a></dt>
 <dd><p>Satellite’s inclination [deg].</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyTle.int_designator">
 <code class="sig-name descname">int_designator</code><a class="headerlink" href="#cysgp4.PyTle.int_designator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Satellite’s international designator.</p>
@@ -263,46 +264,46 @@ Last digit is the piece of the launch.
 (see <a class="reference external" href="https://en.wikipedia.org/wiki/Two-line_element_set">TLEs on Wikipedia</a>)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyTle.mean_anomaly">
 <code class="sig-name descname">mean_anomaly</code><a class="headerlink" href="#cysgp4.PyTle.mean_anomaly" title="Permalink to this definition">¶</a></dt>
 <dd><p>Satellite’s mean anomaly [deg].</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyTle.mean_motion">
 <code class="sig-name descname">mean_motion</code><a class="headerlink" href="#cysgp4.PyTle.mean_motion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Satellite’s mean motion [1 / day].</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyTle.mean_motion_dt2">
 <code class="sig-name descname">mean_motion_dt2</code><a class="headerlink" href="#cysgp4.PyTle.mean_motion_dt2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Satellite’s first time derivative of the mean motion divided by two.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyTle.mean_motion_dt6">
 <code class="sig-name descname">mean_motion_dt6</code><a class="headerlink" href="#cysgp4.PyTle.mean_motion_dt6" title="Permalink to this definition">¶</a></dt>
 <dd><p>Satellite’s second time derivative of mean motion divided by six.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyTle.raan">
 <code class="sig-name descname">raan</code><a class="headerlink" href="#cysgp4.PyTle.raan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Satellite’s right ascension of the ascending node (RAAN) [deg].</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="cysgp4.PyTle.rev_number">
 <code class="sig-name descname">rev_number</code><a class="headerlink" href="#cysgp4.PyTle.rev_number" title="Permalink to this definition">¶</a></dt>
 <dd><p>Satellite’s revolution number at epoch (revolutions).</p>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
-<dl class="method">
+<dl class="py method">
 <dt id="cysgp4.PyTle.tle_strings">
-<code class="sig-name descname">tle_strings</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyTle.tle_strings" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">tle_strings</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cysgp4.PyTle.tle_strings" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -310,6 +311,7 @@ Last digit is the piece of the launch.
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -332,8 +334,8 @@ Last digit is the piece of the launch.
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2020, Benjamin Winkel.<br/>
-    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.4. &nbsp;
-    Last built 26 Jun 2020. <br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.0. &nbsp;
+    Last built 03 Nov 2020. <br/>
   </p>
 </footer>
   </body>
