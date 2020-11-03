@@ -152,7 +152,7 @@ def tle_tuples_from_text(str tle_text):
 
     '''
 
-    all_lines = tle_text.split('\r\n')
+    all_lines = tle_text.replace('\r', '').split('\n')
     tle_list = list(zip(*tuple(all_lines[idx::3] for idx in range(3))))
 
     return tle_list
@@ -378,6 +378,5 @@ cpdef tuple tle_linestrings_from_orbital_parameters(
 
         str tle1 = '{:s}{:d}'.format(tmp1[:68], tle_checksum(tmp1))
         str tle2 = '{:s}{:d}'.format(tmp2[:68], tle_checksum(tmp2))
-
 
     return (sat_name, tle1, tle2)

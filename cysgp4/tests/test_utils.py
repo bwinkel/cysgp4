@@ -48,6 +48,22 @@ def test_tles_from_text():
     assert repr(tles[-1]) == '<PyTle: ZHANGZHENG-1 (CSES)     >'
 
 
+def test_tles_from_text_lineendings():
+    # test that both, "\n" and "\r\n" line endings, work.
+
+    tle_text = get_example_tles()
+    tles = tles_from_text(tle_text)
+
+    assert repr(tles[0]) == '<PyTle: AKEBONO (EXOS-D)        >'
+    assert repr(tles[-1]) == '<PyTle: ZHANGZHENG-1 (CSES)     >'
+
+    tle_text = tle_text.replace('\r', '')
+    tles = tles_from_text(tle_text)
+
+    assert repr(tles[0]) == '<PyTle: AKEBONO (EXOS-D)        >'
+    assert repr(tles[-1]) == '<PyTle: ZHANGZHENG-1 (CSES)     >'
+
+
 def test_satellite_mean_motion():
 
     assert_allclose(satellite_mean_motion(500.), 15.21937835)
