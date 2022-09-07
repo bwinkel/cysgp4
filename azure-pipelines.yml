@@ -35,6 +35,9 @@ jobs:
     # image: skhep/manylinuxgcc-x86_64
     python.architecture: x64
     sphinx.version: '>=3.0'
+    pytest.version: ''
+    doctestplus.version: ''
+    extra.packages: ''
 
   strategy:
     matrix:
@@ -43,11 +46,21 @@ jobs:
       #   python.version: '3.5'
       #   py_whl: 35
       #   numpy.version: '1.13.1'
-      linux36:
-        imageName: 'ubuntu-16.04'
-        python.version: '3.6'
-        py_whl: 36
-        numpy.version: '1.13.1'
+      # linux36:
+      #   imageName: 'ubuntu-16.04'
+      #   python.version: '3.6'
+      #   py_whl: 36
+      #   numpy.version: '1.13.1'
+      # linux37:
+      #   imageName: 'ubuntu-16.04'
+      #   python.version: '3.7'
+      #   py_whl: 37
+      #   numpy.version: '1.14.5'
+      linux38:
+        imageName: 'ubuntu-latest'
+        python.version: '3.8'
+        py_whl: 38
+        numpy.version: '1.18.1'
         # docs should only be published by one thread, as they are version-
         # independent; and only if not on a PR
         publish.docs: ${{ not(eq(variables['is.pullrequest'], true)) }}
@@ -59,48 +72,73 @@ jobs:
         # independent
         build.tarball: ${{ true }}
         publish.tarball: ${{ eq(variables['is.tag'], true) }}
-      linux37:
-        imageName: 'ubuntu-16.04'
-        python.version: '3.7'
-        py_whl: 37
-        numpy.version: '1.14.5'
-      linux38:
-        imageName: 'ubuntu-16.04'
-        python.version: '3.8'
-        py_whl: 38
-        numpy.version: '1.16.5'
+        pytest.version: '<6'
+        doctestplus.version: '<0.6.1'
+        extra.packages: 'sysroot_linux-64 "jinja2<3.1"'
+      linux39:
+        imageName: 'ubuntu-latest'
+        python.version: '3.9'
+        py_whl: 39
+        numpy.version: '1.20.0'
+      linux310:
+        imageName: 'ubuntu-latest'
+        python.version: '3.10'
+        py_whl: 310
+        numpy.version: '1.22.0'
       # mac35:
       #   imageName: 'macos-10.14'
       #   python.version: '3.5'
       #   numpy.version: '1.13.1'
-      mac36:
-        imageName: 'macos-10.14'
-        python.version: '3.6'
-        numpy.version: '1.13.1'
-      mac37:
-        imageName: 'macos-10.14'
-        python.version: '3.7'
-        numpy.version: '1.14.5'
+      # mac36:
+      #   imageName: 'macos-10.14'
+      #   python.version: '3.6'
+      #   numpy.version: '1.13.1'
+      # mac37:
+      #   imageName: 'macos-10.14'
+      #   python.version: '3.7'
+      #   numpy.version: '1.14.5'
       mac38:
-        imageName: 'macos-10.14'
+        imageName: 'macos-10.15'
         python.version: '3.8'
-        numpy.version: '1.16.5'
+        numpy.version: '1.18.1'
+      mac39:
+        imageName: 'macos-latest'
+        python.version: '3.9'
+        numpy.version: '1.20.0'
+      # mac310:
+      #   imageName: 'macos-latest'
+      #   python.version: '3.10'
+      #   numpy.version: '1.22.0'
       # win35:
       #   imageName: 'vs2017-win2016'
       #   python.version: '3.5'
       #   numpy.version: '1.13.1'
-      win36:
-        imageName: 'vs2017-win2016'
-        python.version: '3.6'
-        numpy.version: '1.13.1'
-      win37:
-        imageName: 'vs2017-win2016'
-        python.version: '3.7'
-        numpy.version: '1.14.5'
+      # win36:
+      #   imageName: 'vs2017-win2016'
+      #   python.version: '3.6'
+      #   numpy.version: '1.13.1'
+      # win37:
+      #   imageName: 'vs2017-win2016'
+      #   python.version: '3.7'
+      #   numpy.version: '1.14.5'
+      # win38:
+      #   imageName: 'vs2017-win2016'
+      #   python.version: '3.8'
+      #   numpy.version: '1.16.5'
       win38:
-        imageName: 'vs2017-win2016'
+        imageName: 'windows-latest'
         python.version: '3.8'
-        numpy.version: '1.16.5'
+        # numpy.version: '1.17.4'
+        numpy.version: '1.18.1'
+      win39:
+        imageName: 'windows-latest'
+        python.version: '3.9'
+        numpy.version: '1.20.0'
+      win310:
+        imageName: 'windows-latest'
+        python.version: '3.10'
+        py_whl: cp310-
+        numpy.version: '1.22.0'
 
   pool:
     vmImage: $(imageName)
@@ -112,6 +150,13 @@ jobs:
     displayName: Fix a conda bug on MacOS
     condition: startsWith(variables['Agent.OS'], 'Darwin')
 
+  # see https://github.com/mamba-org/mamba/issues/488
+  # and https://github.com/MPAS-Dev/compass/pull/320
+  - bash: |
+      rm /usr/share/miniconda/pkgs/cache/*.json
+    displayName: Fix a conda bug on Linux
+    condition: startsWith(variables['Agent.OS'], 'Linux')
+
   - bash: |
       echo "##vso[task.prependpath]$CONDA/bin"
       echo "##vso[task.setvariable variable=conda.activate]source activate"
@@ -119,11 +164,22 @@ jobs:
     # condition: not(eq(variables['is.win'], true))
     condition: not(startsWith(variables['Agent.OS'], 'Windows'))
 
+
+  - bash: |
+      echo "##vso[task.prependpath]/usr/bin"
+    displayName: Bugfix MacOS command line interface
+    condition: startsWith(variables['Agent.OS'], 'Darwin')
+
   - powershell: |
       Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
       echo "##vso[task.setvariable variable=conda.activate]call activate"
     displayName: Add conda to PATH, Windows
     # condition: eq(variables['is.win'], true)
+    condition: startsWith(variables['Agent.OS'], 'Windows')
+
+  - script: |
+      echo on
+    displayName: Verbosity on Win
     condition: startsWith(variables['Agent.OS'], 'Windows')
 
   - script: |
@@ -152,7 +208,10 @@ jobs:
     # condition: not(eq(variables['is.win'], true))
     condition: not(startsWith(variables['Agent.OS'], 'Windows'))
 
-  - script: conda create --yes --quiet --name cysgp4-env -c conda-forge
+
+  - script: |
+      conda install --yes -c conda-forge mamba
+      conda create --yes --quiet --name cysgp4-env -c conda-forge
     displayName: Create Anaconda environment
 
   # note: with project.toml it should not be necessary to have cython
@@ -161,35 +220,60 @@ jobs:
   # pip installation)
   - script: |
       $(conda.activate) cysgp4-env
-      conda install --yes --quiet -c conda-forge python=$(python.version) cython numpy==$(numpy.version) setuptools_scm twine "pytest<6" pytest-astropy "pytest-doctestplus<0.6.1" sgp4 wheel
+      mamba install --yes --quiet -c conda-forge python=$(python.version) cython numpy==$(numpy.version) setuptools_scm twine "pytest$(pytest.version)" pytest-astropy "pytest-doctestplus$(doctestplus.version)" "sgp4>2" wheel $(extra.packages)
     displayName: Install Anaconda packages
+
+  # # see Issue #55 of github/pycraf
+  # - bash: |
+  #     rm /usr/share/miniconda/envs/cysgp4-env/x86_64-conda-linux-gnu/sysroot/lib64/librt.so.1 || true
+  #   displayName: Fix another conda bug on Linux
+  #   condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'), eq(variables['python.version'], 3.8))
 
   # need to fix cctools and ld64 to slightly older version, otherwise an
   # error ("ld: library not found for -lSystem") occurs during build
   - script: |
       $(conda.activate) cysgp4-env
-      conda install --yes --quiet --name cysgp4-env -c conda-forge clang_osx-64 clangxx_osx-64 llvm-openmp openmp cctools==921 ld64==409.12
+      mamba install --yes --quiet --name cysgp4-env -c conda-forge clang_osx-64 clangxx_osx-64 llvm-openmp openmp cctools==921 ld64==409.12 ta-lib
     displayName: Prepare clang, MacOS
     # condition: and(succeeded(), eq(variables['is.macos'], true))
-    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Darwin'))
+    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Darwin'), lt(variables['python.version'], 3.8))
 
   - script: |
       $(conda.activate) cysgp4-env
-      pip install -e .
+      mamba install --yes --quiet --name cysgp4-env -c conda-forge compilers llvm-openmp
+    displayName: Prepare clang, MacOS
+    # condition: and(succeeded(), eq(variables['is.macos'], true))
+    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Darwin'), ge(variables['python.version'], 3.8))
+
+  # see Issue github/pycraf #55
+  - script: |
+      $(conda.activate) cysgp4-env
+      python -m pip install --no-build-isolation --no-deps -v -v -v -e .
     displayName: Building
 
   - script: |
       $(conda.activate) cysgp4-env
-      pip install pytest-azurepipelines
-      pytest -rsx --doctest-rst docs cysgp4
-    displayName: Testing
+      # pip install pytest-azurepipelines
+      # pytest -rsx --doctest-rst --ignore-glob="*/setup_package.py" docs cysgp4
+      pytest -rsx --ignore-glob="*/setup_package.py" cysgp4
+    displayName: Testing package
+
+  - script: |
+      $(conda.activate) cysgp4-env
+      # pip install pytest-azurepipelines
+      pytest -rsx --doctest-rst --ignore-glob="*/setup_package.py" docs
+      # pytest -rsx --doctest-plus --doctest-rst --doctest-glob="*.rst" --doctest-ignore-import-errors docs
+    displayName: Testing docs
+    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'), eq(variables['python.version'], 3.8))
 
   - script: |
       $(conda.activate) cysgp4-env
       conda install --yes --quiet --name cysgp4-env -c conda-forge astropy "sphinx$(sphinx.version)" sphinx-astropy
-      sphinx-build docs docs/_build/html -W -b html
+      # sphinx-build docs docs/_build/html -W -b html
+      cd docs
+      sphinx-build . _build/html -b html
     displayName: Make docs
-    condition: succeeded()
+    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'))
 
   - task: DownloadSecureFile@1
     inputs:
@@ -222,6 +306,7 @@ jobs:
     displayName: 'Twine Authenticate'
 
   - bash: |
+      rm -rf build
       docker run -e NPY_NUM_BUILD_JOBS=4 -e PLAT=$(plat) -e package_name=$(package_name) -e py_whl=$(py_whl) --rm -v `pwd`:/io $(image) /io/.ci/build-wheels.sh
       ls -lh wheelhouse/
       mkdir -p dist
@@ -241,16 +326,18 @@ jobs:
   # will use system python for upload
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: '3.6'
+      versionSpec: '3.8'
 
   - script: |
       pip install twine
+      ls dist/*.whl
       python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH) dist/*.whl
     displayName: Upload wheels, Linux/MacOS
     condition: and(succeeded(), eq(variables['publish.wheels'], true), not(startsWith(variables['Agent.OS'], 'Windows')))
 
   - script: |
       pip install twine
+      ls dist/*.whl
       python -m twine upload -r "pypi" --config-file %PYPIRC_PATH% dist/*.whl
     displayName: Upload wheels, Windows
     condition: and(succeeded(), eq(variables['publish.wheels'], true), startsWith(variables['Agent.OS'], 'Windows'))
