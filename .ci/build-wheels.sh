@@ -1,5 +1,5 @@
 #!/bin/bash
-# from https://github.com/scikit-hep/boost-histogram
+# from https://github.com/scikit-hep/boost-histogram/tree/v0.6.0/.ci
 
 set -e -x
 
@@ -18,7 +18,7 @@ echo "Using Pythons: ${pys[@]}"
 
 # Compile wheels
 for PYBIN in "${pys[@]}"; do
-    "${PYBIN}/pip" install -r /io/dev-requirements.txt
+    # "${PYBIN}/pip" install -r /io/pip-requirements-dev
     "${PYBIN}/pip" wheel /io/ -w wheelhouse/
 done
 
@@ -30,5 +30,5 @@ done
 # Install packages and test
 for PYBIN in "${pys[@]}"; do
     "${PYBIN}/python" -m pip install $package_name --no-index -f /io/wheelhouse
-    "${PYBIN}/pytest" /io/tests
+    # "${PYBIN}/pytest" /io/tests
 done

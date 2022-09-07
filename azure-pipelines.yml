@@ -59,8 +59,16 @@ jobs:
       linux38:
         imageName: 'ubuntu-latest'
         python.version: '3.8'
-        py_whl: 38
+        py_whl: cp38-
         numpy.version: '1.18.1'
+        pytest.version: '<6'
+        doctestplus.version: '<0.6.1'
+        extra.packages: 'sysroot_linux-64 "jinja2<3.1"'
+      linux39:
+        imageName: 'ubuntu-latest'
+        python.version: '3.9'
+        py_whl: cp39-
+        numpy.version: '1.20.0'
         # docs should only be published by one thread, as they are version-
         # independent; and only if not on a PR
         publish.docs: ${{ not(eq(variables['is.pullrequest'], true)) }}
@@ -72,18 +80,10 @@ jobs:
         # independent
         build.tarball: ${{ true }}
         publish.tarball: ${{ eq(variables['is.tag'], true) }}
-        pytest.version: '<6'
-        doctestplus.version: '<0.6.1'
-        extra.packages: 'sysroot_linux-64 "jinja2<3.1"'
-      linux39:
-        imageName: 'ubuntu-latest'
-        python.version: '3.9'
-        py_whl: 39
-        numpy.version: '1.20.0'
       linux310:
         imageName: 'ubuntu-latest'
         python.version: '3.10'
-        py_whl: 310
+        py_whl: cp310-
         numpy.version: '1.22.0'
       # mac35:
       #   imageName: 'macos-10.14'
@@ -98,17 +98,17 @@ jobs:
       #   python.version: '3.7'
       #   numpy.version: '1.14.5'
       mac38:
-        imageName: 'macos-10.15'
+        imageName: 'macos-latest'
         python.version: '3.8'
         numpy.version: '1.18.1'
       mac39:
         imageName: 'macos-latest'
         python.version: '3.9'
         numpy.version: '1.20.0'
-      # mac310:
-      #   imageName: 'macos-latest'
-      #   python.version: '3.10'
-      #   numpy.version: '1.22.0'
+      mac310:
+        imageName: 'macos-latest'
+        python.version: '3.10'
+        numpy.version: '1.22.0'
       # win35:
       #   imageName: 'vs2017-win2016'
       #   python.version: '3.5'
@@ -167,6 +167,7 @@ jobs:
 
   - bash: |
       echo "##vso[task.prependpath]/usr/bin"
+      echo "##vso[task.setvariable variable=SETUPTOOLS_ENABLE_FEATURES]legacy-editable"
     displayName: Bugfix MacOS command line interface
     condition: startsWith(variables['Agent.OS'], 'Darwin')
 
@@ -176,6 +177,11 @@ jobs:
     displayName: Add conda to PATH, Windows
     # condition: eq(variables['is.win'], true)
     condition: startsWith(variables['Agent.OS'], 'Windows')
+
+  - script: |
+      set -x
+    displayName: Verbosity on Linux/MacOS
+    condition: not(startsWith(variables['Agent.OS'], 'Windows'))
 
   - script: |
       echo on
@@ -220,8 +226,13 @@ jobs:
   # pip installation)
   - script: |
       $(conda.activate) cysgp4-env
-      mamba install --yes --quiet -c conda-forge python=$(python.version) cython numpy==$(numpy.version) setuptools_scm twine "pytest$(pytest.version)" pytest-astropy "pytest-doctestplus$(doctestplus.version)" "sgp4>2" wheel $(extra.packages)
+      mamba install --yes --quiet -c conda-forge python=$(python.version) build cython numpy==$(numpy.version) setuptools_scm twine "pytest$(pytest.version)" "pytest-doctestplus$(doctestplus.version)" "sgp4>2" wheel $(extra.packages)
     displayName: Install Anaconda packages
+
+  # IMPORTANT:
+  # condition: and(succeeded(), ge(variables['python.version'], 3.8))
+  # will be false for python 3.10
+  # TODO: Use and(succeeded(), in(variables['python.version'], '3.8', 3.9', '3.10'))
 
   # # see Issue #55 of github/pycraf
   # - bash: |
@@ -231,19 +242,26 @@ jobs:
 
   # need to fix cctools and ld64 to slightly older version, otherwise an
   # error ("ld: library not found for -lSystem") occurs during build
-  - script: |
-      $(conda.activate) cysgp4-env
-      mamba install --yes --quiet --name cysgp4-env -c conda-forge clang_osx-64 clangxx_osx-64 llvm-openmp openmp cctools==921 ld64==409.12 ta-lib
-    displayName: Prepare clang, MacOS
-    # condition: and(succeeded(), eq(variables['is.macos'], true))
-    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Darwin'), lt(variables['python.version'], 3.8))
+  # - script: |
+  #     $(conda.activate) cysgp4-env
+  #     mamba install --yes --quiet --name cysgp4-env -c conda-forge clang_osx-64 clangxx_osx-64 llvm-openmp openmp cctools==921 ld64==409.12 ta-lib
+  #   displayName: Prepare clang, MacOS
+  #   # condition: and(succeeded(), eq(variables['is.macos'], true))
+  #   condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Darwin'), lt(variables['python.version'], 3.8))
+
+  # - script: |
+  #     $(conda.activate) cysgp4-env
+  #     mamba install --yes --quiet --name cysgp4-env -c conda-forge compilers llvm-openmp
+  #   displayName: Prepare clang, MacOS
+  #   # condition: and(succeeded(), eq(variables['is.macos'], true))
+  #   condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Darwin'), ge(variables['python.version'], 3.8))
 
   - script: |
-      $(conda.activate) cysgp4-env
-      mamba install --yes --quiet --name cysgp4-env -c conda-forge compilers llvm-openmp
+      $(conda.activate) pycraf-env
+      mamba install --yes --quiet --name cysgp4-env -c conda-forge compilers llvm-openmp clang_osx-64 clangxx_osx-64
     displayName: Prepare clang, MacOS
     # condition: and(succeeded(), eq(variables['is.macos'], true))
-    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Darwin'), ge(variables['python.version'], 3.8))
+    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Darwin'))
 
   # see Issue github/pycraf #55
   - script: |
@@ -264,7 +282,7 @@ jobs:
       pytest -rsx --doctest-rst --ignore-glob="*/setup_package.py" docs
       # pytest -rsx --doctest-plus --doctest-rst --doctest-glob="*.rst" --doctest-ignore-import-errors docs
     displayName: Testing docs
-    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'), eq(variables['python.version'], 3.8))
+    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'), eq(variables['python.version'], 3.9))
 
   - script: |
       $(conda.activate) cysgp4-env
@@ -302,8 +320,22 @@ jobs:
 
   - task: TwineAuthenticate@1
     inputs:
-      pythonUploadServiceConnection: pypi
+      pythonUploadServiceConnection: pypi_cysgp4
     displayName: 'Twine Authenticate'
+
+  # twine upload with python 3.5 doesn't work?
+  # (pkg_resources.DistributionNotFound: The 'readme-renderer>=21.0' distribution was not found)
+  # will use system python for upload
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.9'
+
+  - script: |
+      $(conda.activate) cysgp4-env
+      # python setup.py sdist
+      python -m build --sdist
+    displayName: Build tarball
+    condition: and(succeeded(), eq(variables['build.tarball'], true))
 
   - bash: |
       rm -rf build
@@ -321,36 +353,23 @@ jobs:
     displayName: Build wheels, MacOS/Windows
     condition: and(succeeded(), not(startsWith(variables['Agent.OS'], 'Linux')))
 
-  # twine upload with python 3.5 doesn't work?
-  # (pkg_resources.DistributionNotFound: The 'readme-renderer>=21.0' distribution was not found)
-  # will use system python for upload
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.8'
-
   - script: |
       pip install twine
       ls dist/*.whl
-      python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH) dist/*.whl
+      python -m twine upload -r "pypi_cysgp4" --config-file $(PYPIRC_PATH) dist/*.whl
     displayName: Upload wheels, Linux/MacOS
     condition: and(succeeded(), eq(variables['publish.wheels'], true), not(startsWith(variables['Agent.OS'], 'Windows')))
 
   - script: |
       pip install twine
       ls dist/*.whl
-      python -m twine upload -r "pypi" --config-file %PYPIRC_PATH% dist/*.whl
+      python -m twine upload -r "pypi_cysgp4" --config-file %PYPIRC_PATH% dist/*.whl
     displayName: Upload wheels, Windows
     condition: and(succeeded(), eq(variables['publish.wheels'], true), startsWith(variables['Agent.OS'], 'Windows'))
 
   - script: |
       $(conda.activate) cysgp4-env
-      python setup.py sdist
-    displayName: Build tarball
-    condition: and(succeeded(), eq(variables['build.tarball'], true))
-
-  - script: |
-      $(conda.activate) cysgp4-env
-      python -m twine upload -r "pypi" --config-file $(PYPIRC_PATH) dist/*.tar.gz
+      python -m twine upload -r "pypi_cysgp4" --config-file $(PYPIRC_PATH) dist/*.tar.gz
     displayName: Upload tarball
     condition: and(succeeded(), eq(variables['publish.tarball'], true))
 
