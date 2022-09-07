@@ -59,8 +59,16 @@ jobs:
       linux38:
         imageName: 'ubuntu-latest'
         python.version: '3.8'
-        py_whl: 38
+        py_whl: cp38-
         numpy.version: '1.18.1'
+        pytest.version: '<6'
+        doctestplus.version: '<0.6.1'
+        extra.packages: 'sysroot_linux-64 "jinja2<3.1"'
+      linux39:
+        imageName: 'ubuntu-latest'
+        python.version: '3.9'
+        py_whl: cp39-
+        numpy.version: '1.20.0'
         # docs should only be published by one thread, as they are version-
         # independent; and only if not on a PR
         publish.docs: ${{ not(eq(variables['is.pullrequest'], true)) }}
@@ -72,18 +80,10 @@ jobs:
         # independent
         build.tarball: ${{ true }}
         publish.tarball: ${{ eq(variables['is.tag'], true) }}
-        pytest.version: '<6'
-        doctestplus.version: '<0.6.1'
-        extra.packages: 'sysroot_linux-64 "jinja2<3.1"'
-      linux39:
-        imageName: 'ubuntu-latest'
-        python.version: '3.9'
-        py_whl: 39
-        numpy.version: '1.20.0'
       linux310:
         imageName: 'ubuntu-latest'
         python.version: '3.10'
-        py_whl: 310
+        py_whl: cp310-
         numpy.version: '1.22.0'
       # mac35:
       #   imageName: 'macos-10.14'
@@ -264,7 +264,7 @@ jobs:
       pytest -rsx --doctest-rst --ignore-glob="*/setup_package.py" docs
       # pytest -rsx --doctest-plus --doctest-rst --doctest-glob="*.rst" --doctest-ignore-import-errors docs
     displayName: Testing docs
-    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'), eq(variables['python.version'], 3.8))
+    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'), eq(variables['python.version'], 3.9))
 
   - script: |
       $(conda.activate) cysgp4-env
@@ -305,6 +305,19 @@ jobs:
       pythonUploadServiceConnection: pypi
     displayName: 'Twine Authenticate'
 
+  # twine upload with python 3.5 doesn't work?
+  # (pkg_resources.DistributionNotFound: The 'readme-renderer>=21.0' distribution was not found)
+  # will use system python for upload
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.9'
+
+  - script: |
+      $(conda.activate) cysgp4-env
+      python setup.py sdist
+    displayName: Build tarball
+    condition: and(succeeded(), eq(variables['build.tarball'], true))
+
   - bash: |
       rm -rf build
       docker run -e NPY_NUM_BUILD_JOBS=4 -e PLAT=$(plat) -e package_name=$(package_name) -e py_whl=$(py_whl) --rm -v `pwd`:/io $(image) /io/.ci/build-wheels.sh
@@ -321,13 +334,6 @@ jobs:
     displayName: Build wheels, MacOS/Windows
     condition: and(succeeded(), not(startsWith(variables['Agent.OS'], 'Linux')))
 
-  # twine upload with python 3.5 doesn't work?
-  # (pkg_resources.DistributionNotFound: The 'readme-renderer>=21.0' distribution was not found)
-  # will use system python for upload
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.8'
-
   - script: |
       pip install twine
       ls dist/*.whl
@@ -341,12 +347,6 @@ jobs:
       python -m twine upload -r "pypi" --config-file %PYPIRC_PATH% dist/*.whl
     displayName: Upload wheels, Windows
     condition: and(succeeded(), eq(variables['publish.wheels'], true), startsWith(variables['Agent.OS'], 'Windows'))
-
-  - script: |
-      $(conda.activate) cysgp4-env
-      python setup.py sdist
-    displayName: Build tarball
-    condition: and(succeeded(), eq(variables['build.tarball'], true))
 
   - script: |
       $(conda.activate) cysgp4-env
