@@ -349,7 +349,8 @@ jobs:
 
   - script: |
       $(conda.activate) cysgp4-env
-      python setup.py bdist_wheel
+      # python setup.py bdist_wheel
+      python -m build --wheel
     displayName: Build wheels, MacOS/Windows
     condition: and(succeeded(), not(startsWith(variables['Agent.OS'], 'Linux')))
 
