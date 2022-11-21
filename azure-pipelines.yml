@@ -41,21 +41,6 @@ jobs:
 
   strategy:
     matrix:
-      # linux35:
-      #   imageName: 'ubuntu-16.04'
-      #   python.version: '3.5'
-      #   py_whl: 35
-      #   numpy.version: '1.13.1'
-      # linux36:
-      #   imageName: 'ubuntu-16.04'
-      #   python.version: '3.6'
-      #   py_whl: 36
-      #   numpy.version: '1.13.1'
-      # linux37:
-      #   imageName: 'ubuntu-16.04'
-      #   python.version: '3.7'
-      #   py_whl: 37
-      #   numpy.version: '1.14.5'
       linux38:
         imageName: 'ubuntu-latest'
         python.version: '3.8'
@@ -68,7 +53,7 @@ jobs:
         imageName: 'ubuntu-latest'
         python.version: '3.9'
         py_whl: cp39-
-        numpy.version: '1.20.0'
+        numpy.version: '1.20.3'
         # docs should only be published by one thread, as they are version-
         # independent; and only if not on a PR
         publish.docs: ${{ not(eq(variables['is.pullrequest'], true)) }}
@@ -84,19 +69,12 @@ jobs:
         imageName: 'ubuntu-latest'
         python.version: '3.10'
         py_whl: cp310-
-        numpy.version: '1.22.0'
-      # mac35:
-      #   imageName: 'macos-10.14'
-      #   python.version: '3.5'
-      #   numpy.version: '1.13.1'
-      # mac36:
-      #   imageName: 'macos-10.14'
-      #   python.version: '3.6'
-      #   numpy.version: '1.13.1'
-      # mac37:
-      #   imageName: 'macos-10.14'
-      #   python.version: '3.7'
-      #   numpy.version: '1.14.5'
+        numpy.version: '1.21.6'
+      linux311:
+        imageName: 'ubuntu-latest'
+        python.version: '3.11'
+        py_whl: cp311-
+        numpy.version: '1.23.4'
       mac38:
         imageName: 'macos-latest'
         python.version: '3.8'
@@ -104,27 +82,15 @@ jobs:
       mac39:
         imageName: 'macos-latest'
         python.version: '3.9'
-        numpy.version: '1.20.0'
+        numpy.version: '1.20.3'
       mac310:
         imageName: 'macos-latest'
         python.version: '3.10'
-        numpy.version: '1.22.0'
-      # win35:
-      #   imageName: 'vs2017-win2016'
-      #   python.version: '3.5'
-      #   numpy.version: '1.13.1'
-      # win36:
-      #   imageName: 'vs2017-win2016'
-      #   python.version: '3.6'
-      #   numpy.version: '1.13.1'
-      # win37:
-      #   imageName: 'vs2017-win2016'
-      #   python.version: '3.7'
-      #   numpy.version: '1.14.5'
-      # win38:
-      #   imageName: 'vs2017-win2016'
-      #   python.version: '3.8'
-      #   numpy.version: '1.16.5'
+        numpy.version: '1.21.6'
+      mac311:
+        imageName: 'macos-latest'
+        python.version: '3.11'
+        numpy.version: '1.23.4'
       win38:
         imageName: 'windows-latest'
         python.version: '3.8'
@@ -133,12 +99,15 @@ jobs:
       win39:
         imageName: 'windows-latest'
         python.version: '3.9'
-        numpy.version: '1.20.0'
+        numpy.version: '1.20.3'
       win310:
         imageName: 'windows-latest'
         python.version: '3.10'
-        py_whl: cp310-
-        numpy.version: '1.22.0'
+        numpy.version: '1.21.6'
+      win311:
+        imageName: 'windows-latest'
+        python.version: '3.11'
+        numpy.version: '1.23.4'
 
   pool:
     vmImage: $(imageName)
@@ -269,20 +238,22 @@ jobs:
       python -m pip install --no-build-isolation --no-deps -v -v -v -e .
     displayName: Building
 
-  - script: |
-      $(conda.activate) cysgp4-env
       # pip install pytest-azurepipelines
       # pytest -rsx --doctest-rst --ignore-glob="*/setup_package.py" docs cysgp4
-      pytest -rsx --ignore-glob="*/setup_package.py" cysgp4
-    displayName: Testing package
-
   - script: |
       $(conda.activate) cysgp4-env
+      python -m pytest -rsx --ignore-glob="*/setup_package.py" cysgp4
+    displayName: Testing package
+
       # pip install pytest-azurepipelines
-      pytest -rsx --doctest-rst --ignore-glob="*/setup_package.py" docs
+      # pytest -rsx --doctest-rst --ignore-glob="*/setup_package.py" docs
       # pytest -rsx --doctest-plus --doctest-rst --doctest-glob="*.rst" --doctest-ignore-import-errors docs
+  - script: |
+      $(conda.activate) cysgp4-env
+      python -m pytest -rsx --doctest-plus --doctest-glob="*.rst" --doctest-ignore-import-errors
     displayName: Testing docs
-    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'), eq(variables['python.version'], 3.9))
+    # condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'), eq(variables['python.version'], 3.9))
+    condition: succeeded()
 
   - script: |
       $(conda.activate) cysgp4-env
