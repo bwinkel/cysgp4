@@ -590,15 +590,18 @@ def propagate_many(
         (distance/azimuth/elevation) in the results.
     sat_frame : 'zxy' or 'xyz', optional (default: 'zxy')
         How the moving satellite frame is defined. Two options are
-        implemented, 'zxy' and 'xyz'.  If 'zxy' is chosen, the moving
-        satellite frame is constructed such that the `z` axis is aligned with
-        the satellite motion vector. The `y` axis is constructed as a vector
-        that is perpendicular to the plane defined by the motion vector and
-        the ECI zero point (aka Earth center). The resulting `x` axis, which
-        is orthogonal to the `y` and `z` axes, is then approximately pointing
-        to the nadir. Alternatively, if the frame is set as `xyz`, the `x`
-        axes is the motion vector, `y` has the same meaning and `z` is
-        approximately pointing towards the nadir.
+        implemented, 'zxy' and 'xyz'. If 'zxy' is chosen, the moving
+        satellite frame is constructed such that the `z` axis is
+        aligned with the satellite motion vector. The `y` axis is lies
+        perpendicularly to the plane defined by the motion vector and
+        the ECI zero point (aka the Earth centre). The resulting `x`
+        axis, which is orthogonal to the `y` and `z` axes, is then
+        approximately pointing towards nadir. Alternatively, if the
+        frame is set as `xyz`, the `x` axis is the motion vector, `y`
+        has the same meaning (but points into the opposite direction)
+        and `z` is approximately pointing towards the nadir. The
+        definition of the output polar angles is different for the two
+        reference frames, see Returns.
     on_error : str, optional (either 'raise' or 'coerce_to_nan', default: 'raise')
         If the underlying SGP C++ library throws an error (which often
         happens if one works with times that are strongly deviating from
@@ -648,13 +651,27 @@ def propagate_many(
 
         - `sat_azel` : `~numpy.ndarray` of float
 
-          Observer positions in the (moving) satellite frame either given as
-          azimuth (aka across track), elevation (aka along track), and
-          distance - if `sat_frame` is 'zxy', or given as 'theta', 'phi', and
-          distance if `sat_frame` is 'xyz' (with ISO definition of the angles
-          theta and phi); see also `sat_frame` parameter description. Last
-          dimension has length 3, one for each of, (`az`, `el`, `dist`) or
-          (`theta', `phi`, `dist`), respectively.
+          If `sat_frame` is 'zxy', z lies in the direction of motion,
+          y perpendicular to the z-axis and the Earth center, x is
+          pointing approximately towards nadir, see also `sat_frame`
+          parameter description. The Observer positions in the
+          (co-moving) satellite frame are given as azimuth, elevation
+          in the specified reference frame, and distance (az, el,
+          dist). az is the angle between the projection of the vector
+          towards the Observer onto the xy-plane and the x-axis. -180
+          deg < az < 180 deg. el is the angle between the normal
+          vector and the xy-plane. -90 deg < el < 90 deg.
+
+          If `sat_frame` is 'xyz', x lies in the direction of motion,
+          y is perpendicular to z and the Earth center, z is pointing
+          approximately towards nadir, see also `sat_frame` parameter
+          description. The Observer positions in the (moving)
+          satellite frame are given as azimuth and polar angle in the
+          specified reference frame, and distance (az, theta, dist). az
+          is the angle between the projection of the vector towards
+          the observer onto the xy-plane and the x-axis. -180 deg < az
+          < 180 deg. theta is the angle between the normal vector and
+          the z-axis. -90 deg < theta < 90 deg.
 
         In all cases the first dimensions are determined by the
         (broadcasted) shape of the inputs `mjd`, `tles`, and `observers`.
