@@ -1772,11 +1772,11 @@ def _propagate_many_cysgp4(
           approximately towards nadir, see also `sat_frame` parameter
           description. The Observer positions in the (moving)
           satellite frame are given as azimuth and polar angle in the
-          specified reference frame, and distance (az, phi, dist). az
+          specified reference frame, and distance (az, theta, dist). az
           is the angle between the projection of the vector towards
           the observer onto the xy-plane and the x-axis. -180 deg < az
-          < 180 deg. phi is the angle between the normal vector and
-          the z-axis. -90 deg < phi < 90 deg.
+          < 180 deg. theta is the angle between the normal vector and
+          the z-axis. -90 deg < theta < 90 deg.
           
         In all cases the first dimensions are determined by the
         (broadcasted) shape of the inputs `mjd`, `tles`, and `observers`.
