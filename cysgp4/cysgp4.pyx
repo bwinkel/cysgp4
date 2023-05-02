@@ -1756,16 +1756,16 @@ def _propagate_many_cysgp4(
 
         - `sat_azel` : `~numpy.ndarray` of float
 
-          If `sat_frame` is 'zxy', z lies in direction of motion, y
-          perpendicular to z-axis and Earth center, x is pointing
-          approximately towards nadir, see also `sat_frame` parameter
-          description. The Observer positions in the (co-moving)
-          satellite frame are given as azimuth, elevation in the
-          specified reference frame, and distance (az, el, dist). az
-          is the angle between the projection of the vector towards
-          the Observer onto the xy-plane and the x-axis. -180 deg < az
-          < 180 deg. el is the angle between the normal vector and the
-          xy-plane. -90 deg < el < 90 deg.
+          If `sat_frame` is 'zxy', z lies in the direction of motion,
+          y perpendicular to the z-axis and the Earth center, x is
+          pointing approximately towards nadir, see also `sat_frame`
+          parameter description. The Observer positions in the
+          (co-moving) satellite frame are given as azimuth, elevation
+          in the specified reference frame, and distance (az, el,
+          dist). az is the angle between the projection of the vector
+          towards the Observer onto the xy-plane and the x-axis. -180
+          deg < az < 180 deg. el is the angle between the normal
+          vector and the xy-plane. -90 deg < el < 90 deg.
 
           If `sat_frame` is 'xyz', x lies in the direction of motion,
           y is perpendicular to z and the Earth center, z is pointing
