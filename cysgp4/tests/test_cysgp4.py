@@ -783,6 +783,104 @@ def test_propagate_many_sat_frames():
         )
 
 
+def test_propagate_many_rot_matrices():
+
+    tles = PyTle(*TLE_FRAMES)
+    mjd_epoch = 58813.5
+    start_mjd = mjd_epoch - 3.26938 / 2 / np.pi
+    mjds = start_mjd + np.array([0., 77400.]) / 86400.
+    observer = cysgp4.PyObserver(0., 50., 0.)
+
+    result = propagate_many(
+        mjds, tles, observer,
+        do_sat_azel=True, do_obs_pos=True, do_sat_rotmat=True,
+        sat_frame='zxy'
+        )
+
+    obs_pos = result['obs_pos']
+    eci_pos = result['eci_pos']
+    diff_pos = obs_pos - eci_pos
+    rot_mats = result['sat_rotmat']
+    # sat_azel = result['sat_azel']
+
+    # test rot_mats directly, but also vs. sat_azel
+    rot_mats_inv = np.swapaxes(rot_mats, -2, -1)
+    obs_satframe = np.einsum('...ij,...j->...i', rot_mats_inv, diff_pos)
+    b_x, b_y, b_z = (obs_satframe[..., i] for i in range(3))
+
+    sat_dist = np.sqrt(b_x ** 2 + b_y ** 2 + b_z ** 2)
+    sat_el = 90. - np.degrees(np.arccos(b_z / sat_dist))
+    sat_az = np.degrees(np.arctan2(b_y, b_x))
+    sat_azel = np.stack([sat_az, sat_el], axis=-1)
+
+    assert_allclose(
+        rot_mats,
+        np.array([
+            [[0.1605075, 0.5823811, 0.79691254],
+             [-0.0495387, -0.80160985, 0.59579155],
+             [0.98579068, -0.13510703, -0.09981399]],
+            [[-0.72310662, 0.59460503, -0.35151339],
+             [-0.45378182, -0.79260694, -0.40725458],
+             [-0.52076758, -0.1349781, 0.84296029]],
+            ]),
+        atol=1.e-5
+        )
+
+    assert_allclose(
+        sat_azel,
+        np.array([
+            [-1.01254740e+01, 1.53870011e+01],
+            [2.56035984e+01, 6.29046345e+01],
+            ]),
+        atol=1.e-5
+        )
+
+    result = propagate_many(
+        mjds, tles, observer,
+        do_sat_azel=True, do_obs_pos=True, do_sat_rotmat=True,
+        sat_frame='xyz'
+        )
+
+    obs_pos = result['obs_pos']
+    eci_pos = result['eci_pos']
+    diff_pos = obs_pos - eci_pos
+    rot_mats = result['sat_rotmat']
+    # sat_azel = result['sat_azel']
+
+    # test rot_mats directly, but also vs. sat_azel
+    rot_mats_inv = np.swapaxes(rot_mats, -2, -1)
+    obs_satframe = np.einsum('...ij,...j->...i', rot_mats_inv, diff_pos)
+    b_x, b_y, b_z = (obs_satframe[..., i] for i in range(3))
+
+    sat_dist = np.sqrt(b_x ** 2 + b_y ** 2 + b_z ** 2)
+    sat_el = np.degrees(np.arccos(b_z / sat_dist))  # theta
+    sat_az = np.degrees(np.arctan2(b_y, b_x))  # phi
+    sat_azel = np.stack([sat_az, sat_el], axis=-1)
+
+    print(rot_mats)
+    assert_allclose(
+        rot_mats,
+        np.array([
+            [[0.79691254, -0.5823811, 0.1605075],
+             [0.59579155, 0.80160985, -0.0495387],
+             [-0.09981399, 0.13510703, 0.98579068]],
+            [[-0.35151339, -0.59460503, -0.72310662],
+             [-0.40725458, 0.79260694, -0.45378182],
+             [0.84296029, 0.1349781, -0.52076758]],
+            ]),
+        atol=1.e-5
+        )
+
+    assert_allclose(
+        sat_azel,
+        np.array([
+            [3.25712537e+01, 1.83522007e+01],
+            [-1.24672104e+01, 6.57481737e+01],
+            ]),
+        atol=1.e-5
+        )
+
+
 def test_propagate_many_raises_error():
 
     mjd_off = 68805.5
@@ -948,6 +1046,7 @@ def test_propagate_many_cysgp4_vs_many_sgp4():
         do_eci_pos=True, do_eci_vel=True,
         do_geo=True, do_topo=True,
         do_obs_pos=True, do_sat_azel=True,
+        do_sat_rotmat=True,
         sat_frame='zxy'
         )
     res_many = _propagate_many_cysgp4(**kwargs)
@@ -970,7 +1069,11 @@ def test_propagate_many_cysgp4_vs_many_sgp4():
     except ImportError:
         version = 1
 
-    for k in ['eci_pos', 'eci_vel', 'geo', 'topo', 'sat_azel', 'obs_pos']:
+    for k in [
+            'eci_pos', 'eci_vel', 'geo',
+            'topo', 'sat_azel', 'obs_pos',
+            'sat_rotmat',
+            ]:
 
         assert_allclose(
             res_many[k], res_many_sgp4[k],
