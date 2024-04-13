@@ -61,11 +61,11 @@ TLE_FRAMES = (
 
 class TestPyDateTime:
 
-    def setup(self):
+    def setup_method(self):
 
         self.dt = datetime.datetime(2019, 1, 1, 12, 13, 14)
 
-    def teardown(self):
+    def teardown_method(self):
 
         pass
 
@@ -157,7 +157,7 @@ class TestPyDateTime:
 
 class TestPyTle:
 
-    def setup(self):
+    def setup_method(self):
 
         self.tle_tup = TLE_ISS
         self.tle1_str = '''Norad Number:         25544
@@ -174,7 +174,7 @@ class TestPyTle:
             Mean Anomaly:         263.99590000
             Mean Motion:           15.50783143'''.split('\n')
 
-    def teardown(self):
+    def teardown_method(self):
 
         pass
 
@@ -237,11 +237,11 @@ class TestPyTle:
 
 class TestPyCoordGeodetic:
 
-    def setup(self):
+    def setup_method(self):
 
         self.geo_coord = (6.88375, 50.525, 0.366)
 
-    def teardown(self):
+    def teardown_method(self):
 
         pass
 
@@ -264,11 +264,11 @@ class TestPyCoordGeodetic:
 
 class TestPyCoordTopocentric:
 
-    def setup(self):
+    def setup_method(self):
 
         self.topo_coord = (30., 45., 900., 1.)
 
-    def teardown(self):
+    def teardown_method(self):
 
         pass
 
@@ -280,12 +280,12 @@ class TestPyCoordTopocentric:
 
 class TestPyEci:
 
-    def setup(self):
+    def setup_method(self):
 
         self.eci_dt = datetime.datetime(2019, 1, 1, 12, 13, 14)
         self.geo_coord = (6.88376, 50.525, 0.366)
 
-    def teardown(self):
+    def teardown_method(self):
 
         pass
 
@@ -300,11 +300,11 @@ class TestPyEci:
 
 class TestPyObserver:
 
-    def setup(self):
+    def setup_method(self):
 
         self.effbg_observer = (6.88375, 50.525, 0.366)
 
-    def teardown(self):
+    def teardown_method(self):
 
         pass
 
@@ -327,7 +327,7 @@ class TestPyObserver:
 
 class TestSatellite:
 
-    def setup(self):
+    def setup_method(self):
 
         self.tle_tup = TLE_ISS
         self.tle = PyTle(*self.tle_tup)
@@ -339,7 +339,7 @@ class TestSatellite:
         self.effbg_tup_m = (6.88375, 50.525, 366.)
         self.effbg_observer = PyObserver(*self.effbg_tup)
 
-    def teardown(self):
+    def teardown_method(self):
 
         pass
 
