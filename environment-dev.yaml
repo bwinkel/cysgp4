@@ -1,0 +1,24 @@
+name: cysgp4-dev-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - build
+  - cython
+  - extension-helpers
+  - gcc_linux-64
+  - gxx_linux-64
+  - ipdb
+  - numpy==1.23.4
+  - pip
+  - pytest
+  - pytest-astropy
+  - pytest-doctestplus
+  - setuptools
+  - setuptools-scm
+  - sgp4
+  - sphinx
+  - sphinx-astropy
+  - twine
+  - wheel
