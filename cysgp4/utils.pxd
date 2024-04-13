@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+# cython: language_level=3
+# cython: cdivision=True, boundscheck=False, wraparound=False
+# cython: embedsignature=True
+# distutils: language = c++
 
 # ####################################################################
 #

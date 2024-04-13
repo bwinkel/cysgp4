@@ -402,7 +402,7 @@ def _sat_eci_sgp4_accelerated(tles, observers, mjds):
         # doesn't work, as array doesn't know tle_strings method
         # mask = u_tle == tles
         mask = np.array(
-            [u_tle == t for t in tles.flat], dtype=np.bool
+            [u_tle == t for t in tles.flat], dtype=bool
             ).reshape(tles.shape)
 
         mjd = mjds[mask]
@@ -607,7 +607,7 @@ def propagate_many(
         cartesian ECI-aligned coordinates in the results. This can be useful
         for cases where the user needs to transform additional vectors
         between both frames (and is not only interested the observer
-        position in the satellite frame as returned by `do_sat_azel').
+        position in the satellite frame as returned by `do_sat_azel`).
     sat_frame : 'zxy' or 'xyz', optional (default: 'zxy')
         How the moving satellite frame is defined. Two options are
         implemented, 'zxy' and 'xyz'.  If 'zxy' is chosen, the moving
@@ -670,7 +670,7 @@ def propagate_many(
 
           Observer positions in the (moving) satellite frame either given as
           azimuth (aka across track), elevation (aka along track), and
-          distance - if `sat_frame` is 'zxy', or given as 'theta', 'phi', and
+          distance - if `sat_frame` is 'zxy', or given as `theta`, `phi`, and
           distance if `sat_frame` is 'xyz' (with ISO definition of the angles
           theta and phi); see also `sat_frame` parameter description. Last
           dimension has length 3, one for each of, (`az`, `el`, `dist`) or
@@ -686,7 +686,7 @@ def propagate_many(
           This can be useful for cases where the user needs to transform
           additional vectors between both frames (and is not only interested
           the observer position in the satellite frame as returned by
-          `do_sat_azel').
+          `do_sat_azel`).
 
           Likewise, the inverse of these rotation matrices (aka the
           transposed) can be used to rotate any vector from ECI-aligned

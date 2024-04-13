@@ -96,7 +96,7 @@ def set_num_threads(int nthreads):
     openmp.omp_set_num_threads(nthreads)
 
 
-cdef inline int64_t ticks_from_mjd(double mjd) nogil:
+cdef inline int64_t ticks_from_mjd(double mjd) noexcept nogil:
 
     cdef:
         double days, fdays
@@ -112,7 +112,7 @@ cdef inline int64_t ticks_from_mjd(double mjd) nogil:
         )
 
 
-cdef inline double mjd_from_ticks(int64_t ticks) nogil:
+cdef inline double mjd_from_ticks(int64_t ticks) noexcept nogil:
 
     cdef:
         double days, fdays
@@ -122,7 +122,7 @@ cdef inline double mjd_from_ticks(int64_t ticks) nogil:
     return ticks / 8.64e10
 
 
-cdef inline DateTime datetime_from_mjd(double mjd) nogil:
+cdef inline DateTime datetime_from_mjd(double mjd) noexcept nogil:
 
     cdef:
 
@@ -134,7 +134,7 @@ cdef inline DateTime datetime_from_mjd(double mjd) nogil:
 
 cdef inline (double, double, double) ecef_from_geo(
         double lon_rad, double lat_rad, double alt_km
-        ) nogil:
+        ) noexcept nogil:
     '''
     Return ECEF (Cartesian) in km.
 
@@ -160,7 +160,7 @@ cdef inline (double, double, double) ecef_from_geo(
     return x, y, z
 
 
-cdef inline Vector normalize_vector(Vector a) nogil:
+cdef inline Vector normalize_vector(Vector a) noexcept nogil:
 
     cdef double norm = sqrt(a.x ** 2 + a.y ** 2 + a.z ** 2)
     a.x /= norm
@@ -170,7 +170,7 @@ cdef inline Vector normalize_vector(Vector a) nogil:
     return a
 
 
-cdef inline Vector cross_prod(Vector a, Vector b) nogil:
+cdef inline Vector cross_prod(Vector a, Vector b) noexcept nogil:
 
     return Vector(
         a.y * b.z - a.z * b.y,
@@ -178,14 +178,14 @@ cdef inline Vector cross_prod(Vector a, Vector b) nogil:
         a.x * b.y - a.y * b.x,
         )
 
-cdef inline double dot_prod(Vector a, Vector b) nogil:
+cdef inline double dot_prod(Vector a, Vector b) noexcept nogil:
 
     return a.x * b.x + a.y * b.y + a.z * b.z
 
 
 cdef inline (double, double, double, Vector, Vector, Vector) calc_sat_azel(
         Vector sat_pos, Vector sat_vel, Vector obs_pos
-        ) nogil:
+        ) noexcept nogil:
 
     cdef:
 
@@ -216,7 +216,7 @@ cdef inline (double, double, double, Vector, Vector, Vector) calc_sat_azel(
 
 cdef inline (double, double, double, Vector, Vector, Vector) calc_sat_iso(
         Vector sat_pos, Vector sat_vel, Vector obs_pos
-        ) nogil:
+        ) noexcept nogil:
 
     cdef:
 

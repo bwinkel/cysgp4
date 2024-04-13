@@ -4,5 +4,8 @@
 from .cysgp4 import *
 from .utils import *
 from .helpers import *
-from .version import __version__
 from .init_testrunner import *
+from .version import version
+
+
+__version__ = version

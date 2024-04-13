@@ -1,2 +1,15 @@
-cython >= 0.20.2
-numpy >= 1.8
+build
+cython
+extension-helpers
+numpy==1.23.4
+pytest
+pytest-astropy
+pytest-doctestplus
+pytest-remotedata
+setuptools
+setuptools-scm
+sgp4
+sphinx
+sphinx-astropy[confv2]
+sphinx-copybutton
+pydata-sphinx-theme

@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+# cython: language_level=3
+# cython: cdivision=True, boundscheck=False, wraparound=False
+# cython: embedsignature=True
+# distutils: language = c++
 
 # ####################################################################
 #
@@ -76,8 +80,8 @@ cdef extern from 'Tle.h':
             const string & name,
             const string & line_one,
             const string & line_two
-            ) nogil except +
-        Tle(const Tle& tle) nogil except +
+            ) except + nogil
+        Tle(const Tle& tle) except + nogil
         string ToString() nogil const
         string Name() nogil const
         string Line1() nogil const
@@ -118,9 +122,9 @@ cdef extern from 'SGP4.h':
     #    }
 
     cdef cppclass SGP4:
-        SGP4(const Tle& tle) nogil except +
+        SGP4(const Tle& tle) except + nogil
 
-        Eci FindPosition(const DateTime& date) nogil except +
+        Eci FindPosition(const DateTime& date) except + nogil
         Eci FindPositionNaN(const DateTime& date) nogil
 
 
@@ -138,13 +142,13 @@ cdef extern from 'Observer.h':
 
     cdef cppclass Observer:
 
-        Observer() nogil except +
+        Observer() nogil
         Observer(
             const double latitude,
             const double longitude,
             const double altitude
-            ) nogil except +
-        Observer(const CoordGeodetic &geo) nogil except +
+            ) nogil
+        Observer(const CoordGeodetic &geo) nogil
         CoordTopocentric GetLookAngle(const Eci &eci) nogil
         void SetLocation(const CoordGeodetic& geo) nogil
         CoordGeodetic GetLocation() nogil const
@@ -154,10 +158,10 @@ cdef extern from 'Vector.h':
 
     cdef cppclass Vector:
 
-        Vector() nogil except +
+        Vector() noexcept nogil
         Vector(
             const double arg_x, const double arg_y, const double arg_z
-            ) nogil except +
+            ) noexcept nogil
 
         double x
         double y
@@ -176,9 +180,9 @@ cdef extern from 'DateTime.h':
 
     cdef cppclass DateTime:
 
-        DateTime() nogil except +
-        DateTime(int64_t ticks) nogil except +
-        DateTime(unsigned int year, double doy) nogil except +
+        DateTime() nogil
+        DateTime(int64_t ticks) nogil
+        DateTime(unsigned int year, double doy) nogil
         void Initialise(
             int year, int month, int day,
             int hour, int minute, int second, int microsecond
@@ -220,18 +224,18 @@ cdef extern from 'Eci.h':
 
     cdef cppclass Eci:
 
-        Eci() nogil except +
+        Eci() nogil
         Eci(
             const DateTime& dt, const double latitude, const double longitude,
             const double altitude
-            ) nogil except +
-        Eci(const DateTime& dt, const CoordGeodetic& geo) nogil except +
-        Eci(const DateTime& dt, const Vector &position) nogil except +
+            ) nogil
+        Eci(const DateTime& dt, const CoordGeodetic& geo) nogil
+        Eci(const DateTime& dt, const Vector &position) nogil
         Eci(
             const DateTime& dt,
             const Vector &position,
             const Vector &velocity
-            ) nogil except +
+            ) nogil
         void Update(const DateTime& dt, const CoordGeodetic& geo) nogil
         DateTime GetDateTime() nogil const
         CoordGeodetic ToGeodetic() nogil const
@@ -243,11 +247,11 @@ cdef extern from 'CoordTopocentric.h':
 
     cdef cppclass CoordTopocentric:
 
-        CoordTopocentric() nogil except +
-        CoordTopocentric(const CoordTopocentric& topo) nogil except +
+        CoordTopocentric() nogil
+        CoordTopocentric(const CoordTopocentric& topo) nogil
         CoordTopocentric(
             double az, double el, double rnge, double rnge_rate
-            ) nogil except +
+            ) nogil
         string ToString() nogil const
         # azimuth in radians
         double azimuth
@@ -263,11 +267,11 @@ cdef extern from 'CoordGeodetic.h':
 
     cdef cppclass CoordGeodetic:
 
-        CoordGeodetic() nogil except +
-        CoordGeodetic(const CoordGeodetic& geo) nogil except +
+        CoordGeodetic() nogil
+        CoordGeodetic(const CoordGeodetic& geo) nogil
         CoordGeodetic(
             double lat, double lon, double alt, bool is_radians=False
-            ) nogil except +
+            ) nogil
         string ToString() nogil const
         # latitude in radians (-PI >= latitude < PI)
         double latitude
@@ -294,9 +298,9 @@ cdef extern from *:
     void array_delete[T](T* x)
 
 
-cdef int64_t ticks_from_mjd(double mjd) nogil
-cdef double mjd_from_ticks(int64_t ticks) nogil
-cdef DateTime datetime_from_mjd(double mjd) nogil
+cdef int64_t ticks_from_mjd(double mjd) noexcept nogil
+cdef double mjd_from_ticks(int64_t ticks) noexcept nogil
+cdef DateTime datetime_from_mjd(double mjd) noexcept nogil
 cdef (double, double, double) ecef_from_geo(
     double lon_rad, double lat_rad, double alt_km
-    ) nogil
+    ) noexcept nogil

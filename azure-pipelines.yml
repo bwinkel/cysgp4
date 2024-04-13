@@ -48,12 +48,25 @@ jobs:
         numpy.version: '1.18.1'
         pytest.version: '<6'
         doctestplus.version: '<0.6.1'
-        extra.packages: 'sysroot_linux-64 "jinja2<3.1"'
+        # extra.packages: 'sysroot_linux-64 "jinja2<3.1"'
+        extra.packages: 'gcc_linux-64 gxx_linux-64 sysroot_linux-64 "jinja2<3.1"'
       linux39:
         imageName: 'ubuntu-latest'
         python.version: '3.9'
         py_whl: cp39-
         numpy.version: '1.20.3'
+        extra.packages: 'gcc_linux-64 gxx_linux-64'
+      linux310:
+        imageName: 'ubuntu-latest'
+        python.version: '3.10'
+        py_whl: cp310-
+        numpy.version: '1.21.6'
+        extra.packages: 'gcc_linux-64 gxx_linux-64'
+      linux311:
+        imageName: 'ubuntu-latest'
+        python.version: '3.11'
+        py_whl: cp311-
+        numpy.version: '1.23.4'
         # docs should only be published by one thread, as they are version-
         # independent; and only if not on a PR
         publish.docs: ${{ not(eq(variables['is.pullrequest'], true)) }}
@@ -65,32 +78,38 @@ jobs:
         # independent
         build.tarball: ${{ true }}
         publish.tarball: ${{ eq(variables['is.tag'], true) }}
-      linux310:
+        extra.packages: 'gcc_linux-64 gxx_linux-64'
+      linux312:
         imageName: 'ubuntu-latest'
-        python.version: '3.10'
-        py_whl: cp310-
-        numpy.version: '1.21.6'
-      linux311:
-        imageName: 'ubuntu-latest'
-        python.version: '3.11'
-        py_whl: cp311-
-        numpy.version: '1.23.4'
+        python.version: '3.12'
+        py_whl: cp312-
+        numpy.version: '1.26.4'
+        extra.packages: 'gcc_linux-64 gxx_linux-64'
       mac38:
         imageName: 'macos-latest'
         python.version: '3.8'
         numpy.version: '1.18.1'
+        extra.packages: 'compilers llvm-openmp clang_osx-64 clangxx_osx-64'
       mac39:
         imageName: 'macos-latest'
         python.version: '3.9'
         numpy.version: '1.20.3'
+        extra.packages: 'compilers llvm-openmp clang_osx-64 clangxx_osx-64'
       mac310:
         imageName: 'macos-latest'
         python.version: '3.10'
         numpy.version: '1.21.6'
+        extra.packages: 'compilers llvm-openmp clang_osx-64 clangxx_osx-64'
       mac311:
         imageName: 'macos-latest'
         python.version: '3.11'
         numpy.version: '1.23.4'
+        extra.packages: 'compilers llvm-openmp clang_osx-64 clangxx_osx-64'
+      mac312:
+        imageName: 'macos-latest'
+        python.version: '3.12'
+        numpy.version: '1.26.4'
+        extra.packages: 'compilers llvm-openmp clang_osx-64 clangxx_osx-64'
       win38:
         imageName: 'windows-latest'
         python.version: '3.8'
@@ -108,6 +127,10 @@ jobs:
         imageName: 'windows-latest'
         python.version: '3.11'
         numpy.version: '1.23.4'
+      win312:
+        imageName: 'windows-latest'
+        python.version: '3.12'
+        numpy.version: '1.26.4'
 
   pool:
     vmImage: $(imageName)
@@ -119,7 +142,7 @@ jobs:
     displayName: Fix a conda bug on MacOS
     condition: startsWith(variables['Agent.OS'], 'Darwin')
 
-  # see https://github.com/mamba-org/mamba/issues/488
+  # see https://github.com/conda-org/conda/issues/488
   # and https://github.com/MPAS-Dev/compass/pull/320
   - bash: |
       rm /usr/share/miniconda/pkgs/cache/*.json
@@ -183,9 +206,7 @@ jobs:
     # condition: not(eq(variables['is.win'], true))
     condition: not(startsWith(variables['Agent.OS'], 'Windows'))
 
-
   - script: |
-      conda install --yes -c conda-forge mamba
       conda create --yes --quiet --name cysgp4-env -c conda-forge
     displayName: Create Anaconda environment
 
@@ -195,11 +216,11 @@ jobs:
   # pip installation)
   - script: |
       $(conda.activate) cysgp4-env
-      mamba install --yes --quiet -c conda-forge python=$(python.version) build cython numpy==$(numpy.version) setuptools_scm twine "pytest$(pytest.version)" "pytest-doctestplus$(doctestplus.version)" "sgp4>2" wheel $(extra.packages)
+      conda install --yes --quiet -c conda-forge python=$(python.version) build cython extension-helpers numpy==$(numpy.version) pip "pytest$(pytest.version)" pytest-astropy "pytest-doctestplus$(doctestplus.version)" pytest-remotedata setuptools setuptools_scm "sgp4>2" twine wheel $(extra.packages)
     displayName: Install Anaconda packages
 
   # IMPORTANT:
-  # condition: and(succeeded(), ge(variables['python.version'], 3.8))
+  # condition: and(succeeded(), ge(variables['python.version'], '3.8'))
   # will be false for python 3.10
   # TODO: Use and(succeeded(), in(variables['python.version'], '3.8', 3.9', '3.10'))
 
@@ -207,30 +228,30 @@ jobs:
   # - bash: |
   #     rm /usr/share/miniconda/envs/cysgp4-env/x86_64-conda-linux-gnu/sysroot/lib64/librt.so.1 || true
   #   displayName: Fix another conda bug on Linux
-  #   condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'), eq(variables['python.version'], 3.8))
+  #   condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'), eq(variables['python.version'], '3.8'))
 
   # need to fix cctools and ld64 to slightly older version, otherwise an
   # error ("ld: library not found for -lSystem") occurs during build
   # - script: |
   #     $(conda.activate) cysgp4-env
-  #     mamba install --yes --quiet --name cysgp4-env -c conda-forge clang_osx-64 clangxx_osx-64 llvm-openmp openmp cctools==921 ld64==409.12 ta-lib
+  #     conda install --yes --quiet --name cysgp4-env -c conda-forge clang_osx-64 clangxx_osx-64 llvm-openmp openmp cctools==921 ld64==409.12 ta-lib
   #   displayName: Prepare clang, MacOS
   #   # condition: and(succeeded(), eq(variables['is.macos'], true))
-  #   condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Darwin'), lt(variables['python.version'], 3.8))
+  #   condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Darwin'), lt(variables['python.version'], '3.8'))
 
   # - script: |
   #     $(conda.activate) cysgp4-env
-  #     mamba install --yes --quiet --name cysgp4-env -c conda-forge compilers llvm-openmp
+  #     conda install --yes --quiet --name cysgp4-env -c conda-forge compilers llvm-openmp
   #   displayName: Prepare clang, MacOS
   #   # condition: and(succeeded(), eq(variables['is.macos'], true))
-  #   condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Darwin'), ge(variables['python.version'], 3.8))
+  #   condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Darwin'), ge(variables['python.version'], '3.8'))
 
-  - script: |
-      $(conda.activate) pycraf-env
-      mamba install --yes --quiet --name cysgp4-env -c conda-forge compilers llvm-openmp clang_osx-64 clangxx_osx-64
-    displayName: Prepare clang, MacOS
-    # condition: and(succeeded(), eq(variables['is.macos'], true))
-    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Darwin'))
+  # - script: |
+  #     $(conda.activate) pycraf-env
+  #     conda install --yes --quiet --name cysgp4-env -c conda-forge compilers llvm-openmp clang_osx-64 clangxx_osx-64
+  #   displayName: Prepare clang, MacOS
+  #   # condition: and(succeeded(), eq(variables['is.macos'], true))
+  #   condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Darwin'))
 
   # see Issue github/pycraf #55
   - script: |
@@ -250,19 +271,19 @@ jobs:
       # pytest -rsx --doctest-plus --doctest-rst --doctest-glob="*.rst" --doctest-ignore-import-errors docs
   - script: |
       $(conda.activate) cysgp4-env
-      python -m pytest -rsx --doctest-plus --doctest-glob="*.rst" --doctest-ignore-import-errors
+      python -m pytest cysgp4 docs -rsx --doctest-plus --doctest-glob="*.rst" --doctest-ignore-import-errors --remote-data
     displayName: Testing docs
-    # condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'), eq(variables['python.version'], 3.9))
+    # condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'), eq(variables['python.version'], '3.9'))
     condition: succeeded()
 
   - script: |
       $(conda.activate) cysgp4-env
-      conda install --yes --quiet --name cysgp4-env -c conda-forge astropy "sphinx$(sphinx.version)" sphinx-astropy
+      conda install --yes --quiet --name cysgp4-env -c conda-forge "sphinx$(sphinx.version)" sphinx-astropy[confv2] sphinx-copybutton pydata-sphinx-theme
       # sphinx-build docs docs/_build/html -W -b html
       cd docs
       sphinx-build . _build/html -b html
     displayName: Make docs
-    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'))
+    condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'), eq(variables['python.version'], '3.11'))
 
   - task: DownloadSecureFile@1
     inputs:

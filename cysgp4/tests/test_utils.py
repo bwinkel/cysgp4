@@ -4,7 +4,9 @@
 import datetime
 import pytest
 from numpy.testing import assert_equal, assert_allclose
-from cysgp4 import *
+from .. import cysgp4
+from .. import utils
+from .. import helpers
 
 
 TLE_ISS = (
@@ -24,16 +26,16 @@ def test_tle_checksum():
     tle_line1 = TLE_ISS[1]
     tle_line2 = TLE_ISS[2]
 
-    assert tle_line1[-1] == str(tle_checksum(tle_line1))
-    assert tle_line2[-1] == str(tle_checksum(tle_line2))
+    assert tle_line1[-1] == str(utils.tle_checksum(tle_line1))
+    assert tle_line2[-1] == str(utils.tle_checksum(tle_line2))
 
-    tle_text = get_example_tles()
-    tle_tuples = tle_tuples_from_text(tle_text)
+    tle_text = helpers.get_example_tles()
+    tle_tuples = utils.tle_tuples_from_text(tle_text)
 
     for _, tle_line1, tle_line2 in tle_tuples:
 
-        assert tle_line1[-1] == str(tle_checksum(tle_line1))
-        assert tle_line2[-1] == str(tle_checksum(tle_line2))
+        assert tle_line1[-1] == str(utils.tle_checksum(tle_line1))
+        assert tle_line2[-1] == str(utils.tle_checksum(tle_line2))
 
 
 # def test_tle_tuples_from_text():  # covered by test_tle_checksum
@@ -41,8 +43,8 @@ def test_tle_checksum():
 
 def test_tles_from_text():
 
-    tle_text = get_example_tles()
-    tles = tles_from_text(tle_text)
+    tle_text = helpers.get_example_tles()
+    tles = utils.tles_from_text(tle_text)
 
     assert repr(tles[0]) == '<PyTle: AKEBONO (EXOS-D)        >'
     assert repr(tles[-1]) == '<PyTle: ZHANGZHENG-1 (CSES)     >'
@@ -51,14 +53,14 @@ def test_tles_from_text():
 def test_tles_from_text_lineendings():
     # test that both, "\n" and "\r\n" line endings, work.
 
-    tle_text = get_example_tles()
-    tles = tles_from_text(tle_text)
+    tle_text = helpers.get_example_tles()
+    tles = utils.tles_from_text(tle_text)
 
     assert repr(tles[0]) == '<PyTle: AKEBONO (EXOS-D)        >'
     assert repr(tles[-1]) == '<PyTle: ZHANGZHENG-1 (CSES)     >'
 
     tle_text = tle_text.replace('\r', '')
-    tles = tles_from_text(tle_text)
+    tles = utils.tles_from_text(tle_text)
 
     assert repr(tles[0]) == '<PyTle: AKEBONO (EXOS-D)        >'
     assert repr(tles[-1]) == '<PyTle: ZHANGZHENG-1 (CSES)     >'
@@ -66,7 +68,7 @@ def test_tles_from_text_lineendings():
 
 def test_satellite_mean_motion():
 
-    assert_allclose(satellite_mean_motion(500.), 15.21937835)
+    assert_allclose(utils.satellite_mean_motion(500.), 15.21937835)
 
 
 def test_tle_linestrings_from_orbital_parameters():
@@ -74,7 +76,7 @@ def test_tle_linestrings_from_orbital_parameters():
     # Define satellite orbital parameters
     sat_name, sat_nr = 'MYSAT', 1
     alt_km = 3000.  # satellite altitude
-    mean_motion = satellite_mean_motion(alt_km)
+    mean_motion = utils.satellite_mean_motion(alt_km)
     inclination = 10.  # deg
     raan = 35.  # deg
     eccentricity = 0.0001
@@ -83,9 +85,9 @@ def test_tle_linestrings_from_orbital_parameters():
 
     # assume, the parameters are valid for the following time
     dt = datetime.datetime(2019, 11, 2, 2, 5, 14)
-    pydt = PyDateTime(dt)
+    pydt = cysgp4.PyDateTime(dt)
 
-    tle_tuple = tle_linestrings_from_orbital_parameters(
+    tle_tuple = utils.tle_linestrings_from_orbital_parameters(
         sat_name,
         sat_nr,
         pydt.mjd,
@@ -103,11 +105,11 @@ def test_tle_linestrings_from_orbital_parameters_raises():
 
     # assume, the parameters are valid for the following time
     dt = datetime.datetime(2019, 11, 2, 2, 5, 14)
-    pydt = PyDateTime(dt)
+    pydt = cysgp4.PyDateTime(dt)
 
     # Define satellite orbital parameters
     alt_km = 3000.
-    mm = satellite_mean_motion(alt_km)
+    mm = utils.satellite_mean_motion(alt_km)
 
     kwargs = dict(
         sat_name='MYSAT',
@@ -124,16 +126,16 @@ def test_tle_linestrings_from_orbital_parameters_raises():
     with pytest.raises(ValueError):
         _kwargs = kwargs.copy()
         _kwargs['sat_nr'] = 100000
-        tle_linestrings_from_orbital_parameters(**_kwargs)
+        utils.tle_linestrings_from_orbital_parameters(**_kwargs)
 
     with pytest.raises(ValueError):
         _kwargs = kwargs.copy()
         _kwargs['eccentricity'] = 1.1
-        tle_linestrings_from_orbital_parameters(**_kwargs)
+        utils.tle_linestrings_from_orbital_parameters(**_kwargs)
 
     with pytest.raises(ValueError):
         _kwargs = kwargs.copy()
         dt = datetime.datetime(2057, 11, 2, 2, 5, 14)
-        pydt = PyDateTime(dt)
+        pydt = cysgp4.PyDateTime(dt)
         _kwargs['mjd_epoch'] = pydt.mjd
-        tle_linestrings_from_orbital_parameters(**_kwargs)
+        utils.tle_linestrings_from_orbital_parameters(**_kwargs)

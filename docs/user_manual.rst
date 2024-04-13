@@ -123,18 +123,17 @@ once per day.
 parameters for use by other SGP4 routines. TLEs can be obtained from many
 sources, such as `Celestrak`_::
 
-
     >>> import requests
     >>> import cysgp4
+    >>> url = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=science&FORMAT=tle'
 
-    >>> url = 'http://celestrak.com/NORAD/elements/science.txt'
+.. doctest-remote-data::
     >>> ctrak_science = requests.get(url).text
     >>> all_lines = ctrak_science.split('\r\n')
     >>> all_lines[:3]  # doctest: +SKIP
     ['AKEBONO (EXOS-D)        ',
      '1 19822U 89016A   19331.07700297  .00016037  93960-6  28103-3 0  9992',
      '2 19822  75.0289 316.1359 1764871 261.4338  78.3806 12.01292738 15108']
-
     >>> tle_list = list(zip(*tuple(
     ...     all_lines[idx::3]
     ...     for idx in range(3)
@@ -151,7 +150,9 @@ sources, such as `Celestrak`_::
     `Celestrak`_, you'll be seeing a different set of numbers.
 
 Because re-structuring the TLE text from the download or file into a list of
-tuples is often needed, there is a utility routine to do just that::
+tuples is often needed, there is a utility routine to do just that
+
+.. doctest-remote-data::
 
     >>> tle_list = cysgp4.tle_tuples_from_text(ctrak_science)
 
@@ -249,9 +250,9 @@ the provided `~cysgp4.PyDateTime`::
     <PyEci: 6.8837d, 50.5250d, 0.3660km 2010-12-25 00:00:00.000000 UTC>
 
     >>> # Access is also possible via properties, e.g.:
-    >>> eci.loc  # read-only!
+    >>> eci.loc  # read-only!  # doctest: +FLOAT_CMP
     (-725.3304166274728, 3997.924210010933, 4900.402205553537)
-    >>> eci.vel  # read-only!
+    >>> eci.vel  # read-only!  # doctest: +FLOAT_CMP
     (-0.2915332651982093, -0.05289193431368386, 0.0)
     >>> eci.pydt = PyDateTime.from_mjd(55556.)
 
@@ -364,30 +365,30 @@ would look like::
     >>> sat = Satellite(hst_tle, obs, pydt)
 
     >>> # We can now query positions...
-    >>> sat.eci_pos().loc  # ECI cartesian position
+    >>> sat.eci_pos().loc  # ECI cartesian position  # doctest: +FLOAT_CMP
     (5879.5931344459295, 1545.7455647032068, 3287.4155452595)
-    >>> sat.eci_pos().vel  # ECI cartesian velocity
+    >>> sat.eci_pos().vel  # ECI cartesian velocity  # doctest: +FLOAT_CMP
     (-1.8205895517672226, 7.374044252723081, -0.20697960810978586)
-    >>> sat.geo_pos()  # geographic position
+    >>> sat.geo_pos()  # geographic position  # doctest: +FLOAT_CMP
     <PyCoordGeodetic: 112.2146d, 28.5509d, 538.0173km>
-    >>> sat.topo_pos()  # topocentric position
+    >>> sat.topo_pos()  # topocentric position  # doctest: +FLOAT_CMP
     <PyCoordTopocentric: 60.2453d, -35.6845d, 8314.5681km, 3.5087km/s>
 
     >>> # ... also for different times, also for different times
     >>> sat.mjd += 1 / 720.  # one minute later
-    >>> sat.topo_pos()
+    >>> sat.topo_pos()  # doctest: +FLOAT_CMP
     <PyCoordTopocentric: 54.8446d, -38.2749d, 8734.9196km, 3.4885km/s>
-    >>> sat.topo_pos().az, sat.topo_pos().el
+    >>> sat.topo_pos().az, sat.topo_pos().el  # doctest: +FLOAT_CMP
     (54.84463503781068, -38.274852915850126)
 
     >>> # Change by less than cache resolution (1 ms) produces the same result
     >>> sat.mjd += 0.0005 / 86400.  # 0.5 ms
-    >>> sat.topo_pos().az, sat.topo_pos().el
+    >>> sat.topo_pos().az, sat.topo_pos().el  # doctest: +FLOAT_CMP
     (54.84463503781068, -38.274852915850126)
 
     >>> # Change by another 0.5 ms triggers re-calculation
     >>> sat.mjd += 0.00051 / 86400.
-    >>> sat.topo_pos().az, sat.topo_pos().el
+    >>> sat.topo_pos().az, sat.topo_pos().el  # doctest: +FLOAT_CMP
     (54.844568313870965, -38.274885794151324)
 
 Option 2: Batch calculations

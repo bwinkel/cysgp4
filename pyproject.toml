@@ -1,15 +1,122 @@
+[project]
+name = "cysgp4"
+dynamic = [
+    "version"
+]
+description = "cysgp4: a wrapper around the SGP4 package, for sat TLE calculations"
+readme = "README.rst"
+authors = [
+    { name = "Benjamin Winkel", email = "bwinkel@mpifr.de" }
+]
+license = { text = "GPLv3" }
+requires-python = ">=3.8"
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Development Status :: 4 - Beta",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "License :: OSI Approved :: Apache Software License",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: C++",
+    "Programming Language :: Cython",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+keywords = [
+    "astronomy",
+    "science",
+]
+dependencies = [
+    "astropy",
+    "numpy",
+    "scipy",
+    "sgp4",
+]
+
+[project.urls]
+Homepage = "https://pypi.org/project/cysgp4/"
+Documentation = "https://bwinkel.github.io/cysgp4/"
+Repository = "https://github.com/bwinkel/cysgp4"
+Issues = "https://github.com/bwinkel/cysgp4/issues"
+Changelog = "https://github.com/bwinkel/cysgp4/CHANGES.rst"
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+    "pytest-astropy>=0.10",
+    "pytest-doctestplus",
+    "pytest-remotedata",
+]
+# recommended = [
+#     "scipy>=1.8",
+#     "matplotlib>=3.3,!=3.4.0,!=3.5.2",
+# ]
+docs = [
+    "sphinx",
+    "sphinx-astropy[confv2]",
+    "sphinx-copybutton",
+    "pydata-sphinx-theme",
+    "pytest>=7.0",
+]
+
 [build-system]
 requires = [
-    "setuptools>=30.3.0",
+    "setuptools",
     "wheel",
-    "setuptools_scm>=6.2",
-    "cython",  # >=0.29
-    #"numpy==1.13.1",
+    "setuptools_scm",
+    "cython",
     "numpy==1.13.1; python_version<'3.7'",
     "numpy==1.14.5; python_version=='3.7'",
     "numpy==1.18.1; python_version=='3.8'",
     "numpy==1.20.3; python_version=='3.9'",
     "numpy==1.21.6; python_version=='3.10'",
     "numpy==1.23.4; python_version=='3.11'",
+    "numpy==1.26.4; python_version=='3.12'",
+    "extension-helpers",
     ]
 build-backend = "setuptools.build_meta"
+
+[tool.extension-helpers]
+use_extension_helpers = true
+
+[tool.setuptools]
+include-package-data = true
+license-files = ["COPYING.Apache2", "COPYING.GPLv3.txt", "TEMPLATE_LICENCE.rst"]
+
+[tool.setuptools.packages.find]
+include = ["cysgp4*"]
+namespaces = true
+
+[tool.setuptools.package-data]
+"*" = [
+    "tests/data/*",
+]
+"cysgp4" = ["*.cpp"]
+
+[tool.setuptools_scm]
+write_to = "cysgp4/version.py"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = [
+    "cysgp4",
+    "docs",
+]
+norecursedirs = [
+    "docs[\\/]_build",
+    "docs[\\/]generated",
+    "cysgp4[\\/]extern",
+    "cysgp4[\\/]_dev",
+]
+astropy_header = true
+doctest_plus = "enabled"
+text_file_format = "rst"
+remote_data_strict = true
+addopts = [
+    "--doctest-rst",
+    "-p no:legacypath",
+]
+doctest_norecursedirs = [
+    "*/setup_package.py",
+]

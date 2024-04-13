@@ -23,6 +23,7 @@ requirements:
   host:
     - openmp 4.0.*  # [osx]
     - python
+    - extension-helpers
     - pip
     - setuptools
     - setuptools_scm

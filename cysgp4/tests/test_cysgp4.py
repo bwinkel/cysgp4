@@ -8,7 +8,9 @@ import pytest
 import datetime
 import numpy as np
 from numpy.testing import assert_equal, assert_allclose
-from cysgp4 import *
+from .. import cysgp4
+from .. import helpers
+from .. import utils
 
 
 # skip over sgp4 related tests, if not package present:
@@ -71,31 +73,31 @@ class TestPyDateTime:
 
     def test_constructor(self):
 
-        t1 = PyDateTime(self.dt)
+        t1 = cysgp4.PyDateTime(self.dt)
         assert str(t1) == '2019-01-01 12:13:14.000000 UTC'
 
     def test_times(self):
 
-        t1 = PyDateTime(self.dt)
+        t1 = cysgp4.PyDateTime(self.dt)
         assert_allclose(t1.gmst(), 4.95971515)
 
         assert_allclose(t1.lmst(6.88375), 5.07985925)
 
     def test_datetimes(self):
 
-        t1 = PyDateTime(self.dt)
+        t1 = cysgp4.PyDateTime(self.dt)
         assert t1.datetime == self.dt
 
     def test_ticks(self):
 
-        t1a = PyDateTime(self.dt)
-        t1b = PyDateTime.from_ticks(63681941594000000)
+        t1a = cysgp4.PyDateTime(self.dt)
+        t1b = cysgp4.PyDateTime.from_ticks(63681941594000000)
         dt2 = datetime.datetime(1, 1, 1, 0, 0, 0)  # zero ticks
-        t2a = PyDateTime(dt2)
-        t2b = PyDateTime.from_ticks(0)
+        t2a = cysgp4.PyDateTime(dt2)
+        t2b = cysgp4.PyDateTime.from_ticks(0)
         dt3 = datetime.datetime(1858, 11, 17, 0, 0, 0)  # MJD-0 ticks
-        t3a = PyDateTime(dt3)
-        t3b = PyDateTime.from_ticks(58628880000000000)
+        t3a = cysgp4.PyDateTime(dt3)
+        t3b = cysgp4.PyDateTime.from_ticks(58628880000000000)
 
         assert t1a.ticks == 63681941594000000
         assert t1b.ticks == 63681941594000000
@@ -107,7 +109,7 @@ class TestPyDateTime:
     def test_mjd(self):
 
         mjd = 56458.123
-        t1 = PyDateTime.from_mjd(mjd)
+        t1 = cysgp4.PyDateTime.from_mjd(mjd)
 
         assert str(t1) == '2013-06-15 02:57:07.199999 UTC'
         assert_allclose(mjd, t1.mjd)
@@ -116,20 +118,20 @@ class TestPyDateTime:
 
         # Note: this is an oddity with the TLE time format; if day is
         # zero, it is really the last day of the previous year...
-        t = PyDateTime.from_tle_epoch(19000.)
+        t = cysgp4.PyDateTime.from_tle_epoch(19000.)
         assert str(t) == '2018-12-31 00:00:00.000000 UTC'
 
         dt = datetime.datetime(2018, 12, 31, 0, 0, 0)
-        t = PyDateTime(dt)
+        t = cysgp4.PyDateTime(dt)
         print(t)
         assert_allclose(t.tle_epoch, 18365.)  # sic!
 
         tle_epoch = 19001.0
-        t = PyDateTime.from_tle_epoch(tle_epoch)
+        t = cysgp4.PyDateTime.from_tle_epoch(tle_epoch)
         assert str(t) == '2019-01-01 00:00:00.000000 UTC'
 
         dt = datetime.datetime(2019, 1, 1, 0, 0, 0)
-        t = PyDateTime(dt)
+        t = cysgp4.PyDateTime(dt)
         print(t)
         assert_allclose(t.tle_epoch, tle_epoch)
 
@@ -137,18 +139,18 @@ class TestPyDateTime:
         tle_epoch = 19050.1
         dt = datetime.datetime(2019, 2, 19, 2, 24, 0)
 
-        t = PyDateTime(dt)
+        t = cysgp4.PyDateTime(dt)
         print(t)
         assert str(t) == '2019-02-19 02:24:00.000000 UTC'
         assert_allclose(t.tle_epoch, tle_epoch)
 
-        t = PyDateTime.from_mjd(mjd)
+        t = cysgp4.PyDateTime.from_mjd(mjd)
         print(t)
         assert str(t) == '2019-02-19 02:23:59.999999 UTC'
 
         assert_allclose(t.tle_epoch, tle_epoch)
 
-        t = PyDateTime.from_tle_epoch(tle_epoch)
+        t = cysgp4.PyDateTime.from_tle_epoch(tle_epoch)
         print(t)
         assert str(t) == '2019-02-19 02:24:00.000000 UTC'
 
@@ -180,7 +182,7 @@ class TestPyTle:
 
     def test_constructor(self):
 
-        tle1 = PyTle(*self.tle_tup)
+        tle1 = cysgp4.PyTle(*self.tle_tup)
         slist = str(tle1).split('\n')
         for s1, s2 in zip(slist, self.tle1_str):
             assert s1.strip() == s2.strip()
@@ -189,7 +191,7 @@ class TestPyTle:
 
     def test_tle_strings(self):
 
-        tle = PyTle(*self.tle_tup)
+        tle = cysgp4.PyTle(*self.tle_tup)
         for s1, s2 in zip(self.tle_tup, tle.tle_strings()):
             assert s1.strip() == s2.strip()
 
@@ -204,7 +206,7 @@ class TestPyTle:
             TLE_ISS[1][:-1] + '0',  # modify checksum
             TLE_ISS[2],
             )
-        tle_wrong = PyTle(*tle_tup_wrong)
+        tle_wrong = cysgp4.PyTle(*tle_tup_wrong)
         slist = str(tle_wrong).split('\n')
 
         for s1, s2 in zip(slist, self.tle1_str):
@@ -224,13 +226,13 @@ class TestPyTle:
             TLE_ISS[2],
             )
         with pytest.raises(RuntimeError) as excinfo:
-            PyTle(*tle_tup_wrong)
+            cysgp4.PyTle(*tle_tup_wrong)
 
         assert 'Invalid length for line one' in str(excinfo.value)
 
     def test_epoch(self):
 
-        tle = PyTle(*self.tle_tup)
+        tle = cysgp4.PyTle(*self.tle_tup)
 
         assert_allclose(tle.epoch.mjd, 56457.590972)
 
@@ -247,12 +249,12 @@ class TestPyCoordGeodetic:
 
     def test_constructor(self):
 
-        geo1 = PyCoordGeodetic(*self.geo_coord)
+        geo1 = cysgp4.PyCoordGeodetic(*self.geo_coord)
         assert str(geo1) == '6.8838d, 50.5250d, 0.3660km'
 
     def test_ecef(self):
 
-        geo = PyCoordGeodetic(*self.geo_coord)
+        geo = cysgp4.PyCoordGeodetic(*self.geo_coord)
 
         print(geo.ecef)
         assert_allclose(
@@ -274,7 +276,7 @@ class TestPyCoordTopocentric:
 
     def test_constructor(self):
 
-        topo1 = PyCoordTopocentric(*self.topo_coord)
+        topo1 = cysgp4.PyCoordTopocentric(*self.topo_coord)
         assert str(topo1) == '30.0000d, 45.0000d, 900.0000km, 1.0000km/s'
 
 
@@ -291,9 +293,9 @@ class TestPyEci:
 
     def test_constructor(self):
 
-        t1 = PyDateTime(self.eci_dt)
-        geo1 = PyCoordGeodetic(*self.geo_coord)
-        eci1 = PyEci(t1, geo1)
+        t1 = cysgp4.PyDateTime(self.eci_dt)
+        geo1 = cysgp4.PyCoordGeodetic(*self.geo_coord)
+        eci1 = cysgp4.PyEci(t1, geo1)
         des = '6.8838d, 50.5250d, 0.3660km 2019-01-01 12:13:14.000000 UTC'
         assert str(eci1) == des
 
@@ -310,17 +312,17 @@ class TestPyObserver:
 
     def test_constructor(self):
 
-        obs = PyObserver()
+        obs = cysgp4.PyObserver()
         assert str(obs) == '0.0000d, 0.0000d, 0.0000km'
 
-        obs = PyObserver(*self.effbg_observer)
+        obs = cysgp4.PyObserver(*self.effbg_observer)
         assert str(obs) == '6.8838d, 50.5250d, 0.3660km'
 
     def test_location_property(self):
 
-        obs = PyObserver(*self.effbg_observer)
+        obs = cysgp4.PyObserver(*self.effbg_observer)
         assert str(obs.loc) == '6.8838d, 50.5250d, 0.3660km'
-        geo = PyCoordGeodetic(1, 2, 3)
+        geo = cysgp4.PyCoordGeodetic(1, 2, 3)
         obs.loc = geo
         assert str(obs) == '1.0000d, 2.0000d, 3.0000km'
 
@@ -330,14 +332,14 @@ class TestSatellite:
     def setup_method(self):
 
         self.tle_tup = TLE_ISS
-        self.tle = PyTle(*self.tle_tup)
+        self.tle = cysgp4.PyTle(*self.tle_tup)
 
         self.dt_tup = (2013, 6, 15, 2, 57, 7, 200000)
-        self.pydt = PyDateTime(datetime.datetime(*self.dt_tup))
+        self.pydt = cysgp4.PyDateTime(datetime.datetime(*self.dt_tup))
         self.mjd = 56458.123
         self.effbg_tup = (6.88375, 50.525, 0.366)
         self.effbg_tup_m = (6.88375, 50.525, 366.)
-        self.effbg_observer = PyObserver(*self.effbg_tup)
+        self.effbg_observer = cysgp4.PyObserver(*self.effbg_tup)
 
     def teardown_method(self):
 
@@ -345,25 +347,25 @@ class TestSatellite:
 
     def test_constructor(self):
 
-        Satellite(self.tle)
-        Satellite(self.tle, self.effbg_observer)
-        Satellite(self.tle, self.effbg_observer, self.pydt)
-        Satellite(self.tle, self.effbg_observer, self.pydt, 1 / 86400.)
+        cysgp4.Satellite(self.tle)
+        cysgp4.Satellite(self.tle, self.effbg_observer)
+        cysgp4.Satellite(self.tle, self.effbg_observer, self.pydt)
+        cysgp4.Satellite(self.tle, self.effbg_observer, self.pydt, 1 / 86400.)
 
     def test_error(self):
 
-        pydt_off = PyDateTime.from_mjd(68805.5)
+        pydt_off = cysgp4.PyDateTime.from_mjd(68805.5)
 
-        tle_ecc_err = PyTle(*TLE_ECC_ERR)
+        tle_ecc_err = cysgp4.PyTle(*TLE_ECC_ERR)
         with pytest.raises(RuntimeError) as excinfo:
-            sat = Satellite(tle_ecc_err, self.effbg_observer, pydt_off)
+            sat = cysgp4.Satellite(tle_ecc_err, self.effbg_observer, pydt_off)
             sat.eci_pos()
 
         assert 'e <= -0.001' in str(excinfo.value)
 
-        tle_elsq_err = PyTle(*TLE_ELSQ_ERR)
+        tle_elsq_err = cysgp4.PyTle(*TLE_ELSQ_ERR)
         with pytest.raises(RuntimeError) as excinfo:
-            sat = Satellite(tle_elsq_err, self.effbg_observer, pydt_off)
+            sat = cysgp4.Satellite(tle_elsq_err, self.effbg_observer, pydt_off)
             sat.eci_pos()
 
         assert 'elsq >= 1.0' in str(excinfo.value)
@@ -377,10 +379,10 @@ class TestSatellite:
 
     def test_error_coerce(self):
 
-        pydt_off = PyDateTime.from_mjd(68805.5)
+        pydt_off = cysgp4.PyDateTime.from_mjd(68805.5)
 
-        tle_ecc_err = PyTle(*TLE_ECC_ERR)
-        sat = Satellite(
+        tle_ecc_err = cysgp4.PyTle(*TLE_ECC_ERR)
+        sat = cysgp4.Satellite(
             tle_ecc_err, self.effbg_observer, pydt_off,
             on_error='coerce_to_nan',
             )
@@ -389,7 +391,7 @@ class TestSatellite:
 
     def test_eci_position(self):
 
-        sat = Satellite(self.tle, self.effbg_observer, self.pydt)
+        sat = cysgp4.Satellite(self.tle, self.effbg_observer, self.pydt)
         # sat.mjd = self.mjd
         # print(sat.dt)
         eci_pos = sat.eci_pos()
@@ -406,7 +408,7 @@ class TestSatellite:
 
     def test_geo_position(self):
 
-        sat = Satellite(self.tle, self.effbg_observer, self.pydt)
+        sat = cysgp4.Satellite(self.tle, self.effbg_observer, self.pydt)
         # sat.mjd = self.mjd
         # print(sat.dt)
         eci_pos = sat.eci_pos()
@@ -422,7 +424,7 @@ class TestSatellite:
 
     def test_topo_position(self):
 
-        sat = Satellite(self.tle, self.effbg_observer, self.pydt)
+        sat = cysgp4.Satellite(self.tle, self.effbg_observer, self.pydt)
         # sat.mjd = self.mjd
         # print(sat.dt)
         topo_pos = sat.topo_pos()
@@ -445,7 +447,7 @@ class TestSatellite:
             *self.dt_tup[:-2], self.dt_tup[-2] + self.dt_tup[-1] / 1e6
             )
 
-        sat = Satellite(self.tle, self.effbg_observer, self.pydt)
+        sat = cysgp4.Satellite(self.tle, self.effbg_observer, self.pydt)
         eci_pos = sat.eci_pos()
 
         print(eci_pos.loc)
@@ -479,7 +481,7 @@ class TestSatellite:
         az %= 360.
         print(az, el, dist)
 
-        sat = Satellite(self.tle, self.effbg_observer, self.pydt)
+        sat = cysgp4.Satellite(self.tle, self.effbg_observer, self.pydt)
         # sat.mjd = self.mjd
         # print(sat.pydt)
         eci_pos = sat.eci_pos()
@@ -496,7 +498,9 @@ class TestSatellite:
     def test_mjd_caching(self):
 
         # change cache resolution to 1 second
-        sat = Satellite(self.tle, self.effbg_observer, self.pydt, 1. / 86400)
+        sat = cysgp4.Satellite(
+            self.tle, self.effbg_observer, self.pydt, 1. / 86400
+            )
         topo_pos = sat.topo_pos()
 
         assert_allclose(
@@ -532,7 +536,7 @@ def test_geo_to_eci():
     alt = 0.366
     mjds = np.linspace(56458.123, 56459.123, 4)
 
-    x, y, z = geo_to_eci(lon, lat, alt, mjds)
+    x, y, z = cysgp4.geo_to_eci(lon, lat, alt, mjds)
 
     assert_allclose(
         x,
@@ -558,7 +562,7 @@ def test_eci_to_geo():
     z = np.array([4900.402206, 4900.402206, 4900.402206, 4900.402206])
     mjds = np.linspace(56458.123, 56459.123, 4)
 
-    lon, lat, alt = eci_to_geo(x, y, z, mjds)
+    lon, lat, alt = cysgp4.eci_to_geo(x, y, z, mjds)
 
     assert_allclose(
         lon,
@@ -586,10 +590,10 @@ def test_lookangles():
     sat_dy = np.array([-86.91773, 25.70071, -77.70843, -37.30622])
     sat_dz = np.array([2.40220, 4.40220, 9.40220, 2.40220])
 
-    observers = PyObserver(6.88375, 50.525, 0.366)
+    observers = cysgp4.PyObserver(6.88375, 50.525, 0.366)
     mjds = np.linspace(56458.123, 56459.123, 4)
 
-    obs_az, obs_el, sat_az, sat_el, dist, distrate = lookangles(
+    obs_az, obs_el, sat_az, sat_el, dist, distrate = cysgp4.lookangles(
         sat_x, sat_y, sat_z,
         sat_dx, sat_dy, sat_dz,
         mjds, observers, sat_frame='zxy',
@@ -629,10 +633,10 @@ def test_lookangles():
 
 def test_propagate_many():
 
-    tles = PyTle(*TLE_ISS)
-    observers = PyObserver(6.88375, 50.525, 0.366)
+    tles = cysgp4.PyTle(*TLE_ISS)
+    observers = cysgp4.PyObserver(6.88375, 50.525, 0.366)
     mjds = np.linspace(56458.123, 56459.123, 4)
-    result = propagate_many(
+    result = helpers.propagate_many(
         mjds, tles, observers,
         do_obs_pos=True, do_sat_azel=True,
         )
@@ -718,26 +722,28 @@ def test_propagate_many():
 
 def test_propagate_many_broadcast():
 
-    tles = np.array([PyTle(*TLE_ISS), PyTle(*TLE_GPS)])[:, np.newaxis]
-    observers = PyObserver(6.88375, 50.525, 0.366)
+    tles = np.array([
+        cysgp4.PyTle(*TLE_ISS), cysgp4.PyTle(*TLE_GPS)
+        ])[:, np.newaxis]
+    observers = cysgp4.PyObserver(6.88375, 50.525, 0.366)
     mjds = np.linspace(56458.123, 56459.123, 4)[np.newaxis, :]
-    result = propagate_many(mjds, tles, observers)
+    result = helpers.propagate_many(mjds, tles, observers)
 
     assert result['eci_pos'][..., 0].shape == (2, 4)
 
 
 def test_propagate_many_pos_switches():
 
-    tles = PyTle(*TLE_ISS)
+    tles = cysgp4.PyTle(*TLE_ISS)
     mjds = np.linspace(56458.123, 56459.123, 4)
 
-    result = propagate_many(
+    result = helpers.propagate_many(
         mjds, tles,
         do_eci_pos=True, do_eci_vel=True, do_geo=True, do_topo=True,
         )
     assert all(k in result for k in ['eci_pos', 'eci_vel', 'geo', 'topo'])
 
-    result = propagate_many(
+    result = helpers.propagate_many(
         mjds, tles,
         do_eci_pos=False, do_eci_vel=True, do_geo=True, do_topo=True,
         )
@@ -746,13 +752,13 @@ def test_propagate_many_pos_switches():
 
 def test_propagate_many_sat_frames():
 
-    tles = PyTle(*TLE_FRAMES)
+    tles = cysgp4.PyTle(*TLE_FRAMES)
     mjd_epoch = 58813.5
     start_mjd = mjd_epoch - 3.26938 / 2 / np.pi
     mjds = start_mjd + np.array([0., 77400.]) / 86400.
     observer = cysgp4.PyObserver(0., 50., 0.)
 
-    result = propagate_many(
+    result = helpers.propagate_many(
         mjds, tles, observer,
         do_sat_azel=True, do_obs_pos=True,
         sat_frame='zxy'
@@ -767,7 +773,7 @@ def test_propagate_many_sat_frames():
         atol=1.e-5
         )
 
-    result = propagate_many(
+    result = helpers.propagate_many(
         mjds, tles, observer,
         do_sat_azel=True, do_obs_pos=True,
         sat_frame='xyz'
@@ -785,13 +791,13 @@ def test_propagate_many_sat_frames():
 
 def test_propagate_many_rot_matrices():
 
-    tles = PyTle(*TLE_FRAMES)
+    tles = cysgp4.PyTle(*TLE_FRAMES)
     mjd_epoch = 58813.5
     start_mjd = mjd_epoch - 3.26938 / 2 / np.pi
     mjds = start_mjd + np.array([0., 77400.]) / 86400.
     observer = cysgp4.PyObserver(0., 50., 0.)
 
-    result = propagate_many(
+    result = helpers.propagate_many(
         mjds, tles, observer,
         do_sat_azel=True, do_obs_pos=True, do_sat_rotmat=True,
         sat_frame='zxy'
@@ -835,7 +841,7 @@ def test_propagate_many_rot_matrices():
         atol=1.e-5
         )
 
-    result = propagate_many(
+    result = helpers.propagate_many(
         mjds, tles, observer,
         do_sat_azel=True, do_obs_pos=True, do_sat_rotmat=True,
         sat_frame='xyz'
@@ -884,29 +890,29 @@ def test_propagate_many_rot_matrices():
 def test_propagate_many_raises_error():
 
     mjd_off = 68805.5
-    obs = PyObserver(6.88375, 50.525, 0.366)
+    obs = cysgp4.PyObserver(6.88375, 50.525, 0.366)
 
-    tle_ecc_err = PyTle(*TLE_ECC_ERR)
+    tle_ecc_err = cysgp4.PyTle(*TLE_ECC_ERR)
     with pytest.raises(RuntimeError) as excinfo:
-        propagate_many(mjd_off, tle_ecc_err, obs)
+        helpers.propagate_many(mjd_off, tle_ecc_err, obs)
 
     assert 'e <= -0.001' in str(excinfo.value)
 
-    tle_elsq_err = PyTle(*TLE_ELSQ_ERR)
+    tle_elsq_err = cysgp4.PyTle(*TLE_ELSQ_ERR)
     with pytest.raises(RuntimeError) as excinfo:
-        propagate_many(mjd_off, tle_elsq_err, obs)
+        helpers.propagate_many(mjd_off, tle_elsq_err, obs)
 
     assert 'elsq >= 1.0' in str(excinfo.value)
 
-    tle_ecc_err = PyTle(*TLE_ECC_ERR)
+    tle_ecc_err = cysgp4.PyTle(*TLE_ECC_ERR)
     with pytest.raises(RuntimeError) as excinfo:
-        propagate_many_slow(mjd_off, tle_ecc_err, obs)
+        helpers.propagate_many_slow(mjd_off, tle_ecc_err, obs)
 
     assert 'e <= -0.001' in str(excinfo.value)
 
-    tle_elsq_err = PyTle(*TLE_ELSQ_ERR)
+    tle_elsq_err = cysgp4.PyTle(*TLE_ELSQ_ERR)
     with pytest.raises(RuntimeError) as excinfo:
-        propagate_many_slow(mjd_off, tle_elsq_err, obs)
+        helpers.propagate_many_slow(mjd_off, tle_elsq_err, obs)
 
     assert 'elsq >= 1.0' in str(excinfo.value)
 
@@ -914,14 +920,16 @@ def test_propagate_many_raises_error():
 def test_propagate_many_suppress_error():
 
     mjd_off = 68805.5
-    obs = PyObserver(6.88375, 50.525, 0.366)
+    obs = cysgp4.PyObserver(6.88375, 50.525, 0.366)
 
-    tle_ecc_err = PyTle(*TLE_ECC_ERR)
-    res = propagate_many(mjd_off, tle_ecc_err, obs, on_error='coerce_to_nan')
+    tle_ecc_err = cysgp4.PyTle(*TLE_ECC_ERR)
+    res = helpers.propagate_many(
+        mjd_off, tle_ecc_err, obs, on_error='coerce_to_nan'
+        )
 
     assert_allclose(res['eci_pos'], np.array([np.nan] * 3))
 
-    res = propagate_many_slow(
+    res = helpers.propagate_many_slow(
         mjd_off, tle_ecc_err, obs, on_error='coerce_to_nan'
         )
 
@@ -931,49 +939,49 @@ def test_propagate_many_suppress_error():
 def test_propagate_many_argument_errors():
 
     mjds = 56458.123
-    obs = PyObserver(6.88375, 50.525, 0.366)
-    tles = PyTle(*TLE_ISS)
+    obs = cysgp4.PyObserver(6.88375, 50.525, 0.366)
+    tles = cysgp4.PyTle(*TLE_ISS)
 
-    propagate_many(mjds, tles, obs)
+    helpers.propagate_many(mjds, tles, obs)
 
     with pytest.raises(ValueError) as excinfo:
-        propagate_many(mjds, tles, obs, on_error='bla')
+        helpers.propagate_many(mjds, tles, obs, on_error='bla')
 
     print(str(excinfo.value))
     assert str(excinfo.value) == '"on_error" most be one of ["raise", "coerce_to_nan"]'
 
     with pytest.raises(ValueError) as excinfo:
-        propagate_many(mjds, tles, obs, sat_frame='bla')
+        helpers.propagate_many(mjds, tles, obs, sat_frame='bla')
 
     print(str(excinfo.value))
     assert str(excinfo.value) == '"sat_frame" most be one of ["zxy", "xyz"]'
 
     with pytest.raises(TypeError) as excinfo:
-        propagate_many(mjds, 1, obs)
+        helpers.propagate_many(mjds, 1, obs)
 
     print(str(excinfo.value))
     assert str(excinfo.value) == 'Argument "tles" must be of type "PyTle" (or list/array of "PyTle")'
 
     with pytest.raises(TypeError) as excinfo:
-        propagate_many(mjds, [tles, 1], obs)
+        helpers.propagate_many(mjds, [tles, 1], obs)
 
     print(str(excinfo.value))
     assert str(excinfo.value) == 'Argument "tles" must be of type "PyTle" (or list/array of "PyTle")'
 
     with pytest.raises(TypeError) as excinfo:
-        propagate_many(mjds, tles, 1)
+        helpers.propagate_many(mjds, tles, 1)
 
     print(str(excinfo.value))
     assert str(excinfo.value) == 'Argument "observers" must be of type "PyObserver" (or list/array of "PyObserver")'
 
     with pytest.raises(TypeError) as excinfo:
-        propagate_many(mjds, tles, [obs, 1])
+        helpers.propagate_many(mjds, tles, [obs, 1])
 
     print(str(excinfo.value))
     assert str(excinfo.value) == 'Argument "observers" must be of type "PyObserver" (or list/array of "PyObserver")'
 
     with pytest.raises(TypeError) as excinfo:
-        propagate_many('a', tles, obs)
+        helpers.propagate_many('a', tles, obs)
 
     print(str(excinfo.value))
     assert "could not be cast" in str(excinfo.value)
@@ -994,11 +1002,11 @@ def _propagate_prepare():
         all_lines[idx::3] for idx in range(3)
         )))
     tles = np.array([
-        PyTle(*tle) for tle in tle_list
+        cysgp4.PyTle(*tle) for tle in tle_list
         ])[np.newaxis, np.newaxis, :20]
     observers = np.array([
-        PyObserver(6.88375, 50.525, 0.366),
-        PyObserver(16.88375, 50.525, 0.366),
+        cysgp4.PyObserver(6.88375, 50.525, 0.366),
+        cysgp4.PyObserver(16.88375, 50.525, 0.366),
         ])[np.newaxis, :, np.newaxis]
     mjds = np.linspace(58805.5, 58806.5, 100)[:, np.newaxis, np.newaxis]
 
@@ -1007,17 +1015,17 @@ def _propagate_prepare():
 
 def _propagate_many_cysgp4(**kwargs):
 
-    return propagate_many(*_propagate_prepare(), **kwargs)
+    return helpers.propagate_many(*_propagate_prepare(), **kwargs)
 
 
 def _propagate_many_cysgp4_slow():
 
-    return propagate_many_slow(*_propagate_prepare())
+    return helpers.propagate_many_slow(*_propagate_prepare())
 
 
 def _propagate_many_sgp4(**kwargs):
 
-    return propagate_many(
+    return helpers.propagate_many(
         *_propagate_prepare(), method='vallado', **kwargs
         )
 

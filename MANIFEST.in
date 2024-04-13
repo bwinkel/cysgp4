@@ -1,11 +1,11 @@
-recursive-include cextern/sgp4-05d8cc2fc596/libsgp4 *.cpp
-recursive-include cextern/sgp4-05d8cc2fc596/libsgp4 *.h
+recursive-include cextern/sgp4-f5cb54b3/libsgp4 *.cc
+recursive-include cextern/sgp4-f5cb54b3/libsgp4 *.h
 recursive-include cysgp4 *.pyx
 recursive-include cysgp4 *.pxd
-recursive-include cysgp4 *.py
+# recursive-include cysgp4 *.py
 recursive-include cysgp4/tests/data *
 exclude .gitignore .git build
-include README.rst COPYING* *.rst MANIFEST.in setup.cfg pip-requirements
-include tox.ini pyproject.toml retry.sh
+include README.rst COPYING* *.rst MANIFEST.in pip-requirements TEMPLATE_LICENCE CHANGES.rst
+include tox.ini pyproject.toml
 include docs/conf.py docs/make.bat docs/Makefile
 recursive-include docs *.rst
