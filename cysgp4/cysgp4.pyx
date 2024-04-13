@@ -183,7 +183,7 @@ cdef inline double dot_prod(Vector a, Vector b) nogil:
     return a.x * b.x + a.y * b.y + a.z * b.z
 
 
-cdef inline (double, double, double) calc_sat_azel(
+cdef inline (double, double, double, Vector, Vector, Vector) calc_sat_azel(
         Vector sat_pos, Vector sat_vel, Vector obs_pos
         ) nogil:
 
@@ -211,10 +211,10 @@ cdef inline (double, double, double) calc_sat_azel(
     sat_el = M_PI / 2 - acos(b_z / sat_dist)
     sat_az = atan2(b_y, b_x)
 
-    return sat_dist, sat_az, sat_el
+    return sat_dist, sat_az, sat_el, e_x, e_y, e_z
 
 
-cdef inline (double, double, double) calc_sat_iso(
+cdef inline (double, double, double, Vector, Vector, Vector) calc_sat_iso(
         Vector sat_pos, Vector sat_vel, Vector obs_pos
         ) nogil:
 
@@ -242,7 +242,7 @@ cdef inline (double, double, double) calc_sat_iso(
     sat_theta = acos(b_z / sat_dist)
     sat_phi = atan2(b_y, b_x)
 
-    return sat_dist, sat_phi, sat_theta
+    return sat_dist, sat_phi, sat_theta, e_x, e_y, e_z
 
 
 cdef class PyDateTime(object):
@@ -1649,6 +1649,7 @@ def _propagate_many_cysgp4(
         bint do_eci_pos=True, bint do_eci_vel=True,
         bint do_geo=True, bint do_topo=True,
         bint do_obs_pos=False, bint do_sat_azel=False,
+        bint do_sat_rotmat=False,
         str sat_frame='zxy', str on_error='raise',
         ):
     '''
@@ -1696,11 +1697,18 @@ def _propagate_many_cysgp4(
         Whether to include geographic/geodetic positions in the result.
     do_topo : Boolean, optional (default: True)
         Whether to include topocentric positions in the result.
-    do_obs_pos : Boolean, optional (default: True)
+    do_obs_pos : Boolean, optional (default: False)
         Whether to include the observer ECI position in the results.
-    do_sat_azel : Boolean, optional (default: True)
+    do_sat_azel : Boolean, optional (default: False)
         Whether to include the observer position as seen by the satellite
         (distance/azimuth/elevation) in the results.
+    do_sat_rotmat : Boolean, optional (default: False)
+        Whether to include the rotation matrix that converts the
+        (moving and rotated) satellite frame (in cartesian) into
+        cartesian ECI-aligned coordinates in the results. This can be useful
+        for cases where the user needs to transform additional vectors
+        between both frames (and is not only interested the observer
+        position in the satellite frame as returned by `do_sat_azel').
     sat_frame : 'zxy' or 'xyz', optional (default: 'zxy')
         How the moving satellite frame is defined. Two options are
         implemented, 'zxy' and 'xyz'.  If 'zxy' is chosen, the moving
@@ -1759,7 +1767,23 @@ def _propagate_many_cysgp4(
           distance if `sat_frame` is 'xyz' (with ISO definition of the angles
           theta and phi); see also `sat_frame` parameter description. Last
           dimension has length 3, one for each of, (`az`, `el`, `dist`) or
-          (`theta', `phi`, `dist`), respectively.
+          (`theta`, `phi`, `dist`), respectively.
+
+        - `sat_rotmat` : `~numpy.ndarray` of float
+
+          Rotation matrices which would transform a vector defined in the
+          (moving and rotated) satellite frames (in cartesian) to the
+          cartesian ECI-aligned basis frame. It is noted that the origin of
+          this ECI-aligned frame is still at the satellite center.
+
+          This can be useful for cases where the user needs to transform
+          additional vectors between both frames (and is not only interested
+          the observer position in the satellite frame as returned by
+          `do_sat_azel').
+
+          Likewise, the inverse of these rotation matrices (aka the
+          transposed) can be used to rotate any vector from ECI-aligned
+          satellite basis frame to the satellite frame.
 
         In all cases the first dimensions are determined by the
         (broadcasted) shape of the inputs `mjd`, `tles`, and `observers`.
@@ -1817,6 +1841,7 @@ def _propagate_many_cysgp4(
         CoordTopocentric _topo
         Vector _sat_pos, _sat_vel, _obs_pos
         double _sat_dist, _sat_az, _sat_el  # observer pos in sat frame
+        Vector _sat_e_x, _sat_e_y, _sat_e_z
 
         np.ndarray[double] mjd
         np.ndarray[object] tle, obs
@@ -1826,6 +1851,7 @@ def _propagate_many_cysgp4(
         double[:, ::1] topo_v  # topocentric
         double[:, ::1] obs_pos_v  # observer eci position
         double[:, ::1] sat_azel_v  # observer pos in sat frame (as dist/az/el)
+        double[:, ::1] sat_e_x_v, sat_e_y_v, sat_e_z_v  # sat frame basis
         int i, size, n, pnum
 
         tle_ptr_t* _tle_ptr_array
@@ -1873,6 +1899,11 @@ def _propagate_many_cysgp4(
     if do_sat_azel:
         out_dts.append(np.dtype(('float64', 3)))
         pnum += 1
+    if do_sat_rotmat:
+        out_dts.append(np.dtype(('float64', 3)))
+        out_dts.append(np.dtype(('float64', 3)))
+        out_dts.append(np.dtype(('float64', 3)))
+        pnum += 3
 
     it = np.nditer(
         [tles, observers, mjds] + [None] * pnum,
@@ -1915,6 +1946,14 @@ def _propagate_many_cysgp4(
 
         if do_sat_azel:
             sat_azel_v = itup[n]
+            n += 1
+
+        if do_sat_rotmat:
+            sat_e_x_v = itup[n]
+            n += 1
+            sat_e_y_v = itup[n]
+            n += 1
+            sat_e_z_v = itup[n]
             n += 1
 
         size = mjd.shape[0]
@@ -1996,22 +2035,41 @@ def _propagate_many_cysgp4(
                 obs_pos_v[i, 1] = _obs_pos.y
                 obs_pos_v[i, 2] = _obs_pos.z
 
-            if do_sat_azel:
+            if do_sat_azel or do_sat_rotmat:
                 _obs_eci = Eci(_dt, _obs_ptr_array[i].GetLocation())
                 _sat_pos = _sat_eci.Position()
                 _sat_vel = _sat_eci.Velocity()
                 _obs_pos = _obs_eci.Position()
                 if _sat_frame == 0:
-                    _sat_dist, _sat_az, _sat_el = calc_sat_azel(
+                    (
+                        _sat_dist, _sat_az, _sat_el,
+                        _sat_e_x, _sat_e_y, _sat_e_z
+                        ) = calc_sat_azel(
                         _sat_pos, _sat_vel, _obs_pos
                         )
                 elif _sat_frame == 1:
-                    _sat_dist, _sat_az, _sat_el = calc_sat_iso(
+                    (
+                        _sat_dist, _sat_az, _sat_el,
+                        _sat_e_x, _sat_e_y, _sat_e_z
+                        ) = calc_sat_iso(
                         _sat_pos, _sat_vel, _obs_pos
                         )
-                sat_azel_v[i, 0] = _sat_az * RAD2DEG
-                sat_azel_v[i, 1] = _sat_el * RAD2DEG
-                sat_azel_v[i, 2] = _sat_dist
+
+                if do_sat_azel:
+                    sat_azel_v[i, 0] = _sat_az * RAD2DEG
+                    sat_azel_v[i, 1] = _sat_el * RAD2DEG
+                    sat_azel_v[i, 2] = _sat_dist
+
+                if do_sat_rotmat:
+                    sat_e_x_v[i, 0] = _sat_e_x.x
+                    sat_e_x_v[i, 1] = _sat_e_x.y
+                    sat_e_x_v[i, 2] = _sat_e_x.z
+                    sat_e_y_v[i, 0] = _sat_e_y.x
+                    sat_e_y_v[i, 1] = _sat_e_y.y
+                    sat_e_y_v[i, 2] = _sat_e_y.z
+                    sat_e_z_v[i, 0] = _sat_e_z.x
+                    sat_e_z_v[i, 1] = _sat_e_z.y
+                    sat_e_z_v[i, 2] = _sat_e_z.z
 
         array_delete(_tle_ptr_array)
         array_delete(_obs_ptr_array)
@@ -2042,6 +2100,13 @@ def _propagate_many_cysgp4(
     if do_sat_azel:
         result['sat_azel'] = it.operands[n]
         n += 1
+
+    if do_sat_rotmat:
+        result['sat_rotmat'] = np.stack([
+            it.operands[n + i] for i in range(3)
+            ], axis=-1)
+        n += 3
+
 
     return result
 
@@ -2165,6 +2230,7 @@ def lookangles(
         sat_pos_x, sat_pos_y, sat_pos_z,
         sat_vel_x, sat_vel_y, sat_vel_z,
         mjds, observers, str sat_frame='zxy',
+        bint do_sat_rotmat=False,
         ):
 
     cdef:
@@ -2176,6 +2242,7 @@ def lookangles(
         CoordTopocentric _topo
         Vector _obs_pos, _sat_pos, _sat_vel
         double _sat_dist, _sat_az, _sat_el
+        Vector _sat_e_x, _sat_e_y, _sat_e_z
 
         np.ndarray[double] mjd
         np.ndarray[object] obs
@@ -2187,6 +2254,9 @@ def lookangles(
         const double[:] sat_vel_y_v
         const double[:] sat_vel_z_v
         double[:] obs_az_v, obs_el_v, sat_az_v, sat_el_v
+        double[:] sat_e_x_x_v, sat_e_x_y_v, sat_e_x_z_v
+        double[:] sat_e_y_x_v, sat_e_y_y_v, sat_e_y_z_v
+        double[:] sat_e_z_x_v, sat_e_z_y_v, sat_e_z_z_v
         double[:] dist_v
         double[:] distrate_v
 
@@ -2194,6 +2264,7 @@ def lookangles(
 
         int i, size
         int _sat_frame = 0  # 0: 'zxy', 1: 'xyz'
+        int outpnum = 15 if do_sat_rotmat else 6
 
     assert sat_frame in ['zxy', 'xyz']
 
@@ -2205,10 +2276,10 @@ def lookangles(
             mjds, observers,
             sat_pos_x, sat_pos_y, sat_pos_z,
             sat_vel_x, sat_vel_y, sat_vel_z,
-            ] + [None] * 6,
+            ] + [None] * outpnum,
         flags=['external_loop', 'buffered', 'delay_bufalloc', 'refs_ok'],
-        op_flags=[['readonly']] * 8 + [['readwrite', 'allocate']] * 6,
-        op_dtypes=['float64', 'object'] + ['float64'] * 12,
+        op_flags=[['readonly']] * 8 + [['readwrite', 'allocate']] * outpnum,
+        op_dtypes=['float64', 'object'] + ['float64'] * (6 + outpnum),
         )
 
     # it would be better to use the context manager but
@@ -2232,6 +2303,16 @@ def lookangles(
         sat_el_v = itup[11]
         dist_v = itup[12]
         distrate_v = itup[13]
+        if do_sat_rotmat:
+            sat_e_x_x_v = itup[14]
+            sat_e_x_y_v = itup[15]
+            sat_e_x_z_v = itup[16]
+            sat_e_y_x_v = itup[17]
+            sat_e_y_y_v = itup[18]
+            sat_e_y_z_v = itup[19]
+            sat_e_z_x_v = itup[20]
+            sat_e_z_y_v = itup[21]
+            sat_e_z_z_v = itup[22]
 
         size = mjd.shape[0]
         _obs_ptr_array = array_new[obs_ptr_t](size)
@@ -2261,14 +2342,30 @@ def lookangles(
             _obs_pos = _obs_eci.Position()
 
             if _sat_frame == 0:
-                _sat_dist, _sat_az, _sat_el = calc_sat_azel(
+                (
+                    _sat_dist, _sat_az, _sat_el,
+                    _sat_e_x, _sat_e_y, _sat_e_z
+                    ) = calc_sat_azel(
                     _sat_pos, _sat_vel, _obs_pos
                     )
             elif _sat_frame == 1:
-                _sat_dist, _sat_az, _sat_el = calc_sat_iso(
+                (
+                    _sat_dist, _sat_az, _sat_el,
+                    _sat_e_x, _sat_e_y, _sat_e_z
+                    ) = calc_sat_iso(
                     _sat_pos, _sat_vel, _obs_pos
                     )
             sat_az_v[i] = _sat_az * RAD2DEG
             sat_el_v[i] = _sat_el * RAD2DEG
+            if do_sat_rotmat:
+                sat_e_x_x_v[i] = _sat_e_x.x
+                sat_e_x_y_v[i] = _sat_e_x.y
+                sat_e_x_z_v[i] = _sat_e_x.z
+                sat_e_y_x_v[i] = _sat_e_y.x
+                sat_e_y_y_v[i] = _sat_e_y.y
+                sat_e_y_z_v[i] = _sat_e_y.z
+                sat_e_z_x_v[i] = _sat_e_z.x
+                sat_e_z_y_v[i] = _sat_e_z.y
+                sat_e_z_z_v[i] = _sat_e_z.z
 
-    return it.operands[8:14]
+    return it.operands[8:23] if do_sat_rotmat else it.operands[8:14]

@@ -430,6 +430,7 @@ def _propagate_many_sgp4(
         do_eci_pos=True, do_eci_vel=True,
         do_geo=True, do_topo=True,
         do_obs_pos=False, do_sat_azel=False,
+        do_sat_rotmat=False,
         sat_frame='zxy',  # on_error='raise',
         ):
     '''
@@ -506,20 +507,31 @@ def _propagate_many_sgp4(
             )
         result['geo'] = np.stack([geo_lon, geo_lat, geo_alt], axis=-1)
 
-    if do_topo or do_sat_azel:
-        obs_az, obs_el, sat_az, sat_el, dist, dist_rate = lookangles(
+    if do_topo or do_sat_azel or do_sat_rotmat:
+        res = lookangles(
             eci_pos_x, eci_pos_y, eci_pos_z,
             eci_vel_x, eci_vel_y, eci_vel_z,
-            mjds, observers, sat_frame
+            mjds, observers, sat_frame,
+            do_sat_rotmat=do_sat_rotmat,
             )
-        topo = np.stack([obs_az, obs_el, dist, dist_rate], axis=-1)
-        sat_azel = np.stack([sat_az, sat_el, dist], axis=-1)
+
+        if do_sat_rotmat:
+            obs_az, obs_el, sat_az, sat_el, dist, dist_rate, *sat_bas = res
+        else:
+            obs_az, obs_el, sat_az, sat_el, dist, dist_rate = res
 
     if do_topo:
-        result['topo'] = topo
+        result['topo'] = np.stack([obs_az, obs_el, dist, dist_rate], axis=-1)
 
     if do_sat_azel:
-        result['sat_azel'] = sat_azel
+        result['sat_azel'] = np.stack([sat_az, sat_el, dist], axis=-1)
+
+    if do_sat_rotmat:
+        new_sh = sat_bas[0].shape + (3, 3)
+        result['sat_rotmat'] = np.swapaxes(
+            np.stack(sat_bas, axis=-1).reshape(new_sh),
+            -2, -1,
+            )
 
     if do_obs_pos:
         obs_x, obs_y, obs_z = geo_to_eci(
@@ -535,6 +547,7 @@ def propagate_many(
         do_eci_pos=True, do_eci_vel=True,
         do_geo=True, do_topo=True,
         do_obs_pos=False, do_sat_azel=False,
+        do_sat_rotmat=False,
         sat_frame='zxy', on_error='raise',
         method='dwarner'
         ):
@@ -588,6 +601,13 @@ def propagate_many(
     do_sat_azel : Boolean, optional (default: True)
         Whether to include the observer position as seen by the satellite
         (distance/azimuth/elevation) in the results.
+    do_sat_rotmat : Boolean, optional (default: False)
+        Whether to include the rotation matrix that converts the
+        (moving and rotated) satellite frame (in cartesian) into
+        cartesian ECI-aligned coordinates in the results. This can be useful
+        for cases where the user needs to transform additional vectors
+        between both frames (and is not only interested the observer
+        position in the satellite frame as returned by `do_sat_azel').
     sat_frame : 'zxy' or 'xyz', optional (default: 'zxy')
         How the moving satellite frame is defined. Two options are
         implemented, 'zxy' and 'xyz'.  If 'zxy' is chosen, the moving
@@ -656,6 +676,22 @@ def propagate_many(
           dimension has length 3, one for each of, (`az`, `el`, `dist`) or
           (`theta', `phi`, `dist`), respectively.
 
+        - `sat_rotmat` : `~numpy.ndarray` of float
+
+          Rotation matrices which would transform a vector defined in the
+          (moving and rotated) satellite frames (in cartesian) to the
+          cartesian ECI-aligned basis frame. It is noted that the origin of
+          this ECI-aligned frame is still at the satellite center.
+
+          This can be useful for cases where the user needs to transform
+          additional vectors between both frames (and is not only interested
+          the observer position in the satellite frame as returned by
+          `do_sat_azel').
+
+          Likewise, the inverse of these rotation matrices (aka the
+          transposed) can be used to rotate any vector from ECI-aligned
+          satellite basis frame to the satellite frame.
+
         In all cases the first dimensions are determined by the
         (broadcasted) shape of the inputs `mjd`, `tles`, and `observers`.
 
@@ -717,6 +753,7 @@ def propagate_many(
             do_eci_pos=do_eci_pos, do_eci_vel=do_eci_vel,
             do_geo=do_geo, do_topo=do_topo,
             do_obs_pos=do_obs_pos, do_sat_azel=do_sat_azel,
+            do_sat_rotmat=do_sat_rotmat,
             sat_frame=sat_frame, on_error=on_error,
             )
 
@@ -727,5 +764,6 @@ def propagate_many(
             do_eci_pos=do_eci_pos, do_eci_vel=do_eci_vel,
             do_geo=do_geo, do_topo=do_topo,
             do_obs_pos=do_obs_pos, do_sat_azel=do_sat_azel,
+            do_sat_rotmat=do_sat_rotmat,
             sat_frame=sat_frame,
             )

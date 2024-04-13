@@ -1,3 +1,13 @@
+0.3.6 (unreleased)
+=======================
+
+New Features
+------------
+- Add an option to allow querying the rotation matrices that would convert any
+  vector from the (moving) satellite frame to the ECI-aligned frame to the
+  `propagate_many` function. It is noted that the origin of this ECI-aligned
+  frame is still at the satellite center (See function description.)
+
 0.3.5 (2022-11-19)
 =======================
 This is a pure maintenance release. No features have been added.
