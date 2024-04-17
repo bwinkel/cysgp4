@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cysgp4.helpers &#8212; cysgp4 v0.3.6.dev7+ga806e72</title>
+    <title>cysgp4.helpers &#8212; cysgp4 v0.3.6.dev8+g42bf5b5</title>
   
   
   
@@ -40,7 +40,7 @@
 
     <script src="../../_static/jquery.js?v=5d32c60e"></script>
     <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-    <script src="../../_static/documentation_options.js?v=37367c65"></script>
+    <script src="../../_static/documentation_options.js?v=95595032"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="14 Apr 2024"/>
+    <meta name="docbuild:last-update" content="17 Apr 2024"/>
   </head>
   
   
@@ -121,7 +121,7 @@
   
   
   
-    <p class="title logo__title">cysgp4 v0.3.6.dev7+ga806e72</p>
+    <p class="title logo__title">cysgp4 v0.3.6.dev8+g42bf5b5</p>
   
 </a></div>
     
@@ -1057,15 +1057,18 @@ document.write(`
 <span class="sd">        position in the satellite frame as returned by `do_sat_azel`).</span>
 <span class="sd">    sat_frame : &#39;zxy&#39; or &#39;xyz&#39;, optional (default: &#39;zxy&#39;)</span>
 <span class="sd">        How the moving satellite frame is defined. Two options are</span>
-<span class="sd">        implemented, &#39;zxy&#39; and &#39;xyz&#39;.  If &#39;zxy&#39; is chosen, the moving</span>
-<span class="sd">        satellite frame is constructed such that the `z` axis is aligned with</span>
-<span class="sd">        the satellite motion vector. The `y` axis is constructed as a vector</span>
-<span class="sd">        that is perpendicular to the plane defined by the motion vector and</span>
-<span class="sd">        the ECI zero point (aka Earth center). The resulting `x` axis, which</span>
-<span class="sd">        is orthogonal to the `y` and `z` axes, is then approximately pointing</span>
-<span class="sd">        to the nadir. Alternatively, if the frame is set as `xyz`, the `x`</span>
-<span class="sd">        axes is the motion vector, `y` has the same meaning and `z` is</span>
-<span class="sd">        approximately pointing towards the nadir.</span>
+<span class="sd">        implemented, &#39;zxy&#39; and &#39;xyz&#39;. If &#39;zxy&#39; is chosen, the moving</span>
+<span class="sd">        satellite frame is constructed such that the `z` axis is</span>
+<span class="sd">        aligned with the satellite motion vector. The `y` axis is lies</span>
+<span class="sd">        perpendicularly to the plane defined by the motion vector and</span>
+<span class="sd">        the ECI zero point (aka the Earth centre). The resulting `x`</span>
+<span class="sd">        axis, which is orthogonal to the `y` and `z` axes, is then</span>
+<span class="sd">        approximately pointing towards nadir. Alternatively, if the</span>
+<span class="sd">        frame is set as `xyz`, the `x` axis is the motion vector, `y`</span>
+<span class="sd">        has the same meaning (but points into the opposite direction)</span>
+<span class="sd">        and `z` is approximately pointing towards the nadir. The</span>
+<span class="sd">        definition of the output polar angles is different for the two</span>
+<span class="sd">        reference frames, see Returns.</span>
 <span class="sd">    on_error : str, optional (either &#39;raise&#39; or &#39;coerce_to_nan&#39;, default: &#39;raise&#39;)</span>
 <span class="sd">        If the underlying SGP C++ library throws an error (which often</span>
 <span class="sd">        happens if one works with times that are strongly deviating from</span>
@@ -1115,14 +1118,28 @@ document.write(`
 
 <span class="sd">        - `sat_azel` : `~numpy.ndarray` of float</span>
 
-<span class="sd">          Observer positions in the (moving) satellite frame either given as</span>
-<span class="sd">          azimuth (aka across track), elevation (aka along track), and</span>
-<span class="sd">          distance - if `sat_frame` is &#39;zxy&#39;, or given as `theta`, `phi`, and</span>
-<span class="sd">          distance if `sat_frame` is &#39;xyz&#39; (with ISO definition of the angles</span>
-<span class="sd">          theta and phi); see also `sat_frame` parameter description. Last</span>
-<span class="sd">          dimension has length 3, one for each of, (`az`, `el`, `dist`) or</span>
-<span class="sd">          (`theta&#39;, `phi`, `dist`), respectively.</span>
+<span class="sd">          If `sat_frame` is &#39;zxy&#39;, `z` lies in the direction of motion,</span>
+<span class="sd">          `y` perpendicular to the z-axis and the Earth center, `x` is</span>
+<span class="sd">          pointing approximately towards nadir, see also `sat_frame`</span>
+<span class="sd">          parameter description. The Observer positions in the</span>
+<span class="sd">          (co-moving) satellite frame are given as azimuth, elevation</span>
+<span class="sd">          in the specified reference frame, and distance (`az`, `el`,</span>
+<span class="sd">          `dist`). `az` is the angle between the projection of the vector</span>
+<span class="sd">          towards the Observer onto the xy-plane and the x-axis. -180</span>
+<span class="sd">          deg &lt; `az` &lt; 180 deg. `el` is the angle between the normal</span>
+<span class="sd">          vector and the xy-plane. -90 deg &lt; `el` &lt; 90 deg.</span>
 
+<span class="sd">          If `sat_frame` is &#39;xyz&#39;, `x` lies in the direction of motion,</span>
+<span class="sd">          `y` is perpendicular to `z` and the Earth center, `z` is pointing</span>
+<span class="sd">          approximately towards nadir, see also `sat_frame` parameter</span>
+<span class="sd">          description. The Observer positions in the (moving)</span>
+<span class="sd">          satellite frame are given as azimuth and polar angle in the</span>
+<span class="sd">          specified reference frame, and distance (`az`, `theta`, `dist`). `az`</span>
+<span class="sd">          is the angle between the projection of the vector towards</span>
+<span class="sd">          the observer onto the xy-plane and the x-axis. -180 deg &lt; `az`</span>
+<span class="sd">          &lt; 180 deg. `theta` is the angle between the normal vector and</span>
+<span class="sd">          the z-axis. -90 deg &lt; `theta` &lt; 90 deg.</span>
+<span class="sd">          </span>
 <span class="sd">        - `sat_rotmat` : `~numpy.ndarray` of float</span>
 
 <span class="sd">          Rotation matrices which would transform a vector defined in the</span>
