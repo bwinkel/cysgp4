@@ -2,41 +2,31 @@
 cysgp4
 ******
 
-- *Version:* 0.3.5
-- *Author:* Benjamin Winkel
+.. container::
+
+    |License-GPL| |License-Apache| |License-BSD3|
+
+.. container::
+
+    |PyPI Badge| |PyPI Downloads|
+
+.. container::
+
+    |Conda-Version| |Conda-Platforms-Badge| |Conda-Downloads-Badge|
+
+- *Version:* 0.3.6
+- *Lead author/package maintainer:* Benjamin Winkel
+- *Contributor(s):* Gyula I.G. Józsa
 - *Repository:* `on GitHub <https://github.com/bwinkel/cysgp4>`__
 - *Bug tracker:* `on GitHub <https://github.com/bwinkel/cysgp4/issues>`__
-- *User manual:* `stable <https://bwinkel.github.io/cysgp4/>`__ |
-  `developer <https://bwinkel.github.io/cysgp4/latest/>`__
-
-.. image:: https://img.shields.io/pypi/v/cysgp4.svg
-    :target: https://pypi.python.org/pypi/cysgp4
-    :alt: PyPI tag
-
-.. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
-    :target: https://www.github.com/bwinkel/cysgp4/blob/master/COPYING.GPLv3.txt
-    :alt: License-GPL3
-
-.. image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
-    :target: https://www.github.com/bwinkel/cysgp4/blob/master/COPYING.Apache2
-    :alt: License-Apache
-
-.. image:: https://img.shields.io/badge/License-BSD%203--Clause-blue.svg
-    :target: https://www.github.com/bwinkel/cysgp4/blob/master/TEMPLATE_LICENCE.rst
-    :alt: License-BSD3
-
-
+- *User manual:* `stable <https://bwinkel.github.io/cysgp4/>`__ |  `developer <https://bwinkel.github.io/cysgp4/latest/>`__
 
 Project Status
 ==============
 
-.. image:: https://dev.azure.com/bwinkel78/Benjamin-Winkel-Projects/_apis/build/status/bwinkel.cysgp4?branchName=master
-    :target: https://dev.azure.com/bwinkel78/Benjamin-Winkel-Projects/_build
-    :alt: cysgp4's Azure Pipelines Status
+.. container::
 
-.. image:: https://coveralls.io/repos/github/bwinkel/cysgp4/badge.svg?branch=master
-    :target: https://coveralls.io/github/bwinkel/cysgp4?branch=master
-    :alt: cysgp4's Coveralls Status
+    |Azure Status|
 
 Purpose
 =======
@@ -62,7 +52,7 @@ case installiation is as easy as ::
 
 Otherwise, you should install cysgp4 via `pip`::
 
-    pip install cysgp4
+    python -m pip install cysgp4
 
 The installation is also possible from source. `Detailed installation
 instructions <https://bwinkel.github.io/cysgp4/latest/install.html>`_
@@ -74,8 +64,8 @@ Dependencies
 We kept the dependencies as minimal as possible. The following packages are
 required:
 
-- `Python 3.5` or later
-- `numpy 1.13` or later
+- `Python 3.8` or later
+- `numpy 1.20` or later
 
 If you want to run the notebooks yourself, you will also need the Jupyter
 server and install matplotlib. To run the tests, you'll need `sgp4
@@ -209,4 +199,45 @@ licensed under `Apache-2.0 license
 <https://www.github.com/bwinkel/cysgp4/blob/master/COPYING.Apache2>`_
 
 The package is partly based on the `Astropy-affiliated package template <https://github.com/astropy/package-template>`_, which is under `BSD 3-clause <https://github.com/bwinkel/cysgp4/blob/master/TEMPLATE_LICENCE.rst>`_ license.
+
+
+
+
+.. |PyPI Badge| image:: https://img.shields.io/pypi/v/cysgp4.svg
+    :target: https://pypi.python.org/pypi/cysgp4
+    :alt: PyPI tag
+
+.. |PyPI Downloads| image:: https://img.shields.io/pypi/dm/cysgp4
+   :target: https://pypi.python.org/pypi/cysgp4
+   :alt: PyPI - Downloads
+
+.. |License-GPL| image:: https://img.shields.io/badge/License-GPLv3-blue.svg
+    :target: https://www.github.com/bwinkel/cysgp4/blob/master/COPYING.GPLv3.txt
+    :alt: License-GPL3
+
+.. |License-Apache| image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
+    :target: https://www.github.com/bwinkel/cysgp4/blob/master/COPYING.Apache2
+    :alt: License-Apache
+
+.. |License-BSD3| image:: https://img.shields.io/badge/License-BSD%203--Clause-blue.svg
+    :target: https://www.github.com/bwinkel/cysgp4/blob/master/TEMPLATE_LICENCE.rst
+    :alt: License-BSD3
+
+.. |Conda-Version| image:: https://anaconda.org/conda-forge/cysgp4/badges/version.svg
+    :target: https://anaconda.org/conda-forge/cysgp4
+    :alt: conda-forge platforms: Version on conda-forge
+
+.. |Conda-Platforms-Badge| image:: https://anaconda.org/conda-forge/cysgp4/badges/platforms.svg
+    :target: https://anaconda.org/conda-forge/cysgp4
+    :alt: conda-forge platforms: linux-64, osx-64, win-64
+
+.. |Conda-Downloads-Badge| image:: https://anaconda.org/conda-forge/cysgp4/badges/downloads.svg
+    :target: https://anaconda.org/conda-forge/cysgp4
+    :alt: conda-forge downloads
+
+
+.. |Azure Status| image:: https://dev.azure.com/bwinkel78/Benjamin-Winkel-Projects/_apis/build/status/bwinkel.cysgp4?branchName=master
+    :target: https://dev.azure.com/bwinkel78/Benjamin-Winkel-Projects/_build
+    :alt: cysgp4's Azure Pipelines Status
+
 
