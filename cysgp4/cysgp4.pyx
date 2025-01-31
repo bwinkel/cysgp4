@@ -1784,7 +1784,8 @@ def _propagate_many_cysgp4(
           is the angle between the projection of the vector towards
           the observer onto the xy-plane and the x-axis. -180 deg < `az`
           < 180 deg. `theta` is the angle between the normal vector and
-          the z-axis. -90 deg < `theta` < 90 deg.
+          the z-axis. 0 <= `theta` < 180 deg. `theta` = 0 corresponds to 
+          nadir direction.
 
         - `sat_rotmat` : `~numpy.ndarray` of float
 
