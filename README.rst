@@ -14,9 +14,9 @@ cysgp4
 
     |Conda-Version| |Conda-Platforms-Badge| |Conda-Downloads-Badge|
 
-- *Version:* 0.3.6
+- *Version:* 0.4.0
 - *Lead author/package maintainer:* Benjamin Winkel
-- *Contributor(s):* Gyula I.G. Józsa
+- *Contributor(s):* Gyula I.G. Józsa, Boris Sorokin
 - *Repository:* `on GitHub <https://github.com/bwinkel/cysgp4>`__
 - *Bug tracker:* `on GitHub <https://github.com/bwinkel/cysgp4/issues>`__
 - *User manual:* `stable <https://bwinkel.github.io/cysgp4/>`__ |  `developer <https://bwinkel.github.io/cysgp4/latest/>`__
@@ -64,8 +64,8 @@ Dependencies
 We kept the dependencies as minimal as possible. The following packages are
 required:
 
-- `Python 3.8` or later
-- `numpy 1.20` or later
+- `Python 3.10` or later
+- `numpy 2.0` or later (older numpy version may work)
 
 If you want to run the notebooks yourself, you will also need the Jupyter
 server and install matplotlib. To run the tests, you'll need `sgp4
