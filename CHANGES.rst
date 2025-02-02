@@ -1,4 +1,4 @@
-0.4.0 (unreleased)
+0.4.0 (2024-02-03)
 =======================
 This is a maintenance release. pycraf now uses numpy version 2.0.0 or higher.
 
