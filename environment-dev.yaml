@@ -10,7 +10,7 @@ dependencies:
   - gcc_linux-64
   - gxx_linux-64
   - ipdb
-  - numpy==1.23.4
+  - numpy>=2
   - pip
   - pytest
   - pytest-astropy

@@ -1,4 +1,8 @@
-0.3.6 (unreleased)
+0.4.0 (unreleased)
+=======================
+This is a maintenance release. pycraf now uses numpy version 2.0.0 or higher.
+
+0.3.6 (2024-04-17)
 =======================
 
 New Features
@@ -7,6 +11,11 @@ New Features
   vector from the (moving) satellite frame to the ECI-aligned frame to the
   `propagate_many` function. It is noted that the origin of this ECI-aligned
   frame is still at the satellite center (See function description.)
+
+Trivia
+~~~~~~
+
+- Migrated to a new package structure (`pyproject.toml`-based). [#29]
 
 0.3.5 (2022-11-19)
 =======================

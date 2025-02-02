@@ -28,8 +28,8 @@ jobs:
 
   variables:
     arch: x86_64
-    plat: manylinux2010_x86_64
-    image: quay.io/pypa/manylinux2010_x86_64
+    plat: manylinux_2_28_x86_64
+    image: quay.io/pypa/manylinux_2_28_x86_64
     # for very old systems, the following would also be an alternative:
     # plat: manylinux1_x86_64
     # image: skhep/manylinuxgcc-x86_64
@@ -40,33 +40,21 @@ jobs:
     extra.packages: ''
 
   strategy:
+    # Note: numpy ABI compatibility is not an issue anymore; can now use
+    # the latest numpy version for each python version and it will
+    # be backwards compatible
     matrix:
-      linux38:
-        imageName: 'ubuntu-latest'
-        python.version: '3.8'
-        py_whl: cp38-
-        numpy.version: '1.18.1'
-        pytest.version: '<6'
-        doctestplus.version: '<0.6.1'
-        # extra.packages: 'sysroot_linux-64 "jinja2<3.1"'
-        extra.packages: 'gcc_linux-64 gxx_linux-64 sysroot_linux-64 "jinja2<3.1"'
-      linux39:
-        imageName: 'ubuntu-latest'
-        python.version: '3.9'
-        py_whl: cp39-
-        numpy.version: '1.20.3'
-        extra.packages: 'gcc_linux-64 gxx_linux-64'
       linux310:
         imageName: 'ubuntu-latest'
         python.version: '3.10'
         py_whl: cp310-
-        numpy.version: '1.21.6'
+        numpy.version: '=2.1'
         extra.packages: 'gcc_linux-64 gxx_linux-64'
       linux311:
         imageName: 'ubuntu-latest'
         python.version: '3.11'
         py_whl: cp311-
-        numpy.version: '1.23.4'
+        numpy.version: '=2.2'
         # docs should only be published by one thread, as they are version-
         # independent; and only if not on a PR
         publish.docs: ${{ not(eq(variables['is.pullrequest'], true)) }}
@@ -83,63 +71,61 @@ jobs:
         imageName: 'ubuntu-latest'
         python.version: '3.12'
         py_whl: cp312-
-        numpy.version: '1.26.4'
+        numpy.version: '>=2.2'
         extra.packages: 'gcc_linux-64 gxx_linux-64'
-      mac38:
-        imageName: 'macos-latest'
-        python.version: '3.8'
-        numpy.version: '1.18.1'
-        extra.packages: 'compilers llvm-openmp clang_osx-64 clangxx_osx-64'
-      mac39:
-        imageName: 'macos-latest'
-        python.version: '3.9'
-        numpy.version: '1.20.3'
-        extra.packages: 'compilers llvm-openmp clang_osx-64 clangxx_osx-64'
       mac310:
         imageName: 'macos-latest'
         python.version: '3.10'
-        numpy.version: '1.21.6'
+        numpy.version: '=2.1'
         extra.packages: 'compilers llvm-openmp clang_osx-64 clangxx_osx-64'
       mac311:
         imageName: 'macos-latest'
         python.version: '3.11'
-        numpy.version: '1.23.4'
+        numpy.version: '=2.2'
         extra.packages: 'compilers llvm-openmp clang_osx-64 clangxx_osx-64'
       mac312:
         imageName: 'macos-latest'
         python.version: '3.12'
-        numpy.version: '1.26.4'
+        numpy.version: '>=2.2'
         extra.packages: 'compilers llvm-openmp clang_osx-64 clangxx_osx-64'
-      win38:
-        imageName: 'windows-latest'
-        python.version: '3.8'
-        # numpy.version: '1.17.4'
-        numpy.version: '1.18.1'
-      win39:
-        imageName: 'windows-latest'
-        python.version: '3.9'
-        numpy.version: '1.20.3'
       win310:
         imageName: 'windows-latest'
         python.version: '3.10'
-        numpy.version: '1.21.6'
+        numpy.version: '=2.1'
       win311:
         imageName: 'windows-latest'
         python.version: '3.11'
-        numpy.version: '1.23.4'
+        numpy.version: '=2.2'
       win312:
         imageName: 'windows-latest'
         python.version: '3.12'
-        numpy.version: '1.26.4'
+        numpy.version: '>=2.2'
 
   pool:
     vmImage: $(imageName)
 
   steps:
 
+
+  # miniconda was removed from macos images...
+  # - bash: |
+  #     env
+  #     echo "USER" $USER
+  #     echo "CONDA" $CONDA
+  #     echo "sudo chown -R $USER $CONDA"
+  #     sudo chown -R $USER $CONDA
+  #   displayName: Fix a conda bug on MacOS
+  #   condition: startsWith(variables['Agent.OS'], 'Darwin')
+
   - bash: |
-      sudo chown -R 501:20 $CONDA
-    displayName: Fix a conda bug on MacOS
+      mkdir -p ~/miniconda && cd ~/miniconda
+      curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" && cd ..
+      ls ~/miniconda
+      bash ~/miniconda/Miniforge3-$(uname)-$(uname -m).sh -b -u -p ~/miniconda
+      rm ~/miniconda/miniconda.sh
+      ~/miniconda/bin/conda init bash
+      echo "##vso[task.setvariable variable=CONDA]~/miniconda/"
+    displayName: Install miniconda in runner
     condition: startsWith(variables['Agent.OS'], 'Darwin')
 
   # see https://github.com/conda-org/conda/issues/488
@@ -216,7 +202,7 @@ jobs:
   # pip installation)
   - script: |
       $(conda.activate) cysgp4-env
-      conda install --yes --quiet -c conda-forge python=$(python.version) build cython extension-helpers numpy==$(numpy.version) pip "pytest$(pytest.version)" pytest-astropy "pytest-doctestplus$(doctestplus.version)" pytest-remotedata setuptools setuptools_scm "sgp4>2" twine wheel $(extra.packages)
+      conda install --yes --quiet -c conda-forge python=$(python.version) cython extension-helpers numpy$(numpy.version) pip "pytest$(pytest.version)" pytest-astropy "pytest-doctestplus$(doctestplus.version)" pytest-remotedata python-build setuptools setuptools_scm "sgp4>2" twine wheel $(extra.packages)
     displayName: Install Anaconda packages
 
   # IMPORTANT:
@@ -350,20 +336,20 @@ jobs:
   - script: |
       pip install twine
       ls dist/*.whl
-      python -m twine upload -r "pypi_cysgp4" --config-file $(PYPIRC_PATH) dist/*.whl
+      python -m twine upload -r "pypi_cysgp4" --skip-existing --config-file $(PYPIRC_PATH) dist/*.whl
     displayName: Upload wheels, Linux/MacOS
     condition: and(succeeded(), eq(variables['publish.wheels'], true), not(startsWith(variables['Agent.OS'], 'Windows')))
 
   - script: |
       pip install twine
       ls dist/*.whl
-      python -m twine upload -r "pypi_cysgp4" --config-file %PYPIRC_PATH% dist/*.whl
+      python -m twine upload -r "pypi_cysgp4" --skip-existing --config-file %PYPIRC_PATH% dist/*.whl
     displayName: Upload wheels, Windows
     condition: and(succeeded(), eq(variables['publish.wheels'], true), startsWith(variables['Agent.OS'], 'Windows'))
 
   - script: |
       $(conda.activate) cysgp4-env
-      python -m twine upload -r "pypi_cysgp4" --config-file $(PYPIRC_PATH) dist/*.tar.gz
+      python -m twine upload -r "pypi_cysgp4" --skip-existing --config-file $(PYPIRC_PATH) dist/*.tar.gz
     displayName: Upload tarball
     condition: and(succeeded(), eq(variables['publish.tarball'], true))
 
