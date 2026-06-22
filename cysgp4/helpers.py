@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pkg_resources import resource_stream
+# from pkg_resources import resource_stream
+import importlib_resources
 import numpy as np
 from .cysgp4 import PyDateTime, Satellite, PyObserver
 from .cysgp4 import eci_to_geo, geo_to_eci, lookangles, _propagate_many_cysgp4
@@ -48,8 +49,13 @@ def get_example_tles():
 
     '''
 
-    with resource_stream('cysgp4', 'tests/data/science.txt') as f:
-        text = f.read()
+    # new setuptools don't come with this anymore
+    # with resource_stream('cysgp4', 'tests/data/science.txt') as f:
+    #     text = f.read()
+
+    ref = importlib_resources.files('cysgp4').joinpath('tests/data/science.txt')
+    with ref.open('rb') as fp:
+        text = fp.read()
 
     return text.decode('utf-8')
 
@@ -691,9 +697,9 @@ def propagate_many(
           is the angle between the projection of the vector towards
           the observer onto the xy-plane and the x-axis. -180 deg < `az`
           < 180 deg. `theta` is the angle between the normal vector and
-          the z-axis. 0 <= `theta` < 180 deg. `theta` = 0 corresponds to 
+          the z-axis. 0 <= `theta` < 180 deg. `theta` = 0 corresponds to
           nadir direction.
-          
+
         - `sat_rotmat` : `~numpy.ndarray` of float
 
           Rotation matrices which would transform a vector defined in the
