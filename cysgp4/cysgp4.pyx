@@ -742,7 +742,7 @@ cdef class PyTle(object):
         computations can have large errorbars.
 
         Returns
-        ----------
+        -------
         epoch : `~cysgp4.PyDateTime`
             Epoch of the satellites TLE.
         '''
@@ -1567,7 +1567,7 @@ cdef class Satellite(object):
         than the MJD cache resolution (see class documentation).
 
         Returns
-        ----------
+        -------
         topo : `~cysgp4.PyCoordTopocentric`
             Topocentric position of satellite w.r.t. given observer.
         '''
@@ -1589,7 +1589,7 @@ cdef class Satellite(object):
         than the MJD cache resolution (see class documentation).
 
         Returns
-        ----------
+        -------
         geo : `~cysgp4.PyCoordGeodetic`
             Geographic position of satellite.
         '''
@@ -1611,7 +1611,7 @@ cdef class Satellite(object):
         than the MJD cache resolution (see class documentation).
 
         Returns
-        ----------
+        -------
         eci : `~cysgp4.PyEci`
             ECI position of satellite.
         '''
@@ -1708,10 +1708,10 @@ def _propagate_many_cysgp4(
         cartesian ECI-aligned coordinates in the results. This can be useful
         for cases where the user needs to transform additional vectors
         between both frames (and is not only interested the observer
-        position in the satellite frame as returned by `do_sat_azel').
-    sat_frame : 'zxy' or 'xyz', optional (default: 'zxy')
+        position in the satellite frame as returned by `do_sat_azel`).
+    sat_frame : `zxy` or `xyz`, optional (default: `zxy`)
         How the moving satellite frame is defined. Two options are
-        implemented, 'zxy' and 'xyz'. If 'zxy' is chosen, the moving
+        implemented, `zxy` and `xyz`. If `zxy` is chosen, the moving
         satellite frame is constructed such that the `z` axis is
         aligned with the satellite motion vector. The `y` axis is lies
         perpendicularly to the plane defined by the motion vector and
@@ -1784,7 +1784,7 @@ def _propagate_many_cysgp4(
           is the angle between the projection of the vector towards
           the observer onto the xy-plane and the x-axis. -180 deg < `az`
           < 180 deg. `theta` is the angle between the normal vector and
-          the z-axis. 0 <= `theta` < 180 deg. `theta` = 0 corresponds to 
+          the z-axis. 0 <= `theta` < 180 deg. `theta` = 0 corresponds to
           nadir direction.
 
         - `sat_rotmat` : `~numpy.ndarray` of float
@@ -2130,7 +2130,7 @@ def _propagate_many_cysgp4(
 
 
 def eci_to_geo(eci_x, eci_y, eci_z, mjds):
-    """
+    '''
     Calculate geocentric coordinates from ECI cartesian positions.
 
     Parameters
@@ -2144,7 +2144,7 @@ def eci_to_geo(eci_x, eci_y, eci_z, mjds):
     -------
     geo_lon, geo_lat, geo_alt : `~numpy.ndarray` of float
         Geodetic positions.
-    """
+    '''
     cdef:
 
         Eci _eci
@@ -2202,7 +2202,7 @@ def eci_to_geo(eci_x, eci_y, eci_z, mjds):
 
 
 def geo_to_eci(lon, lat, alt, mjds):
-    """
+    '''
     Calculate ECI cartesian positions from geocentric coordinates.
 
     Parameters
@@ -2216,7 +2216,7 @@ def geo_to_eci(lon, lat, alt, mjds):
     -------
     eci_x, eci_y, eci_z : `~numpy.ndarray` of float
         Geodetic positions.
-    """
+    '''
 
     cdef:
 
@@ -2279,7 +2279,7 @@ def lookangles(
         mjds, observers, str sat_frame='zxy',
         bint do_sat_rotmat=False,
         ):
-    """
+    '''
     Calculate looking angles for both, satellite and observer frames.
 
     This function is similar to `propagate_many` when that is run with
@@ -2301,9 +2301,9 @@ def lookangles(
     observers : `~numpy.ndarray`, `~list`, or scalar of `~cysgp4.PyObserver` or None (default: None)
         Observer instance. If `None` then the observer location is set to
         (0 deg, 0 deg, 0 km).
-    sat_frame : 'zxy' or 'xyz', optional (default: 'zxy')
+    sat_frame : `zxy` or `xyz`, optional (default: `zxy`)
         How the moving satellite frame is defined. Two options are
-        implemented, 'zxy' and 'xyz'. If 'zxy' is chosen, the moving
+        implemented, `zxy` and `xyz`. If `zxy` is chosen, the moving
         satellite frame is constructed such that the `z` axis is
         aligned with the satellite motion vector. The `y` axis is lies
         perpendicularly to the plane defined by the motion vector and
@@ -2321,7 +2321,7 @@ def lookangles(
         cartesian ECI-aligned coordinates in the results. This can be useful
         for cases where the user needs to transform additional vectors
         between both frames (and is not only interested the observer
-        position in the satellite frame as returned by `do_sat_azel').
+        position in the satellite frame as returned by `do_sat_azel`).
 
     Returns
     -------
@@ -2329,13 +2329,15 @@ def lookangles(
 
         `obs_az`, `obs_el` - Satellites Topocentric positions.
         `sat_az`, `sat_el` - Observer position in satellite frame
-            See `sat_frame` input parameter for meaning of those angles when
-            `sat_frame` is `xyz` instead of `zxy`.
         `dist`, `dist_rate` - Distances and distance rates
 
-    If `do_sat_rotmat=True`, the satellite rotation matrix elements are
-    appended to the returned tuple, see description of `propagate_many`.
-    """
+        See `sat_frame` input parameter for meaning of those angles when
+        `sat_frame` is `xyz` instead of `zxy`.
+
+        If `do_sat_rotmat=True`, the satellite rotation matrix elements are
+        appended to the returned tuple, see description of `propagate_many`.
+
+    '''
 
     cdef:
 

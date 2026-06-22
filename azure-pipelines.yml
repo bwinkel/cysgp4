@@ -34,7 +34,7 @@ jobs:
     # plat: manylinux1_x86_64
     # image: skhep/manylinuxgcc-x86_64
     python.architecture: x64
-    sphinx.version: '>=3.0'
+    sphinx.version: '>=9.0'
     pytest.version: ''
     doctestplus.version: ''
     extra.packages: ''
