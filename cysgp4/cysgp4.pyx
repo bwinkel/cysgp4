@@ -1744,7 +1744,7 @@ def _propagate_many_cysgp4(
 
         - `eci_vel` : `~numpy.ndarray` of float
 
-          Satellites ECI cartesian velicities. Last dimension has length 3,
+          Satellites ECI cartesian velocities. Last dimension has length 3,
           one for each of `v_x`, `v_y`, and `v_z`.
 
         - `geo` : `~numpy.ndarray` of float
@@ -2130,7 +2130,21 @@ def _propagate_many_cysgp4(
 
 
 def eci_to_geo(eci_x, eci_y, eci_z, mjds):
+    """
+    Calculate geocentric coordinates from ECI cartesian positions.
 
+    Parameters
+    ----------
+    eci_[x,y,z] : `~numpy.ndarray`, `~list`, or scalar of float
+        ECI cartesian positions.
+    mjds : `~numpy.ndarray`, `~list`, or scalar of float
+        Modified Julian Date.
+
+    Returns
+    -------
+    geo_lon, geo_lat, geo_alt : `~numpy.ndarray` of float
+        Geodetic positions.
+    """
     cdef:
 
         Eci _eci
@@ -2188,6 +2202,21 @@ def eci_to_geo(eci_x, eci_y, eci_z, mjds):
 
 
 def geo_to_eci(lon, lat, alt, mjds):
+    """
+    Calculate ECI cartesian positions from geocentric coordinates.
+
+    Parameters
+    ----------
+    geo_lon, geo_lat, geo_alt : `~numpy.ndarray`, `~list`, or scalar of float
+        ECI cartesian positions.
+    mjds : `~numpy.ndarray`, `~list`, or scalar of float
+        Modified Julian Date.
+
+    Returns
+    -------
+    eci_x, eci_y, eci_z : `~numpy.ndarray` of float
+        Geodetic positions.
+    """
 
     cdef:
 
@@ -2250,6 +2279,63 @@ def lookangles(
         mjds, observers, str sat_frame='zxy',
         bint do_sat_rotmat=False,
         ):
+    """
+    Calculate looking angles for both, satellite and observer frames.
+
+    This function is similar to `propagate_many` when that is run with
+    `do_sat_azel=True` and will provide both the position of the satellites
+    in the observer frame, as well as the positions of the observers in
+    the satellite frame. While `propagate_many` will calculate the sat
+    positions and velocities, here it is assumed that those are provided.
+    However, the time (`mjds`) and observer objects are still required as
+    an input.
+
+    Parameters
+    ----------
+    sat_pos_[x,y,z] : `~numpy.ndarray`, `~list`, or scalar of float
+        Satellites ECI cartesian positions.
+    sat_vel_[x,y,z] : `~numpy.ndarray`, `~list`, or scalar of float
+        Satellites ECI cartesian velocities.
+    mjds : `~numpy.ndarray`, `~list`, or scalar of float
+        Modified Julian Date.
+    observers : `~numpy.ndarray`, `~list`, or scalar of `~cysgp4.PyObserver` or None (default: None)
+        Observer instance. If `None` then the observer location is set to
+        (0 deg, 0 deg, 0 km).
+    sat_frame : 'zxy' or 'xyz', optional (default: 'zxy')
+        How the moving satellite frame is defined. Two options are
+        implemented, 'zxy' and 'xyz'. If 'zxy' is chosen, the moving
+        satellite frame is constructed such that the `z` axis is
+        aligned with the satellite motion vector. The `y` axis is lies
+        perpendicularly to the plane defined by the motion vector and
+        the ECI zero point (aka the Earth centre). The resulting `x`
+        axis, which is orthogonal to the `y` and `z` axes, is then
+        approximately pointing towards nadir. Alternatively, if the
+        frame is set as `xyz`, the `x` axis is the motion vector, `y`
+        has the same meaning (but points into the opposite direction)
+        and `z` is approximately pointing towards the nadir. The
+        definition of the output polar angles is different for the two
+        reference frames, see Returns.
+    do_sat_rotmat : Boolean, optional (default: False)
+        Whether to include the rotation matrix that converts the
+        (moving and rotated) satellite frame (in cartesian) into
+        cartesian ECI-aligned coordinates in the results. This can be useful
+        for cases where the user needs to transform additional vectors
+        between both frames (and is not only interested the observer
+        position in the satellite frame as returned by `do_sat_azel').
+
+    Returns
+    -------
+    obs_az, obs_el, sat_az, sat_el, dist, dist_rate : `~numpy.ndarray` of float
+
+        `obs_az`, `obs_el` - Satellites Topocentric positions.
+        `sat_az`, `sat_el` - Observer position in satellite frame
+            See `sat_frame` input parameter for meaning of those angles when
+            `sat_frame` is `xyz` instead of `zxy`.
+        `dist`, `dist_rate` - Distances and distance rates
+
+    If `do_sat_rotmat=True`, the satellite rotation matrix elements are
+    appended to the returned tuple, see description of `propagate_many`.
+    """
 
     cdef:
 
